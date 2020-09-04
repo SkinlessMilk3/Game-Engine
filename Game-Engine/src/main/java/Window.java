@@ -44,6 +44,10 @@ public class Window {
 
     private void init(){
 
+        //print any glfw errors to a log txt
+        glfwSetErrorCallback((errcode, dsc)->{
+            GL_LOG.Log_Data(errcode + " " + GLFWErrorCallback.getDescription(dsc));
+        });
         GLFWErrorCallback.createPrint(System.err).set();
 
         if(!glfwInit())
