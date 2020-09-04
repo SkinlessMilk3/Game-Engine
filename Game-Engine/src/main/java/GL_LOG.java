@@ -8,9 +8,7 @@ class GL_LOG{
 
     private static FileWriter out;
 
-    public GL_LOG(){
-
-    }
+    public GL_LOG(){}
 
     public void Restart_Log(){
 
@@ -48,6 +46,7 @@ class GL_LOG{
         }
     }
 
+    //Write error to log.txt
     static public void Log_Data(String message){
 
         try {
