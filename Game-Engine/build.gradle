@@ -1,3 +1,4 @@
+import org.gradle.internal.os.OperatingSystem
 plugins {
     id 'java'
 }
@@ -15,8 +16,15 @@ dependencies {
 
 project.ext.lwjglVersion = "3.2.3"
 project.ext.jomlVersion = "1.9.25"
-project.ext.lwjglNatives = "natives-linux"
-
+//project.ext.lwjglNatives = "natives-linux"
+switch (OperatingSystem.current()) {
+    case OperatingSystem.LINUX:
+        project.ext.lwjglNatives = "natives-linux"
+        break
+    case OperatingSystem.WINDOWS:
+        project.ext.lwjglNatives = System.getProperty("os.arch").contains("64") ? "natives-windows" : "natives-windows-x86"
+        break
+}
 repositories {
     mavenCentral()
 }
