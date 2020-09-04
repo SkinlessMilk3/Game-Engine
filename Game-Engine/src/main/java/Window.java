@@ -24,6 +24,27 @@ public class Window {
     private int width, height;
     String title;
 
+    //used to calculate frame rate
+    static class Frame_Rate{
+        private static int frame_count;
+        private static double prev_time;
+
+        static void Update_Frame_Rate_Counter() {
+            double curr_time = glfwGetTime();
+            double elapsed_time = curr_time - prev_time;
+
+            if(elapsed_time > 0.25){
+                double frame_rate = frame_count/elapsed_time;
+                prev_time = curr_time;
+                String str = Double.toString(frame_rate);
+                glfwSetWindowTitle(wnd, str);
+
+                frame_count = 0;
+            }
+            frame_count += 1;
+        }
+    }
+
     private Window(){
         this.title = "Game Engine";
         this.width = 1360;//Gotta figure out how to get these values from glfw because not every display has the same resolution.
@@ -129,15 +150,15 @@ public class Window {
 
         while(!glfwWindowShouldClose(wnd)){
 
+            Frame_Rate.Update_Frame_Rate_Counter();
             glfwPollEvents();
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             glUseProgram(shader_program);
             glBindVertexArray(vao);
             glDrawArrays(GL_TRIANGLES, 0, 3);
-            //glfwSwapBuffers(wnd);
 
-            //System.out.println("Mouse is at x: "  + MouseEventListener.getX() + " y: " + MouseEventListener.getY());
+            System.out.println("Mouse is at x: "  + MouseEventListener.getX() + " y: " + MouseEventListener.getY());
 
             glfwSwapBuffers(wnd);
             
@@ -151,5 +172,4 @@ public class Window {
         }
         return window;
     }
-
 }

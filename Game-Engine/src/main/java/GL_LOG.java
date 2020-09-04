@@ -18,14 +18,6 @@ class GL_LOG{
             e.printStackTrace();
             System.out.println("Failed to open file Log.txt");
         }
-        finally {
-            try {
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.out.println("Failed to close log file");
-            }
-        }
 
         LocalDateTime time = LocalDateTime.now();
         DateTimeFormatter obj = DateTimeFormatter.ofPattern("MM-dd-yyyy HH;mm:ss");
