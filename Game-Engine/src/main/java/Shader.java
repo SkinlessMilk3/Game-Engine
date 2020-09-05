@@ -15,7 +15,7 @@ public class Shader {
         glGetShaderiv(shader,GL_COMPILE_STATUS, tmp);
 
         if(GL_TRUE != tmp[0]){
-            GL_LOG.Log_Data("SHADER COMPILE ERROR: "+glGetShaderInfoLog(shader));
+            GL_LOG.Log_Data("SHADER COMPILE ERROR: "+ glGetShaderInfoLog(shader));
             return -1;
         }
         return shader;
