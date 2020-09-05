@@ -14,8 +14,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class Window {
@@ -136,21 +135,42 @@ public class Window {
                 -0.5f, -0.5f,0.0f
         };
 
-        //IntBuffer vbo = BufferUtils.createIntBuffer(1);
-        //vbo.put(points)
-        //IntBuffer vao = BufferUtils.createIntBuffer(1);
-        int vao = 0;//Vertex Buffer Object
-        int vbo = 0;//Vertex Array Object
-        vbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        float colours[]={
+          1.0f, 0.0f, 0.0f,
+          0.0f, 1.0f, 0.0f,
+          0.0f, 0.0f, 1.0f
+        };
 
+        int vao = 0;//Vertex Array Object
+        int vbo_points = 0;//Vertex Buffer Object
+        int vbo_colours = 0;
+
+        vbo_points = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_points);
         glBufferData(GL_ARRAY_BUFFER, points, GL_STATIC_DRAW);
+
+        vbo_colours = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_colours);
+        glBufferData(GL_ARRAY_BUFFER, colours, GL_STATIC_DRAW);
+
 
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
         glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_points);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, NULL);
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_colours);
+        glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, NULL);
+
+        /*
+         *We have two attributes, points and colours, one assigned to index 0 and index 1 of our
+         * vao. We have to enable the vao currently binded so that we may use these attributes
+         * in the shaders. I believe this only needs to happen once for this vao where as in
+         * previous versions it had to happen every time a vao was swapped for another.
+         */
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
 
         final String vertex_shader = reader.getFileContent("ShaderCode/first.vert");
         //Job is to set the colour for each fragment

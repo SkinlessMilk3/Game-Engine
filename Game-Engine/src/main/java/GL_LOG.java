@@ -43,25 +43,22 @@ class GL_LOG{
     static public void Log_Data(String message){
 
         try {
-            out = new FileWriter("Log.txt",true);
+            out = new FileWriter("../../../build/Log.txt",true);
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
-            try {
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-
-            }finally {
-                System.out.println("Failed to open Log.txt to add message");
-            }
         }
 
         try {
-            out.write(message);
+            out.write("\n"+ message);
+
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Failed to write data to Log.txt");
+        }
+        try {
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
