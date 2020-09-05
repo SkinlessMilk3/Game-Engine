@@ -95,6 +95,9 @@ public class Window {
     }
 
     private void loop(){
+
+        GL_Shader_Reader reader = new GL_Shader_Reader();
+
         GL.createCapabilities();
 
         glClearColor(0.8f, 0.8f, 0.8f,0.0f);
@@ -121,32 +124,24 @@ public class Window {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, NULL);
 
-        final String vertex_shader = "" +
-                "#version 410\n" +
-                "in vec3 vp;" +
-                "void main(){" +
-                "   gl_Position = vec4 (vp, 1.0);" +
-                "}";
+        final String vertex_shader = reader.getFileContent("first.vert");
         //Job is to set the colour for each fragment
-        final String fragment_shader = "" +
-                "#version 410\n" +
-                "out vec4 frag_colour;" +
-                "void main(){" +
-                "   frag_color = vec4 (0.5, 0.0, 0.5, 1.0);" +
-                "}";
+        final String fragment_shader = reader.getFileContent("first.frag");
 
-        int vs = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vs, vertex_shader);
-        glCompileShader(vs);
+        int vs = Shader.CompileShader(GL_VERTEX_SHADER, vertex_shader);
 
-        int fs = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fs, fragment_shader);
-        glCompileShader(fs);
+        int fs = Shader.CompileShader(GL_FRAGMENT_SHADER, fragment_shader);
 
         int shader_program = glCreateProgram();
         glAttachShader(shader_program, fs);
         glAttachShader(shader_program, vs);
         glLinkProgram(shader_program);
+
+        int[] params = new int[1];
+        glGetProgramiv(shader_program, GL_LINK_STATUS, params);
+        if(GL_TRUE != params[0]){
+            GL_LOG.Log_Data("PROGRAM LINKING ERROR: "+glGetProgramInfoLog(shader_program));
+        }
 
         while(!glfwWindowShouldClose(wnd)){
 
@@ -158,7 +153,7 @@ public class Window {
             glBindVertexArray(vao);
             glDrawArrays(GL_TRIANGLES, 0, 3);
 
-            System.out.println("Mouse is at x: "  + MouseEventListener.getX() + " y: " + MouseEventListener.getY());
+            //System.out.println("Mouse is at x: "  + MouseEventListener.getX() + " y: " + MouseEventListener.getY());
 
             glfwSwapBuffers(wnd);
             
