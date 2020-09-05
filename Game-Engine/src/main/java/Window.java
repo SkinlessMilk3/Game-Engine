@@ -1,5 +1,9 @@
 import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventListener;
+
+import org.lwjgl.BufferUtils;
+import org.lwjgl.Version;
+
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -16,7 +20,8 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Window {
     private static long wnd;
-    private static Window window;
+    private static Window window = null;
+    private static Scene currentScene;
     private int width, height;
     String title;
 
@@ -41,6 +46,25 @@ public class Window {
         }
     }
 
+    public static void ChangeScene(int newScene)
+    {
+        // Temporary switch case
+        switch (newScene)
+        {
+            case 0:
+                currentScene = new LevelEditorScene();
+                currentScene.init();
+                break;
+            case 1:
+                currentScene = new LevelScene();
+                currentScene.init();
+                break;
+            default:
+                assert false : "Unknown scene '" + newScene + "'!";
+                break;
+        }
+    }
+
     private Window(){
         this.title = "Game Engine";
         this.width = 1360;//Gotta figure out how to get these values from glfw because not every display has the same resolution.
@@ -48,13 +72,16 @@ public class Window {
     }
 
     public void run(){
+        System.out.println("Started LWJGL" + Version.getVersion() + "!");
 
         init();
         loop();
 
+        //Free memory
         glfwFreeCallbacks(wnd);
         glfwDestroyWindow(wnd);
 
+        //Terminate GLFW and free the error callback
         glfwTerminate();
         glfwSetErrorCallback(null).free();
     }
@@ -70,26 +97,31 @@ public class Window {
         if(!glfwInit())
             throw new IllegalStateException("Failed to initialize GLFW");
 
+        //Configure GLFW
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
+        //Create the window
         wnd = GLFW.glfwCreateWindow(this.width, this.height, this.title, NULL, NULL);
 
+        if(wnd == NULL)
+            throw new RuntimeException("Failed to create window");
+
+        //Lambda Functions
         glfwSetKeyCallback(wnd, KeyEventListener::isKeyPressed);
         glfwSetMouseButtonCallback(wnd, MouseEventListener::isPressedCallback);
         glfwSetScrollCallback(wnd, MouseEventListener::isScrolledCallback);
         glfwSetCursorPosCallback(wnd, MouseEventListener::isMovedCallback);
 
-        if(wnd == NULL)
-            throw new RuntimeException("Failed to create window");
-
+        //Make openGL context current
         glfwMakeContextCurrent(wnd);
+        //Enable v-sync
         glfwSwapInterval(1);
 
+        //Make the window visible
         glfwShowWindow(wnd);
     }
-
     private void loop(){
 
         GL_Shader_Reader reader = new GL_Shader_Reader();
@@ -132,22 +164,32 @@ public class Window {
         glAttachShader(shader_program, fs);
         glAttachShader(shader_program, vs);
         glLinkProgram(shader_program);
-
+  
         int[] params = new int[1];
         glGetProgramiv(shader_program, GL_LINK_STATUS, params);
         if(GL_TRUE != params[0]){
             GL_LOG.Log_Data("PROGRAM LINKING ERROR: "+glGetProgramInfoLog(shader_program));
         }
 
+
+        GL.createCapabilities();
+
+        //Sets starting scene
+        Window.ChangeScene(0);
+   
+
+        
         while(!glfwWindowShouldClose(wnd)){
 
             Frame_Rate.Update_Frame_Rate_Counter();
+
             glfwPollEvents();
+
+            glClearColor(0.8f, 0.8f, 0.8f,1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            glUseProgram(shader_program);
-            glBindVertexArray(vao);
-            glDrawArrays(GL_TRIANGLES, 0, 3);
+            //Draws/updates current scene
+            currentScene.update();
 
             //System.out.println("Mouse is at x: "  + MouseEventListener.getX() + " y: " + MouseEventListener.getY());
 
