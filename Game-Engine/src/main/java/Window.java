@@ -1,6 +1,7 @@
 import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventListener;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -20,7 +21,8 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Window {
     private static long wnd;
-    private static Window window;
+    private static Window window = null;
+    private static Scene currentScene;
     private int width, height;
     String title;
 
@@ -45,6 +47,25 @@ public class Window {
         }
     }
 
+    public static void ChangeScene(int newScene)
+    {
+        // Temporary switch case
+        switch (newScene)
+        {
+            case 0:
+                currentScene = new LevelEditorScene();
+                currentScene.init();
+                break;
+            case 1:
+                currentScene = new LevelScene();
+                currentScene.init();
+                break;
+            default:
+                assert false : "Unknown scene '" + newScene + "'!";
+                break;
+        }
+    }
+
     private Window(){
         this.title = "Game Engine";
         this.width = 1360;//Gotta figure out how to get these values from glfw because not every display has the same resolution.
@@ -52,13 +73,16 @@ public class Window {
     }
 
     public void run(){
+        System.out.println("Started LWJGL" + Version.getVersion() + "!");
 
         init();
         loop();
 
+        //Free memory
         glfwFreeCallbacks(wnd);
         glfwDestroyWindow(wnd);
 
+        //Terminate GLFW and free the error callback
         glfwTerminate();
         glfwSetErrorCallback(null).free();
     }
@@ -74,89 +98,50 @@ public class Window {
         if(!glfwInit())
             throw new IllegalStateException("Failed to initialize GLFW");
 
+        //Configure GLFW
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
+        //Create the window
         wnd = GLFW.glfwCreateWindow(this.width, this.height, this.title, NULL, NULL);
 
+        if(wnd == NULL)
+            throw new RuntimeException("Failed to create window");
+
+        //Lambda Functions
         glfwSetKeyCallback(wnd, KeyEventListener::isKeyPressed);
         glfwSetMouseButtonCallback(wnd, MouseEventListener::isPressedCallback);
         glfwSetScrollCallback(wnd, MouseEventListener::isScrolledCallback);
         glfwSetCursorPosCallback(wnd, MouseEventListener::isMovedCallback);
 
-        if(wnd == NULL)
-            throw new RuntimeException("Failed to create window");
-
+        //Make openGL context current
         glfwMakeContextCurrent(wnd);
+        //Enable v-sync
         glfwSwapInterval(1);
 
+        //Make the window visible
         glfwShowWindow(wnd);
+
+        GL.createCapabilities();
+
+        //Sets starting scene
+        Window.ChangeScene(0);
     }
 
     private void loop(){
-        GL.createCapabilities();
-
-        glClearColor(0.8f, 0.8f, 0.8f,0.0f);
-
-        float points[]={
-                0.0f, 0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f,
-                -0.5f, -0.5f,0.0f
-        };
-
-        //IntBuffer vbo = BufferUtils.createIntBuffer(1);
-        //vbo.put(points)
-        //IntBuffer vao = BufferUtils.createIntBuffer(1);
-        int vao = 0;//Vertex Buffer Object
-        int vbo = 0;//Vertex Array Object
-        vbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-        glBufferData(GL_ARRAY_BUFFER, points, GL_STATIC_DRAW);
-
-        vao = glGenVertexArrays();
-        glBindVertexArray(vao);
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, NULL);
-
-        final String vertex_shader = "" +
-                "#version 410\n" +
-                "in vec3 vp;" +
-                "void main(){" +
-                "   gl_Position = vec4 (vp, 1.0);" +
-                "}";
-        //Job is to set the colour for each fragment
-        final String fragment_shader = "" +
-                "#version 410\n" +
-                "out vec4 frag_colour;" +
-                "void main(){" +
-                "   frag_color = vec4 (0.5, 0.0, 0.5, 1.0);" +
-                "}";
-
-        int vs = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vs, vertex_shader);
-        glCompileShader(vs);
-
-        int fs = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fs, fragment_shader);
-        glCompileShader(fs);
-
-        int shader_program = glCreateProgram();
-        glAttachShader(shader_program, fs);
-        glAttachShader(shader_program, vs);
-        glLinkProgram(shader_program);
 
         while(!glfwWindowShouldClose(wnd)){
 
             Frame_Rate.Update_Frame_Rate_Counter();
+
             glfwPollEvents();
+
+            glClearColor(0.8f, 0.8f, 0.8f,1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            glUseProgram(shader_program);
-            glBindVertexArray(vao);
-            glDrawArrays(GL_TRIANGLES, 0, 3);
+            //Draws/updates current scene
+            currentScene.update();
 
             System.out.println("Mouse is at x: "  + MouseEventListener.getX() + " y: " + MouseEventListener.getY());
 
