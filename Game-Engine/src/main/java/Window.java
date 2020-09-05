@@ -1,13 +1,12 @@
 import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventListener;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.Version;
+
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
-
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -122,15 +121,64 @@ public class Window {
 
         //Make the window visible
         glfwShowWindow(wnd);
+    }
+    private void loop(){
+
+        GL_Shader_Reader reader = new GL_Shader_Reader();
+
+        GL.createCapabilities();
+
+        glClearColor(0.8f, 0.8f, 0.8f,0.0f);
+
+        float points[]={
+                0.0f, 0.5f, 0.0f,
+                0.5f, -0.5f, 0.0f,
+                -0.5f, -0.5f,0.0f
+        };
+
+        //IntBuffer vbo = BufferUtils.createIntBuffer(1);
+        //vbo.put(points)
+        //IntBuffer vao = BufferUtils.createIntBuffer(1);
+        int vao = 0;//Vertex Buffer Object
+        int vbo = 0;//Vertex Array Object
+        vbo = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+        glBufferData(GL_ARRAY_BUFFER, points, GL_STATIC_DRAW);
+
+        vao = glGenVertexArrays();
+        glBindVertexArray(vao);
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, NULL);
+
+        final String vertex_shader = reader.getFileContent("ShaderCode/first.vert");
+        //Job is to set the colour for each fragment
+        final String fragment_shader = reader.getFileContent("ShaderCode/first.frag");
+
+        int vs = Shader.CompileShader(GL_VERTEX_SHADER, vertex_shader);
+
+        int fs = Shader.CompileShader(GL_FRAGMENT_SHADER, fragment_shader);
+
+        int shader_program = glCreateProgram();
+        glAttachShader(shader_program, fs);
+        glAttachShader(shader_program, vs);
+        glLinkProgram(shader_program);
+  
+        int[] params = new int[1];
+        glGetProgramiv(shader_program, GL_LINK_STATUS, params);
+        if(GL_TRUE != params[0]){
+            GL_LOG.Log_Data("PROGRAM LINKING ERROR: "+glGetProgramInfoLog(shader_program));
+        }
+
 
         GL.createCapabilities();
 
         //Sets starting scene
         Window.ChangeScene(0);
-    }
+   
 
-    private void loop(){
-
+        
         while(!glfwWindowShouldClose(wnd)){
 
             Frame_Rate.Update_Frame_Rate_Counter();
@@ -143,7 +191,7 @@ public class Window {
             //Draws/updates current scene
             currentScene.update();
 
-            System.out.println("Mouse is at x: "  + MouseEventListener.getX() + " y: " + MouseEventListener.getY());
+            //System.out.println("Mouse is at x: "  + MouseEventListener.getX() + " y: " + MouseEventListener.getY());
 
             glfwSwapBuffers(wnd);
             

@@ -2,7 +2,8 @@ import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 /*
- *Desc: Opens a txt file called Log.txt to write information such as opengl errors.
+ *Desc: Opens a txt file called Log.txt to write information such as opengl errors. Stored in the build
+ * output file.
  */
 class GL_LOG{
 
@@ -13,7 +14,7 @@ class GL_LOG{
     public void Restart_Log(){
 
         try {
-            out = new FileWriter("Log.txt");
+            out = new FileWriter("../../../build/Log.txt");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Failed to open file Log.txt");
