@@ -1,5 +1,8 @@
 import static org.lwjgl.opengl.GL20.*;
 
+/*
+* Does things like compiles shaders and checks for errors
+ */
 public class Shader {
     public Shader(){}
     public static int CompileShader(int shaderType, String shaderCode){

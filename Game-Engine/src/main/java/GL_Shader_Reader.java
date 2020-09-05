@@ -1,4 +1,8 @@
 import java.io.*;
+
+/*
+* Reads shaders from files. Preferably they will have the appropriate file extensions like *.vert *.frag
+ */
 public class GL_Shader_Reader {
 
     public GL_Shader_Reader(){}

@@ -1,12 +1,8 @@
 import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventListener;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
-
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -124,9 +120,9 @@ public class Window {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, NULL);
 
-        final String vertex_shader = reader.getFileContent("first.vert");
+        final String vertex_shader = reader.getFileContent("ShaderCode/first.vert");
         //Job is to set the colour for each fragment
-        final String fragment_shader = reader.getFileContent("first.frag");
+        final String fragment_shader = reader.getFileContent("ShaderCode/first.frag");
 
         int vs = Shader.CompileShader(GL_VERTEX_SHADER, vertex_shader);
 

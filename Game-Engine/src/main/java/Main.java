@@ -7,7 +7,7 @@ public class Main {
         //start the log.txt with data and time
         log.Restart_Log();
 GL_Shader_Reader sh = new GL_Shader_Reader();
-        System.out.println("FILE: " + sh.getFileContent("first.vert"));
+        System.out.println("FILE: " + sh.getFileContent("ShaderCode/first.vert"));
         Window.getWindow().run();
     }
 }
