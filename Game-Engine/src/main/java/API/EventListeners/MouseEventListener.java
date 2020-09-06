@@ -50,7 +50,7 @@ public class MouseEventListener{
         else if(GLFW_RELEASE == action){
             if(button < getListener().isPressed.length) {
                 getListener().isDragging = false;
-                getListener().isPressed[button] = true;
+                getListener().isPressed[button] = false;
             }
         }
     }

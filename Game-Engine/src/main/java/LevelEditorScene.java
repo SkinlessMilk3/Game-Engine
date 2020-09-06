@@ -1,7 +1,12 @@
 import API.EventListeners.KeyEventListener;
+import API.EventListeners.MouseEventListener;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.lwjgl.BufferUtils;
 //import org.lwjgl.BufferUtils;
 
 import java.awt.event.KeyEvent;
+import java.nio.FloatBuffer;
 //import java.nio.FloatBuffer;
 //import java.nio.IntBuffer;
 
@@ -17,9 +22,9 @@ public class LevelEditorScene extends Scene {
 
     private float points[]={
 
-            0.0f, 0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            -0.5f, -0.5f,0.0f
+            0.0f, 500.5f, 0.0f,
+            500.5f, -0.5f, 0.0f,
+            -0.5f, -500.5f,0.0f
     };
     private float colours[] = {
             1.0f, 0.0f, 0.0f,
@@ -29,6 +34,13 @@ public class LevelEditorScene extends Scene {
 
     private int vao, vbo_points, vbo_colours, shader_program;
 
+    public void uploadMat4f(String varName, Matrix4f mat4, int shaderProgram) {
+        int varLocation = glGetUniformLocation(shaderProgram, varName);
+        FloatBuffer matBuffer = BufferUtils.createFloatBuffer(16);
+        mat4.get(matBuffer);
+        glUniformMatrix4fv(varLocation, false, matBuffer);
+    }
+
     public LevelEditorScene()
     {
         System.out.println("Inside level editor!");
@@ -37,6 +49,9 @@ public class LevelEditorScene extends Scene {
     @Override
     public void init()
     {
+        //Initializes camera
+        this.camera = new Camera(new Vector2f());
+
         GL_Shader_Reader reader = new GL_Shader_Reader();
 
         vao = 0; //Vertex Buffer Object
@@ -92,6 +107,15 @@ public class LevelEditorScene extends Scene {
     @Override
     public void update()
     {
+        if (MouseEventListener.isDragging())
+        {
+            if (MouseEventListener.getDeltaX() != MouseEventListener.getX()) {
+                camera.position.x -= MouseEventListener.getDeltaX();
+                camera.position.y += MouseEventListener.getDeltaY();
+            }
+        }
+
+
         // Temp to show scene change
         if (!changingScene && KeyEventListener.isKeyPressed(KeyEvent.VK_SPACE))
         {
@@ -108,6 +132,9 @@ public class LevelEditorScene extends Scene {
         }
 
         glUseProgram(shader_program);
+        uploadMat4f("uProjection", camera.getProjectionMatrix(), shader_program);
+        uploadMat4f("uView", camera.getViewMatrix(), shader_program);
+
         //Bind the VAO that we're using
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);

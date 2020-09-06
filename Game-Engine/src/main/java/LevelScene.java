@@ -1,4 +1,7 @@
 import API.EventListeners.KeyEventListener;
+import API.EventListeners.MouseEventListener;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 
 import java.awt.event.KeyEvent;
@@ -23,19 +26,18 @@ public class LevelScene extends Scene{
     public boolean changingScene = false;
     public float timeToChangeScene = 2.0f;
     private GL_Shader_Reader shader_reader = new GL_Shader_Reader();
-    private String vertexShaderScr = shader_reader.getFileContent("ShaderCode/Square.vert");
+    private String vertexShaderScr = shader_reader.getFileContent("ShaderCode/first.vert");
 
-    private String fragmentShaderSrc = shader_reader.getFileContent("ShaderCode/Square.frag");
+    private String fragmentShaderSrc = shader_reader.getFileContent("ShaderCode/first.frag");
 
     private int vertexID, fragmentID, shaderProgram;
 
     private float[] vertexArray = {
-            //Making Square
-            //positions             //colors
-            0.5f, -0.5f, 0.0f,      1.0f, 0.0f, 0.0f, 1.0f, //Bottom Right
-            -0.5f, 0.5f, 0.0f,      0.0f, 1.0f, 0.0f, 1.0f, //Top left
-            0.5f, 0.5f, 0.0f,       0.0f, 0.0f, 1.0f, 1.0f, //Top Right
-            -0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 0.0f, 1.0f, //Bottom Left
+            // position               // color
+            100.5f, 0.5f, 0.0f,       1.0f, 0.0f, 0.0f, 1.0f, // Bottom right 0
+            0.5f,  100.5f, 0.0f,       0.0f, 1.0f, 0.0f, 1.0f, // Top left     1
+            100.5f,  100.5f, 0.0f ,      1.0f, 0.0f, 1.0f, 1.0f, // Top right    2
+            0.5f, 0.5f, 0.0f,       1.0f, 1.0f, 0.0f, 1.0f, // Bottom left  3
     };
 
     //ALWAYS counter-clockwise
@@ -53,6 +55,13 @@ public class LevelScene extends Scene{
 
     private int vaoID, vboID, eboID;
 
+    public void uploadMat4f(String varName, Matrix4f mat4, int shaderProgram) {
+        int varLocation = glGetUniformLocation(shaderProgram, varName);
+        FloatBuffer matBuffer = BufferUtils.createFloatBuffer(16);
+        mat4.get(matBuffer);
+        glUniformMatrix4fv(varLocation, false, matBuffer);
+    }
+
     public LevelScene()
     {
         System.out.println("Inside level!");
@@ -62,6 +71,9 @@ public class LevelScene extends Scene{
     @Override
     public void init()
     {
+        //Initializes camera
+        this.camera = new Camera(new Vector2f());
+
         //Compile and link shaders
 
         //load and compile vertex shader
@@ -123,6 +135,14 @@ public class LevelScene extends Scene{
     @Override
     public void update()
     {
+        if (MouseEventListener.isDragging())
+        {
+            if (MouseEventListener.getDeltaX() != MouseEventListener.getX()) {
+                camera.position.x -= MouseEventListener.getDeltaX();
+                camera.position.y += MouseEventListener.getDeltaY();
+            }
+        }
+
         // Temp to show scene change
         if (!changingScene && KeyEventListener.isKeyPressed(KeyEvent.VK_SPACE))
         {
@@ -139,6 +159,10 @@ public class LevelScene extends Scene{
         }
 
         glUseProgram(shaderProgram);
+
+        uploadMat4f("uProjection", camera.getProjectionMatrix(), shaderProgram);
+        uploadMat4f("uView", camera.getViewMatrix(), shaderProgram);
+
         //Bind the VAO that we're using
         glBindVertexArray(vaoID);
 
