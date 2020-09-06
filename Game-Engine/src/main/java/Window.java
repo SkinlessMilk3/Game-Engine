@@ -123,82 +123,11 @@ public class Window {
     }
     private void loop(){
 
-        GL_Shader_Reader reader = new GL_Shader_Reader();
-
-        GL.createCapabilities();
-
-        glClearColor(0.8f, 0.8f, 0.8f,0.0f);
-
-        float points[]={
-                0.0f, 0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f,
-                -0.5f, -0.5f,0.0f
-        };
-
-        float colours[]={
-          1.0f, 0.0f, 0.0f,
-          0.0f, 1.0f, 0.0f,
-          0.0f, 0.0f, 1.0f
-        };
-
-        int vao = 0;//Vertex Array Object
-        int vbo_points = 0;//Vertex Buffer Object
-        int vbo_colours = 0;
-
-        vbo_points = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_points);
-        glBufferData(GL_ARRAY_BUFFER, points, GL_STATIC_DRAW);
-
-        vbo_colours = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_colours);
-        glBufferData(GL_ARRAY_BUFFER, colours, GL_STATIC_DRAW);
-
-
-        vao = glGenVertexArrays();
-        glBindVertexArray(vao);
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_points);
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, NULL);
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_colours);
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, NULL);
-
-        /*
-         *We have two attributes, points and colours, one assigned to index 0 and index 1 of our
-         * vao. We have to enable the vao currently binded so that we may use these attributes
-         * in the shaders. I believe this only needs to happen once for this vao where as in
-         * previous versions it had to happen every time a vao was swapped for another.
-         */
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-
-        final String vertex_shader = reader.getFileContent("ShaderCode/first.vert");
-        //Job is to set the colour for each fragment
-        final String fragment_shader = reader.getFileContent("ShaderCode/first.frag");
-
-        int vs = Shader.CompileShader(GL_VERTEX_SHADER, vertex_shader);
-
-        int fs = Shader.CompileShader(GL_FRAGMENT_SHADER, fragment_shader);
-
-        int shader_program = glCreateProgram();
-        glAttachShader(shader_program, fs);
-        glAttachShader(shader_program, vs);
-        glLinkProgram(shader_program);
-  
-        int[] params = new int[1];
-        glGetProgramiv(shader_program, GL_LINK_STATUS, params);
-        if(GL_TRUE != params[0]){
-            GL_LOG.Log_Data("PROGRAM LINKING ERROR: "+glGetProgramInfoLog(shader_program));
-        }
-
-
         GL.createCapabilities();
 
         //Sets starting scene
         Window.ChangeScene(0);
-   
 
-        
         while(!glfwWindowShouldClose(wnd)){
 
             Frame_Rate.Update_Frame_Rate_Counter();

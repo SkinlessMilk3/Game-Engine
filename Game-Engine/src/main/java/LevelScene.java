@@ -22,30 +22,10 @@ public class LevelScene extends Scene{
 
     public boolean changingScene = false;
     public float timeToChangeScene = 2.0f;
+    private GL_Shader_Reader shader_reader = new GL_Shader_Reader();
+    private String vertexShaderScr = shader_reader.getFileContent("ShaderCode/Square.vert");
 
-    private String vertexShaderScr = "#version 330 core\n" +
-            "\n" +
-            "layout (location=0) in vec3 aPos;\n" +
-            "layout (location=1) in vec4 aColor;\n" +
-            "\n" +
-            "out vec4 fColor;\n" +
-            "\n" +
-            "void main()\n" +
-            "{\n" +
-            "    fColor = aColor;\n" +
-            "    gl_Position = vec4(aPos, 1.0);\n" +
-            "}";
-
-    private String fragmentShaderSrc = "#version 330 core\n" +
-            "\n" +
-            "in vec4 fColor;\n" +
-            "\n" +
-            "out vec4 color;\n" +
-            "\n" +
-            "void main()\n" +
-            "{\n" +
-            "    color = fColor;\n" +
-            "}";
+    private String fragmentShaderSrc = shader_reader.getFileContent("ShaderCode/Square.frag");
 
     private int vertexID, fragmentID, shaderProgram;
 
@@ -85,36 +65,10 @@ public class LevelScene extends Scene{
         //Compile and link shaders
 
         //load and compile vertex shader
-        vertexID = glCreateShader(GL_VERTEX_SHADER);
-        //Pass the shader source to GPU
-        glShaderSource(vertexID, vertexShaderScr);
-        glCompileShader(vertexID);
-
-        //Check for errors in compilation
-        int success = glGetShaderi(vertexID, GL_COMPILE_STATUS);
-        if (success == GL_FALSE)
-        {
-            int len = glGetShaderi(vertexID, GL_INFO_LOG_LENGTH);
-            System.out.println("Error: 'defaultShader.glsl'\nVertex shader compilation failed.");
-            System.out.println(glGetShaderInfoLog(vertexID, len));
-            assert false : "";
-        }
+        vertexID = Shader.CompileShader(GL_VERTEX_SHADER, vertexShaderScr);
 
         //load and compile fragment shader
-        fragmentID = glCreateShader(GL_FRAGMENT_SHADER);
-        //Pass the shader source to GPU
-        glShaderSource(fragmentID, fragmentShaderSrc);
-        glCompileShader(fragmentID);
-
-        //Check for errors in compilation
-        success = glGetShaderi(fragmentID, GL_COMPILE_STATUS);
-        if (success == GL_FALSE)
-        {
-            int len = glGetShaderi(fragmentID, GL_INFO_LOG_LENGTH);
-            System.out.println("Error: 'defaultShader.glsl'\nFragment shader compilation failed.");
-            System.out.println(glGetShaderInfoLog(fragmentID, len));
-            assert false : "";
-        }
+        fragmentID = Shader.CompileShader(GL_FRAGMENT_SHADER, fragmentShaderSrc);
 
         // Link shaders and check for errors
         shaderProgram = glCreateProgram();
@@ -123,7 +77,7 @@ public class LevelScene extends Scene{
         glLinkProgram(shaderProgram);
 
         //Check linking status
-        success = glGetProgrami(shaderProgram, GL_LINK_STATUS);
+        int success = glGetProgrami(shaderProgram, GL_LINK_STATUS);
         if (success == GL_FALSE)
         {
             int len = glGetProgrami(shaderProgram, GL_INFO_LOG_LENGTH);

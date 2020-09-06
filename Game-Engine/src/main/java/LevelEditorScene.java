@@ -7,8 +7,7 @@ import java.awt.event.KeyEvent;
 
 //import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class LevelEditorScene extends Scene {
@@ -22,8 +21,13 @@ public class LevelEditorScene extends Scene {
             0.5f, -0.5f, 0.0f,
             -0.5f, -0.5f,0.0f
     };
+    private float colours[] = {
+            1.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 1.0f
+    };
 
-    private int vao, vbo, shader_program;
+    private int vao, vbo_points, vbo_colours, shader_program;
 
     public LevelEditorScene()
     {
@@ -33,49 +37,56 @@ public class LevelEditorScene extends Scene {
     @Override
     public void init()
     {
-        //IntBuffer vbo = BufferUtils.createIntBuffer(1);
-        //vbo.put(points)
-        //IntBuffer vao = BufferUtils.createIntBuffer(1);
-        vao = 0; //Vertex Buffer Object
-        vbo = 0; //Vertex Array Object
-        vbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        GL_Shader_Reader reader = new GL_Shader_Reader();
 
+        vao = 0; //Vertex Buffer Object
+        vbo_points = 0; //Vertex Array Object
+        vbo_colours = 0;
+
+        vbo_points = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_points);
         glBufferData(GL_ARRAY_BUFFER, points, GL_STATIC_DRAW);
+
+        vbo_colours = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_colours);
+        glBufferData(GL_ARRAY_BUFFER, colours, GL_STATIC_DRAW);
 
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_points);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, NULL);
 
-        final String vertex_shader = "" +
-                "#version 410\n" +
-                "in vec3 vp;" +
-                "void main(){" +
-                "   gl_Position = vec4 (vp, 1.0);" +
-                "}";
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_colours);
+        glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, NULL);
+
+        /*
+         *We have two attributes, points and colours, one assigned to index 0 and index 1 of our
+         * vao. We have to enable the vao currently binded so that we may use these attributes
+         * in the shaders. I believe this only needs to happen once for this vao where as in
+         * previous versions it had to happen every time a vao was swapped for another.
+         */
+
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+
+        final String vertex_shader = reader.getFileContent("ShaderCode/first.vert");
         //Job is to set the colour for each fragment
-        final String fragment_shader = "" +
-                "#version 410\n" +
-                "out vec4 frag_colour;" +
-                "void main(){" +
-                "   frag_color = vec4 (0.5, 0.0, 0.5, 1.0);" +
-                "}";
+        final String fragment_shader = reader.getFileContent("ShaderCode/first.frag");
 
-        int vs = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vs, vertex_shader);
-        glCompileShader(vs);
+        int vs = Shader.CompileShader(GL_VERTEX_SHADER, vertex_shader);
 
-        int fs = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fs, fragment_shader);
-        glCompileShader(fs);
+        int fs = Shader.CompileShader(GL_FRAGMENT_SHADER, fragment_shader);
 
         shader_program = glCreateProgram();
         glAttachShader(shader_program, fs);
         glAttachShader(shader_program, vs);
         glLinkProgram(shader_program);
 
+        int[] params = new int[1];
+        glGetProgramiv(shader_program, GL_LINK_STATUS, params);
+        if(GL_TRUE != params[0]) {
+            GL_LOG.Log_Data("PROGRAM LINKING ERROR: " + glGetProgramInfoLog(shader_program));
+        }
     }
 
     @Override
