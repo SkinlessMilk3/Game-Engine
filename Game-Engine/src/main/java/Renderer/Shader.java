@@ -1,4 +1,7 @@
+package Renderer;
+
 import static org.lwjgl.opengl.GL20.*;
+import Engine.GL_LOG;
 
 /*
 * Does things like compiles shaders and checks for errors

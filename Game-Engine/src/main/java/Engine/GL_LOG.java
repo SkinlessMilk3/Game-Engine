@@ -1,3 +1,5 @@
+package Engine;
+
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -5,7 +7,7 @@ import java.time.format.DateTimeFormatter;
  *Desc: Opens a txt file called Log.txt to write information such as opengl errors. Stored in the build
  * output file.
  */
-class GL_LOG{
+public class GL_LOG{
 
     private static FileWriter out;
 

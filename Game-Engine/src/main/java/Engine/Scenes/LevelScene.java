@@ -1,5 +1,12 @@
+package Engine.Scenes;
+
 import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventListener;
+import Engine.Camera;
+import Engine.Scene;
+import Engine.Window;
+import Renderer.GL_Shader_Reader;
+import Renderer.Shader;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
@@ -21,10 +28,12 @@ import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
-public class LevelScene extends Scene{
+public class LevelScene extends Scene {
 
     public boolean changingScene = false;
+    public int sceneNum = 1;
     public float timeToChangeScene = 2.0f;
+
     private GL_Shader_Reader shader_reader = new GL_Shader_Reader();
     private String vertexShaderScr = shader_reader.getFileContent("ShaderCode/first.vert");
 
@@ -34,10 +43,10 @@ public class LevelScene extends Scene{
 
     private float[] vertexArray = {
             // position               // color
-            100.5f, 0.5f, 0.0f,       1.0f, 0.0f, 0.0f, 1.0f, // Bottom right 0
-            0.5f,  100.5f, 0.0f,       0.0f, 1.0f, 0.0f, 1.0f, // Top left     1
-            100.5f,  100.5f, 0.0f ,      1.0f, 0.0f, 1.0f, 1.0f, // Top right    2
-            0.5f, 0.5f, 0.0f,       1.0f, 1.0f, 0.0f, 1.0f, // Bottom left  3
+            300.5f, 500.5f, 0.0f,       1.0f, 0.0f, 0.0f, 1.0f, // Bottom right 0
+            500.5f,  100.5f, 0.0f,       0.0f, 1.0f, 0.0f, 1.0f, // Top left     1
+            300.5f,  100.5f, 0.0f ,      1.0f, 0.0f, 1.0f, 1.0f, // Top right    2
+            500.5f, 500.5f, 0.0f,       1.0f, 1.0f, 0.0f, 1.0f, // Bottom left  3
     };
 
     //ALWAYS counter-clockwise
@@ -133,7 +142,7 @@ public class LevelScene extends Scene{
     }
 
     @Override
-    public void update()
+    public void update(float dt)
     {
         if (MouseEventListener.isDragging())
         {
@@ -146,6 +155,7 @@ public class LevelScene extends Scene{
         // Temp to show scene change
         if (!changingScene && KeyEventListener.isKeyPressed(KeyEvent.VK_SPACE))
         {
+            sceneNum++;
             changingScene = true;
         }
         if (changingScene && timeToChangeScene > 0)
@@ -155,7 +165,7 @@ public class LevelScene extends Scene{
         else if (changingScene)
         {
             timeToChangeScene = 2.0f;
-            Window.ChangeScene(0);
+            Window.ChangeScene(sceneNum);
         }
 
         glUseProgram(shaderProgram);
