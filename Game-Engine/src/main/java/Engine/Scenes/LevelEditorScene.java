@@ -1,5 +1,11 @@
+package Engine.Scenes;
+
 import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventListener;
+import Components.SpriteRenderer;
+import Engine.*;
+import Renderer.GL_Shader_Reader;
+import Renderer.Shader;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
@@ -18,6 +24,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 public class LevelEditorScene extends Scene {
 
     public boolean changingScene = false;
+    public int sceneNum = 0;
     public float timeToChangeScene = 2.0f;
 
     private float points[]={
@@ -34,6 +41,10 @@ public class LevelEditorScene extends Scene {
 
     private int vao, vbo_points, vbo_colours, shader_program;
 
+    //Temp
+    private GameObject testObj;
+    private boolean firstTime = false;
+
     public void uploadMat4f(String varName, Matrix4f mat4, int shaderProgram) {
         int varLocation = glGetUniformLocation(shaderProgram, varName);
         FloatBuffer matBuffer = BufferUtils.createFloatBuffer(16);
@@ -49,6 +60,11 @@ public class LevelEditorScene extends Scene {
     @Override
     public void init()
     {
+        System.out.println("Creating Test object!");
+        this.testObj = new GameObject("test object");
+        this.testObj.addComponent(new SpriteRenderer());
+        this.addGameObjectToScene(this.testObj);
+
         //Initializes camera
         this.camera = new Camera(new Vector2f());
 
@@ -105,7 +121,7 @@ public class LevelEditorScene extends Scene {
     }
 
     @Override
-    public void update()
+    public void update(float dt)
     {
         if (MouseEventListener.isDragging())
         {
@@ -119,6 +135,7 @@ public class LevelEditorScene extends Scene {
         // Temp to show scene change
         if (!changingScene && KeyEventListener.isKeyPressed(KeyEvent.VK_SPACE))
         {
+            sceneNum++;
             changingScene = true;
         }
         if (changingScene && timeToChangeScene > 0)
@@ -128,7 +145,7 @@ public class LevelEditorScene extends Scene {
         else if (changingScene)
         {
             timeToChangeScene = 2.0f;
-            Window.ChangeScene(1);
+            Window.ChangeScene(sceneNum);
         }
 
         glUseProgram(shader_program);
@@ -144,7 +161,10 @@ public class LevelEditorScene extends Scene {
 
         glUseProgram(0);
 
-
+        for (GameObject go : this.gameObjects)
+        {
+            go.update(dt);
+        }
     }
 
 

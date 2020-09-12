@@ -1,7 +1,11 @@
+package Engine;
+
 import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventListener;
 
-import org.lwjgl.BufferUtils;
+import Engine.Scenes.CounterDemoScene;
+import Engine.Scenes.LevelEditorScene;
+import Engine.Scenes.LevelScene;
 import org.lwjgl.Version;
 
 import org.lwjgl.glfw.GLFW;
@@ -11,10 +15,6 @@ import org.lwjgl.opengl.GL;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class Window {
@@ -53,10 +53,17 @@ public class Window {
             case 0:
                 currentScene = new LevelEditorScene();
                 currentScene.init();
+                currentScene.start();
                 break;
             case 1:
                 currentScene = new LevelScene();
                 currentScene.init();
+                currentScene.start();
+                break;
+            case 2:
+                currentScene = new CounterDemoScene();
+                currentScene.init();
+                currentScene.start();
                 break;
             default:
                 assert false : "Unknown scene '" + newScene + "'!";
@@ -123,6 +130,10 @@ public class Window {
     }
     private void loop(){
 
+        float beginTime = (float)glfwGetTime();
+        float endTime;
+        float dt = -1.0f;
+
         GL.createCapabilities();
 
         //Sets starting scene
@@ -138,12 +149,18 @@ public class Window {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             //Draws/updates current scene
-            currentScene.update();
+            if (dt >= 0)
+            {
+                currentScene.update(dt);
+            }
 
             //System.out.println("Mouse is at x: "  + MouseEventListener.getX() + " y: " + MouseEventListener.getY());
 
             glfwSwapBuffers(wnd);
-            
+
+            endTime = (float)glfwGetTime();
+            dt = endTime - beginTime;
+            beginTime = endTime;
         }
     }
 
