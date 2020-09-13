@@ -1,5 +1,7 @@
 package Renderer;
 
+import org.lwjgl.BufferUtils;
+
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL15.*;
@@ -8,15 +10,18 @@ import static org.lwjgl.opengl.GL15.*;
 Helper class that abstracts away the vertex buffer objects.
  */
 public class VBO {
-    int renderId;
-    int target;
+    private int renderId;
+    private int target;
+    private FloatBuffer localBuffer;
 
-    public VBO(int target, float[] buffer){
+    public VBO(int target, final float[] buffer){
         this.target = target;
-
+        localBuffer = BufferUtils.createFloatBuffer(buffer.length);
+        localBuffer.put(buffer).flip();
         renderId = glGenBuffers();
+
         glBindBuffer(this.target, renderId);
-        glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, localBuffer, GL_STATIC_DRAW);
     }
     public void bind(){
         glBindBuffer(target, renderId);

@@ -7,6 +7,7 @@ import Engine.Scenes.CounterDemoScene;
 import Engine.Scenes.ExTexture;
 import Engine.Scenes.LevelEditorScene;
 import Engine.Scenes.LevelScene;
+import Renderer.Renderer;
 import org.lwjgl.Version;
 
 import org.lwjgl.glfw.GLFW;
@@ -24,7 +25,7 @@ public class Window {
     private static long wnd;
     private static Window window = null;
     private static Scene currentScene;
-    private int width, height;
+    private static int width, height;
     String title;
 
     //used to calculate frame rate
@@ -48,36 +49,20 @@ public class Window {
         }
     }
 
-    public static void ChangeScene(int newScene)
-    {
-        // Temporary switch case
-        switch (newScene)
-        {
-            case 0:
-                currentScene = new LevelEditorScene();
-                currentScene.init();
-                currentScene.start();
-                break;
-            case 1:
-                currentScene = new LevelScene();
-                currentScene.init();
-                currentScene.start();
-                break;
-            case 2:
-                currentScene = new CounterDemoScene();
-                currentScene.init();
-                currentScene.start();
-                break;
-            default:
-                assert false : "Unknown scene '" + newScene + "'!";
-                break;
-        }
-    }
+
 
     private Window(){
         this.title = "Game Engine";
         this.width = 1360;//Gotta figure out how to get these values from glfw because not every display has the same resolution.
         this.height = 768;
+    }
+
+    public static int getWidth(){
+        return width;
+    }
+
+    public static int getHeight(){
+        return height;
     }
 
     public void run(){
@@ -145,9 +130,8 @@ public class Window {
         float beginTime = (float)glfwGetTime();
         float endTime;
         float dt = -1.0f;
-
         GL.createCapabilities();
-;
+
         //Sets starting scene
         Window.ChangeScene(0);
 
@@ -156,10 +140,14 @@ public class Window {
         /*Note for the future. Draw calls need to happen after the glClear function in the loop
          * or nothing will be drawn.
          */
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        Renderer renderer = new Renderer();
         while(!glfwWindowShouldClose(wnd)){
 
-            glClearColor(0.8f, 1.8f, 0.8f,1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
+            renderer.Clear();
+            //renderer.Draw();
 
             Frame_Rate.Update_Frame_Rate_Counter();
 
@@ -187,5 +175,31 @@ public class Window {
             window = new Window();
         }
         return window;
+    }
+
+    public static void ChangeScene(int newScene)
+    {
+        // Temporary switch case
+        switch (newScene)
+        {
+            case 0:
+                currentScene = new LevelEditorScene();
+                currentScene.init();
+                currentScene.start();
+                break;
+            case 1:
+                currentScene = new LevelScene();
+                currentScene.init();
+                currentScene.start();
+                break;
+            case 2:
+                currentScene = new CounterDemoScene();
+                currentScene.init();
+                currentScene.start();
+                break;
+            default:
+                assert false : "Unknown scene '" + newScene + "'!";
+                break;
+        }
     }
 }

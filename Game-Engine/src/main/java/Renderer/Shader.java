@@ -22,6 +22,7 @@ import java.io.IOException;
 * Use of this class will let you do texture and program bindings, compiling, and linking just by
 * calling the constructor.
 * It has the functions bind, unbind, and set uniform functions the user will find of use.
+* This class should define any opengl uniform functionality. This way we don't repeat code.
  */
 public class Shader {
     //Used for parsing
@@ -82,6 +83,13 @@ public class Shader {
             GL_LOG.Log_Data("Uniform not found: " + u_name);
         else
             glUniform1i(location, value);
+    }
+    public void setUniformmat4(String u_name, float[] matrix){
+        int location = glGetUniformLocation(this.renderid, u_name);
+
+        if(location == -1)
+            GL_LOG.Log_Data("Uniform not found: " + u_name);
+        glUniformMatrix4fv(location, false, matrix);
     }
     //A helper function for compiling opengl shaders as well as error checking.
     //Will call compileProgram for program compilation.

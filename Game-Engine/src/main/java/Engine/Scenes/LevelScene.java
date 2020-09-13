@@ -6,10 +6,7 @@ import Engine.Camera;
 import Engine.GL_LOG;
 import Engine.Scene;
 import Engine.Window;
-import Renderer.Shader;
-import Renderer.Texture;
-import Renderer.VAO;
-import Renderer.VBO;
+import Renderer.*;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
@@ -37,7 +34,10 @@ public class LevelScene extends Scene {
     public int sceneNum = 1;
     public float timeToChangeScene = 2.0f;
 
-    private int vertexID, fragmentID, shaderProgram;
+    private Shader shader;
+    private VAO vao;
+    private VBO vbo;
+    private IBO ibo;
 
     private float[] vertexArray = {
             // position               // color
@@ -60,8 +60,6 @@ public class LevelScene extends Scene {
             0,1,3  //Bottom right triangle
     };
 
-    private int vaoID, vboID, eboID;
-
     public void uploadMat4f(String varName, Matrix4f mat4, int shaderProgram) {
         int varLocation = glGetUniformLocation(shaderProgram, varName);
         FloatBuffer matBuffer = BufferUtils.createFloatBuffer(16);
@@ -80,51 +78,17 @@ public class LevelScene extends Scene {
     {
 
         //Initializes camera
-        /*this.camera = new Camera(new Vector2f());
+        this.camera = new Camera(new Vector2f());
 
         //load and compile vertex shader
-        vertexID = new Shader(GL_VERTEX_SHADER, "Assets/first.vert").getId();
 
-        //load and compile fragment shader
-        fragmentID = new Shader(GL_FRAGMENT_SHADER, "Assets/first.frag").getId();
-
-        // Link shaders and check for errors
-        shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram, vertexID);
-        glAttachShader(shaderProgram, fragmentID);
-        glLinkProgram(shaderProgram);
-
-        //Check linking status
-        int success = glGetProgrami(shaderProgram, GL_LINK_STATUS);
-        if (success == GL_FALSE)
-        {
-            int len = glGetProgrami(shaderProgram, GL_INFO_LOG_LENGTH);
-            System.out.println("Error: 'defaultShader.glsl'\nLinking shaders failed.");
-            System.out.println(glGetProgramInfoLog(shaderProgram, len));
-            assert false : "";
-        }
-
+        shader = new Shader("Assets/first.vert");
         //Generate VAO, VBO, EBO buffer objects and send to GPU
-
-        vaoID = glGenVertexArrays();
-        glBindVertexArray(vaoID);
-
-        //Create a float buffer of verticies
-        FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertexArray.length);
-        vertexBuffer.put(vertexArray).flip();
-
+        vao = new VAO();
         //Create VBO upload the vertex buffer
-        vboID = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vboID);
-        glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW);
-
+        vbo = new VBO(GL_ARRAY_BUFFER, vertexArray);
         //Create the indices and upload
-        IntBuffer elementBuffer = BufferUtils.createIntBuffer(elementArray.length);
-        elementBuffer.put(elementArray).flip();
-
-        eboID = glGenBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboID);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementBuffer, GL_STATIC_DRAW);
+        ibo = new IBO(GL_ELEMENT_ARRAY_BUFFER, elementArray);
 
         // Add the vertex attribute pointers
         int positionsSize = 3;
@@ -135,7 +99,7 @@ public class LevelScene extends Scene {
         glEnableVertexAttribArray(0);
 
         glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionsSize * floatSizeBytes);
-        glEnableVertexAttribArray(1);*/
+        glEnableVertexAttribArray(1);
     }
 
     @Override
@@ -167,27 +131,18 @@ public class LevelScene extends Scene {
 
 
 
-        /*glUseProgram(shaderProgram);
+        glUseProgram(shader.getId());
 
-        uploadMat4f("uProjection", camera.getProjectionMatrix(), shaderProgram);
-        uploadMat4f("uView", camera.getViewMatrix(), shaderProgram);
+        uploadMat4f("uProjection", camera.getProjectionMatrix(), shader.getId());
+        uploadMat4f("uView", camera.getViewMatrix(), shader.getId());
 
         //Bind the VAO that we're using
-        glBindVertexArray(vaoID);
-
+        vao.bind();
         //Enable the vertex attribute pointers
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
 
-        glDrawElements(GL_TRIANGLES, elementArray.length, GL_UNSIGNED_INT, 0);
-
-        // Unbind everything
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-
-        glBindVertexArray(0);
-
-        glUseProgram(0);*/
+        glDrawElements(GL_TRIANGLES, ibo.getCount(), GL_UNSIGNED_INT, 0);
     }
 
 }
