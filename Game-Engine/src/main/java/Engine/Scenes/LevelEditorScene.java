@@ -38,8 +38,8 @@ public class LevelEditorScene extends Scene {
             0.0f, 0.0f, 1.0f
     };
 
-    private int vao, vbo_points, vbo_colours, shader_program;
-
+    private int vao, vbo_points, vbo_colours; //shader_program;
+    Shader shader;
     //Temp
     private GameObject testObj;
     private boolean firstTime = false;
@@ -99,22 +99,9 @@ public class LevelEditorScene extends Scene {
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
 
-        Shader vShader = new Shader(GL_VERTEX_SHADER, "Assets/first.vert");
-        Shader fShader = new Shader(GL_FRAGMENT_SHADER, "Assets/first.frag");
-        int vs = vShader.getId();
-        int fs = fShader.getId();
-
-        shader_program = glCreateProgram();
-        glAttachShader(shader_program, fs);
-        glAttachShader(shader_program, vs);
-        glLinkProgram(shader_program);
-
-        int[] params = new int[1];
-        glGetProgramiv(shader_program, GL_LINK_STATUS, params);
-        if(GL_TRUE != params[0]) {
-            GL_LOG.Log_Data("PROGRAM LINKING ERROR: " + glGetProgramInfoLog(shader_program));
-        }
+        shader = new Shader("Assets/first.vert");
     }
+
 
     @Override
     public void update(float dt)
@@ -144,9 +131,9 @@ public class LevelEditorScene extends Scene {
             //Window.ChangeScene(sceneNum);
         }
 
-        glUseProgram(shader_program);
-        uploadMat4f("uProjection", camera.getProjectionMatrix(), shader_program);
-        uploadMat4f("uView", camera.getViewMatrix(), shader_program);
+        shader.bind();
+        uploadMat4f("uProjection", camera.getProjectionMatrix(), shader.getId());
+        uploadMat4f("uView", camera.getViewMatrix(), shader.getId());
 
         //Bind the VAO that we're using
         glBindVertexArray(vao);

@@ -91,10 +91,10 @@ public class CounterDemoScene extends Scene {
         //Compile and link shaders
 
         //load and compile vertex shader
-        vertexID = new Shader(GL_VERTEX_SHADER, "Assets/first.vert").getId();
+        vertexID = new Shader("Assets/first.vert").getId();
 
         //load and compile fragment shader
-        fragmentID = new Shader(GL_FRAGMENT_SHADER, "Assets/first.frag").getId();
+        fragmentID = new Shader("Assets/first.frag").getId();
 
         // Link shaders and check for errors
         shaderProgram = glCreateProgram();

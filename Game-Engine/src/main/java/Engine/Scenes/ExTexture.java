@@ -19,33 +19,14 @@ public class ExTexture {
             -0.5f, -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,      0.0f, 0.0f
     };
     Texture texture;
-    Shader vShader;
-    Shader fShader;
-
-    int program;
+    Shader shader;
     VAO vao;
 
     public ExTexture(){
         texture = new Texture("Assets/Textures/Fantasy-My-Hero-Academia.jpg");
         texture.bind(0);
 
-        GL_LOG.Log_Data("buffer stuff " + Integer.toString(glGetError()));
-
-        vShader = new Shader(GL_VERTEX_SHADER, "Assets/tmp.vert");
-        program = glCreateProgram();
-        glAttachShader(program, vShader.getId());
-
-
-        GL_LOG.Log_Data(Integer.toString(glGetError()));
-
-
-        fShader = new Shader(GL_FRAGMENT_SHADER, "Assets/tmp.frag");
-        glAttachShader(program, fShader.getId());
-        glLinkProgram(program);
-        int success = glGetProgrami(program, GL_LINK_STATUS);
-        if(success == GL_FALSE)
-            GL_LOG.Log_Data("Failed to link");
-
+        shader = new Shader("Assets/Texturing.vert");
 
         GL_LOG.Log_Data("Linking check "+Integer.toString(glGetError()));
 
@@ -69,9 +50,9 @@ public class ExTexture {
     }
     public void onUpdate(){
 
-        fShader.setGLUniform1i(program, "u_texture", 0);
+        shader.setGLUniform1i("u_texture", 0);
 
-        glUseProgram(program);
+        glUseProgram(shader.getId());
         vao.bind();
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);

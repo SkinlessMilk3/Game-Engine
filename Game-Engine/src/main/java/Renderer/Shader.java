@@ -3,39 +3,166 @@ package Renderer;
 import static org.lwjgl.opengl.GL20.*;
 import Engine.GL_LOG;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
 /*
 * Does things like compiles shaders and checks for errors
-* update to contain programs too.
+* updated to contain programs and compile them using shaders.
+*
+* Things to know:
+*   This now takes only one file that contains shaders. ONLY vertex and fragment shaders.
+*   You must define your shaders in your shader files using #shader <shaderType>
+    i.e. #shader vertex. This must be at the top of the file with one shader and at the top
+    * of the second shader. It does not matter what order the shaders are defined. You can
+    * define your fragment shader first or your vertex shader.
+    *
+* Use of this class will let you do texture and program bindings, compiling, and linking just by
+* calling the constructor.
+* It has the functions bind, unbind, and set uniform functions the user will find of use.
  */
 public class Shader {
-    private String shaderCode;
+    //Used for parsing
+    private enum ShaderType{
+        NONE(-1, "NONE"),
+        Vertex(0, "vertex"),
+        Fragment(1, "fragment");
+
+        private int typeVal;
+        private String type;
+        ShaderType(int num, String type){
+            typeVal = num;
+            this.type = type;
+        }
+        public int getTypeVal(){
+            return typeVal;
+        }
+        public String toString(){
+            return type;
+        }
+    }
+    //shader code gets stored here
+    private String[] shaders;
+    //this is ultimately the programid we receive from opengl when glCreateProgram() is called
     private int renderid;
     String filepath;
 
-    public Shader(int shaderType, String filename){
+    public Shader(String filename){
 
         filepath = filename;
+        shaders = new String[2];
 
-        FileReader in = null;
-        char[] buffer = new char[2048];
+        parseShader();
+        compileShader();
+    }
 
+    public int getId(){
+        return renderid;
+    }
+
+    public void bind(){
+        glUseProgram(renderid);
+    }
+
+    public void unbind(){
+        glUseProgram(0);
+    }
+
+    //find the uniform and give it 4 values of type float.
+    public void setGLUniform4f(int program, String u_name, float v1, float v2, float v3, float v4){
+        glUniform4f(glGetUniformLocation(program, u_name), v1, v2, v3, v4);
+    }
+
+    //Find the uniform and give it a value of type float.
+    public void setGLUniform1i(String u_name, int value){
+        int location = glGetUniformLocation(this.renderid, u_name);
+        if(location == -1)
+            GL_LOG.Log_Data("Uniform not found: " + u_name);
+        else
+            glUniform1i(location, value);
+    }
+    //A helper function for compiling opengl shaders as well as error checking.
+    //Will call compileProgram for program compilation.
+    private void compileShader(){
+
+        int v_shader = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(v_shader ,shaders[0]);
+        glCompileShader(v_shader);
+
+        int[] tmp = new int[1];
+        glGetShaderiv(v_shader,GL_COMPILE_STATUS, tmp);
+
+        if(GL_TRUE != tmp[0]){
+            GL_LOG.Log_Data("SHADER COMPILE ERROR " + filepath+":" + glGetShaderInfoLog(v_shader));
+            return;
+        }
+
+        int f_shader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(f_shader, shaders[1]);
+        glCompileShader(f_shader);
+
+
+        glGetShaderiv(f_shader,GL_COMPILE_STATUS, tmp);
+
+        if(GL_TRUE != tmp[0]){
+            GL_LOG.Log_Data("SHADER COMPILE ERROR " + filepath+":" + glGetShaderInfoLog(f_shader));
+            return;
+        }
+
+
+        compileProgram(v_shader, f_shader);
+    }
+
+    //Helper function for compiling and error checking of an opengl program.
+    private void compileProgram(int v_shader, int f_shader){
+
+        int program = glCreateProgram();
+        glAttachShader(program, v_shader);
+        glAttachShader(program, f_shader);
+        glLinkProgram(program);
+
+        int success = glGetProgrami(program, GL_LINK_STATUS);
+        if(success == GL_FALSE)
+            GL_LOG.Log_Data("Failed to link");
+
+        renderid = program;
+    }
+
+    private void parseShader(){
+        ShaderType type = ShaderType.NONE;
+
+        BufferedReader in = null;
         try {
-            in = new FileReader(filename);
+            in = new BufferedReader(new FileReader(filepath));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            System.out.println("failed to open file to read");
+            GL_LOG.Log_Data("Failed to create a reader for a shader file");
         }
 
         if(in != null){
+            String tmp = "";
 
             try {
-                in.read(buffer, 0, 2048);
+                shaders[0] = "";
+                shaders[1] = "";
 
-            } catch (IOException e) {
+                while ((tmp = in.readLine()) != null) {
+                    if(tmp.contains("#shader")){
+                        if(tmp.contains("vertex")){
+                            type = ShaderType.Vertex;
+                        }
+                        else if(tmp.contains("fragment")){
+                            type = ShaderType.Fragment;
+                        }
+                    }
+                    else{
+
+                        shaders[type.getTypeVal()] += tmp + "\n";
+                    }
+                }
+            }catch(IOException e){
                 e.printStackTrace();
             }
         }
@@ -45,41 +172,5 @@ public class Shader {
             e.printStackTrace();
             System.out.println("Failed to close shader file");
         }
-        shaderCode =  new String(buffer);
-        renderid = CompileShader(shaderType);
-    }
-
-    private int CompileShader(int shaderType){
-
-        int shader = glCreateShader(shaderType);
-        glShaderSource(shader, shaderCode);
-        glCompileShader(shader);
-
-        int[] tmp = new int[1];
-        glGetShaderiv(shader,GL_COMPILE_STATUS, tmp);
-
-        if(GL_TRUE != tmp[0]){
-            GL_LOG.Log_Data("SHADER COMPILE ERROR " + filepath+":" + glGetShaderInfoLog(shader));
-            return -1;
-        }
-        return shader;
-    }
-
-    public int getId(){
-        return renderid;
-    }
-
-    //find the uniform and give it 4 values of type float.
-    public void setGLUniform4f(int program, String u_name, float v1, float v2, float v3, float v4){
-        glUniform4f(glGetUniformLocation(program, u_name), v1, v2, v3, v4);
-    }
-
-    //Find the uniform and give it a value of type float.
-    public void setGLUniform1i(int program, String u_name, int value){
-        int location = glGetUniformLocation(program, u_name);
-        if(location == -1)
-            GL_LOG.Log_Data("Uniform not found: " + u_name);
-        else
-            glUniform1i(location, value);
     }
 }

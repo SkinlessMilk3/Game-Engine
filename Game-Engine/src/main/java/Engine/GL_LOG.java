@@ -63,4 +63,26 @@ public class GL_LOG{
             e.printStackTrace();
         }
     }
+
+    static public void Log_Data(char message){
+
+        try {
+            out = new FileWriter("../../../build/Log.txt",true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            out.write("\n"+ message);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Failed to write data to Log.txt");
+        }
+        try {
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

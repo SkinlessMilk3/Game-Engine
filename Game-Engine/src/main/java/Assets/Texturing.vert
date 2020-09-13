@@ -1,3 +1,4 @@
+#shader vertex
 #version 410
 layout(location = 0) in vec4 vertex_point;
 layout(location = 1) in vec3 texColors;
@@ -11,6 +12,20 @@ void main(){
     v_texCoords = texCoords;
     gl_Position = vertex_point;
 
-    //Cast to a vec4/vector 4 with 4 vector directions
-    //so need to add that extra 1.0 direction. Not sure why 1.0 though.
+}
+
+#shader fragment
+#version 410
+
+layout(location = 0)out vec4 frag_colour;
+
+in vec2 v_texCoords;
+uniform sampler2D u_texture;
+
+void main(){
+    vec4 texColor = texture(u_texture, v_texCoords);
+    frag_colour = texColor;
+
+    //cast to a vec4 which means now we have opacity. Set it to 1.0
+    //so that it is visible.
 }
