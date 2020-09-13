@@ -4,6 +4,7 @@ import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventListener;
 
 import Engine.Scenes.CounterDemoScene;
+import Engine.Scenes.ExTexture;
 import Engine.Scenes.LevelEditorScene;
 import Engine.Scenes.LevelScene;
 import org.lwjgl.Version;
@@ -15,6 +16,8 @@ import org.lwjgl.opengl.GL;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL43.*;
+import static org.lwjgl.opengl.GLDebugMessageCallback.getMessage;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class Window {
@@ -98,6 +101,8 @@ public class Window {
         glfwSetErrorCallback((errcode, dsc)->{
             GL_LOG.Log_Data(errcode + " " + GLFWErrorCallback.getDescription(dsc));
         });
+
+
         GLFWErrorCallback.createPrint(System.err).set();
 
         if(!glfwInit())
@@ -122,6 +127,13 @@ public class Window {
 
         //Make openGL context current
         glfwMakeContextCurrent(wnd);
+
+        //Useful error function if it can be figured out.
+        /*glEnable(GL_DEBUG_OUTPUT);
+        glDebugMessageCallback((int src, int type, int id, int severity, int length, long message, long userParam)->{
+            GL_LOG.Log_Data(severity + " " + getMessage(length, message));
+        }, 0);
+*/
         //Enable v-sync
         glfwSwapInterval(1);
 
@@ -135,18 +147,23 @@ public class Window {
         float dt = -1.0f;
 
         GL.createCapabilities();
-
+;
         //Sets starting scene
         Window.ChangeScene(0);
 
+        GL_LOG.Log_Data(Integer.toString(glGetError()));
+
+        /*Note for the future. Draw calls need to happen after the glClear function in the loop
+         * or nothing will be drawn.
+         */
         while(!glfwWindowShouldClose(wnd)){
+
+            glClearColor(0.8f, 1.8f, 0.8f,1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
 
             Frame_Rate.Update_Frame_Rate_Counter();
 
             glfwPollEvents();
-
-            glClearColor(0.8f, 0.8f, 0.8f,1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             //Draws/updates current scene
             if (dt >= 0)

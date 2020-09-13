@@ -7,7 +7,6 @@ import Engine.Camera;
 import Engine.GameObject;
 import Engine.Scene;
 import Engine.Window;
-import Renderer.GL_Shader_Reader;
 import Renderer.Shader;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -36,10 +35,10 @@ public class CounterDemoScene extends Scene {
     public int sceneNum = 2;
     public float timeToChangeScene = 2.0f;
 
-    private GL_Shader_Reader shader_reader = new GL_Shader_Reader();
-    private String vertexShaderScr = shader_reader.getFileContent("ShaderCode/first.vert");
+    //private GL_Shader_Reader shader_reader = new GL_Shader_Reader();
+    //private String //vertexShaderScr = new Shader("Assets/first.vert").CompileShader(GL_VERTEX_SHADER);
 
-    private String fragmentShaderSrc = shader_reader.getFileContent("ShaderCode/first.frag");
+    //private String fragmentShaderSrc = shader_reader.getFileContent("Assets/first.frag");
 
     private int vertexID, fragmentID, shaderProgram;
 
@@ -92,10 +91,10 @@ public class CounterDemoScene extends Scene {
         //Compile and link shaders
 
         //load and compile vertex shader
-        vertexID = Shader.CompileShader(GL_VERTEX_SHADER, vertexShaderScr);
+        vertexID = new Shader(GL_VERTEX_SHADER, "Assets/first.vert").getId();
 
         //load and compile fragment shader
-        fragmentID = Shader.CompileShader(GL_FRAGMENT_SHADER, fragmentShaderSrc);
+        fragmentID = new Shader(GL_FRAGMENT_SHADER, "Assets/first.frag").getId();
 
         // Link shaders and check for errors
         shaderProgram = glCreateProgram();
@@ -170,7 +169,7 @@ public class CounterDemoScene extends Scene {
         else if (changingScene)
         {
             timeToChangeScene = 2.0f;
-            Window.ChangeScene(0);
+            //Window.ChangeScene(0);
         }
 
         glUseProgram(shaderProgram);

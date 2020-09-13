@@ -3,10 +3,13 @@ package Engine.Scenes;
 import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventListener;
 import Engine.Camera;
+import Engine.GL_LOG;
 import Engine.Scene;
 import Engine.Window;
-import Renderer.GL_Shader_Reader;
 import Renderer.Shader;
+import Renderer.Texture;
+import Renderer.VAO;
+import Renderer.VBO;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
@@ -33,11 +36,6 @@ public class LevelScene extends Scene {
     public boolean changingScene = false;
     public int sceneNum = 1;
     public float timeToChangeScene = 2.0f;
-
-    private GL_Shader_Reader shader_reader = new GL_Shader_Reader();
-    private String vertexShaderScr = shader_reader.getFileContent("ShaderCode/first.vert");
-
-    private String fragmentShaderSrc = shader_reader.getFileContent("ShaderCode/first.frag");
 
     private int vertexID, fragmentID, shaderProgram;
 
@@ -80,16 +78,15 @@ public class LevelScene extends Scene {
     @Override
     public void init()
     {
-        //Initializes camera
-        this.camera = new Camera(new Vector2f());
 
-        //Compile and link shaders
+        //Initializes camera
+        /*this.camera = new Camera(new Vector2f());
 
         //load and compile vertex shader
-        vertexID = Shader.CompileShader(GL_VERTEX_SHADER, vertexShaderScr);
+        vertexID = new Shader(GL_VERTEX_SHADER, "Assets/first.vert").getId();
 
         //load and compile fragment shader
-        fragmentID = Shader.CompileShader(GL_FRAGMENT_SHADER, fragmentShaderSrc);
+        fragmentID = new Shader(GL_FRAGMENT_SHADER, "Assets/first.frag").getId();
 
         // Link shaders and check for errors
         shaderProgram = glCreateProgram();
@@ -138,7 +135,7 @@ public class LevelScene extends Scene {
         glEnableVertexAttribArray(0);
 
         glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionsSize * floatSizeBytes);
-        glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(1);*/
     }
 
     @Override
@@ -165,10 +162,12 @@ public class LevelScene extends Scene {
         else if (changingScene)
         {
             timeToChangeScene = 2.0f;
-            Window.ChangeScene(sceneNum);
+            //Window.ChangeScene(sceneNum);
         }
 
-        glUseProgram(shaderProgram);
+
+
+        /*glUseProgram(shaderProgram);
 
         uploadMat4f("uProjection", camera.getProjectionMatrix(), shaderProgram);
         uploadMat4f("uView", camera.getViewMatrix(), shaderProgram);
@@ -188,7 +187,7 @@ public class LevelScene extends Scene {
 
         glBindVertexArray(0);
 
-        glUseProgram(0);
+        glUseProgram(0);*/
     }
 
 }

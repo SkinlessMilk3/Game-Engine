@@ -4,7 +4,6 @@ import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventListener;
 import Components.SpriteRenderer;
 import Engine.*;
-import Renderer.GL_Shader_Reader;
 import Renderer.Shader;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -68,7 +67,7 @@ public class LevelEditorScene extends Scene {
         //Initializes camera
         this.camera = new Camera(new Vector2f());
 
-        GL_Shader_Reader reader = new GL_Shader_Reader();
+        //GL_Shader_Reader reader = new GL_Shader_Reader();
 
         vao = 0; //Vertex Buffer Object
         vbo_points = 0; //Vertex Array Object
@@ -100,13 +99,10 @@ public class LevelEditorScene extends Scene {
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
 
-        final String vertex_shader = reader.getFileContent("ShaderCode/first.vert");
-        //Job is to set the colour for each fragment
-        final String fragment_shader = reader.getFileContent("ShaderCode/first.frag");
-
-        int vs = Shader.CompileShader(GL_VERTEX_SHADER, vertex_shader);
-
-        int fs = Shader.CompileShader(GL_FRAGMENT_SHADER, fragment_shader);
+        Shader vShader = new Shader(GL_VERTEX_SHADER, "Assets/first.vert");
+        Shader fShader = new Shader(GL_FRAGMENT_SHADER, "Assets/first.frag");
+        int vs = vShader.getId();
+        int fs = fShader.getId();
 
         shader_program = glCreateProgram();
         glAttachShader(shader_program, fs);
@@ -145,7 +141,7 @@ public class LevelEditorScene extends Scene {
         else if (changingScene)
         {
             timeToChangeScene = 2.0f;
-            Window.ChangeScene(sceneNum);
+            //Window.ChangeScene(sceneNum);
         }
 
         glUseProgram(shader_program);
