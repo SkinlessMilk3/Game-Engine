@@ -4,7 +4,7 @@ import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventListener;
 import Components.SpriteRenderer;
 import Engine.*;
-import Renderer.Shader;
+import Renderer.*;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;

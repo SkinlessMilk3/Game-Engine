@@ -21,4 +21,12 @@ public class Renderer {
 
         glDrawElements(GL_TRIANGLES, ibo.getCount(), GL_UNSIGNED_INT, 0);
     }
+
+    public void Draw(final VAO vao, final Shader shader, final int count){
+
+        shader.bind();
+        vao.bind();
+
+        glDrawArrays(GL_TRIANGLES, count, GL_UNSIGNED_INT);
+    }
 }
