@@ -2,11 +2,14 @@ package Renderer;
 
 import static org.lwjgl.opengl.GL20.*;
 import Engine.GL_LOG;
+import org.joml.Matrix4f;
+import org.lwjgl.BufferUtils;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.FloatBuffer;
 
 /*
 * Does things like compiles shaders and checks for errors
@@ -72,25 +75,28 @@ public class Shader {
     }
 
     //find the uniform and give it 4 values of type float.
-    public void setGLUniform4f(int program, String u_name, float v1, float v2, float v3, float v4){
+    public void setUniform4f(int program, String u_name, float v1, float v2, float v3, float v4){
         glUniform4f(glGetUniformLocation(program, u_name), v1, v2, v3, v4);
     }
 
     //Find the uniform and give it a value of type float.
-    public void setGLUniform1i(String u_name, int value){
+    public void setUniform1i(String u_name, int value){
         int location = glGetUniformLocation(this.renderid, u_name);
         if(location == -1)
             GL_LOG.Log_Data("Uniform not found: " + u_name);
-        else
-            glUniform1i(location, value);
+
+        glUniform1i(location, value);
     }
-    public void setUniformmat4(String u_name, float[] matrix){
+    public void setUniformMat4(String u_name, Matrix4f matrix){
         int location = glGetUniformLocation(this.renderid, u_name);
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
+        matrix.get(buffer);
 
         if(location == -1)
             GL_LOG.Log_Data("Uniform not found: " + u_name);
-        glUniformMatrix4fv(location, false, matrix);
+        glUniformMatrix4fv(location, false, buffer);
     }
+
     //A helper function for compiling opengl shaders as well as error checking.
     //Will call compileProgram for program compilation.
     private void compileShader(){

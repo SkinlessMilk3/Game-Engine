@@ -1,10 +1,6 @@
-package Engine.Scenes;
+package Engine;
 
-import Engine.GL_LOG;
-import Renderer.Shader;
-import Renderer.Texture;
-import Renderer.VAO;
-import Renderer.VBO;
+import Renderer.*;
 
 import static org.lwjgl.opengl.GL20.*;
 
@@ -21,20 +17,21 @@ public class ExTexture {
     Texture texture;
     Shader shader;
     VAO vao;
-
+    private Renderer renderer;
     public ExTexture(){
         texture = new Texture("Assets/Textures/Fantasy-My-Hero-Academia.jpg");
         texture.bind(0);
+        renderer = new Renderer();
 
         shader = new Shader("Assets/Texturing.vert");
 
-        GL_LOG.Log_Data("Linking check "+Integer.toString(glGetError()));
+        GL_LOG.Log_Data("Linking check "+ glGetError());
 
 
         VBO vbo = new VBO(GL_ARRAY_BUFFER, points);
         vao = new VAO();
 
-        GL_LOG.Log_Data("New VAO and VBO "+Integer.toString(glGetError()));
+        GL_LOG.Log_Data("New VAO and VBO "+ glGetError());
 
         int sizeFloat = 4;
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 8 * sizeFloat, 0);
@@ -44,21 +41,22 @@ public class ExTexture {
         glEnableVertexAttribArray(1);
 
         glVertexAttribPointer(2, 2, GL_FLOAT, false, 8 * sizeFloat, 6 * sizeFloat);
-        GL_LOG.Log_Data("set buffer layouts "+Integer.toString(glGetError()));
+        GL_LOG.Log_Data("set buffer layouts "+ glGetError());
 
         texture.bind(0);
     }
+
     public void onUpdate(){
 
-        shader.setGLUniform1i("u_texture", 0);
+        shader.setUniform1i("u_texture", 0);
 
-        glUseProgram(shader.getId());
+        shader.bind();
         vao.bind();
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);
 
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        renderer.Draw(vao, shader, 6);
 
 
         //GL_LOG.Log_Data("Drawing triangles "+Integer.toString(glGetError()));

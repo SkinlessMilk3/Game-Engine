@@ -88,7 +88,7 @@ public class LevelScene extends Scene {
         //Create VBO upload the vertex buffer
         vbo = new VBO(GL_ARRAY_BUFFER, vertexArray);
         //Create the indices and upload
-        ibo = new IBO(GL_ELEMENT_ARRAY_BUFFER, elementArray);
+        ibo = new IBO(elementArray);
 
         // Add the vertex attribute pointers
         int positionsSize = 3;

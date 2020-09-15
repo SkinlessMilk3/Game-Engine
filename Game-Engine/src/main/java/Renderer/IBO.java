@@ -12,16 +12,16 @@ public class IBO {
     private int sizeOfInt = 4;
     private int bufferCount;
 
-    public IBO(int target, final int[] buffer){
-        localBuffer = BufferUtils.createIntBuffer(buffer.length);
-
+    public IBO(final int[] buffer){
         bufferCount = buffer.length;
+        localBuffer = BufferUtils.createIntBuffer(bufferCount);
+
         localBuffer.put(buffer);
         localBuffer.flip();
 
         renderId = glGenBuffers();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderId);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeOfInt * localBuffer.capacity(), GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, localBuffer, GL_STATIC_DRAW);
     }
 
     public void bind(){

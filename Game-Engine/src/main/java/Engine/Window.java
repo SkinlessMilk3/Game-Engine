@@ -4,7 +4,6 @@ import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventListener;
 
 import Engine.Scenes.CounterDemoScene;
-import Engine.Scenes.ExTexture;
 import Engine.Scenes.LevelEditorScene;
 import Engine.Scenes.LevelScene;
 import Renderer.Renderer;
@@ -17,8 +16,6 @@ import org.lwjgl.opengl.GL;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL43.*;
-import static org.lwjgl.opengl.GLDebugMessageCallback.getMessage;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class Window {
@@ -133,7 +130,7 @@ public class Window {
         GL.createCapabilities();
 
         //Sets starting scene
-        Window.ChangeScene(0);
+        //Window.ChangeScene(0);
 
         GL_LOG.Log_Data(Integer.toString(glGetError()));
 
@@ -144,11 +141,13 @@ public class Window {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         Renderer renderer = new Renderer();
+        Testing tst = new Testing();
+        //ExTexture tst = new ExTexture();
         while(!glfwWindowShouldClose(wnd)){
 
             renderer.Clear();
             //renderer.Draw();
-
+tst.onUpdate();
             Frame_Rate.Update_Frame_Rate_Counter();
 
             glfwPollEvents();
@@ -156,7 +155,7 @@ public class Window {
             //Draws/updates current scene
             if (dt >= 0)
             {
-                currentScene.update(dt);
+                //currentScene.update(dt);
             }
 
             //System.out.println("Mouse is at x: "  + MouseEventListener.getX() + " y: " + MouseEventListener.getY());

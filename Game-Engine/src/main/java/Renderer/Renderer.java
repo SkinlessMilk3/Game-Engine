@@ -15,7 +15,7 @@ public class Renderer {
     }
     public void Draw(final VAO vao, final IBO ibo, final Shader shader){
 
-        //shader.bind();
+        shader.bind();
         vao.bind();
         ibo.bind();
 
@@ -27,6 +27,6 @@ public class Renderer {
         shader.bind();
         vao.bind();
 
-        glDrawArrays(GL_TRIANGLES, count, GL_UNSIGNED_INT);
+        glDrawArrays(GL_TRIANGLES, 0, count);
     }
 }
