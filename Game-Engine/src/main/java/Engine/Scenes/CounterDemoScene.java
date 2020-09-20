@@ -69,16 +69,9 @@ public class CounterDemoScene extends Scene {
 
     private GameObject counterObj;
 
-    public void uploadMat4f(String varName, Matrix4f mat4, int shaderProgram) {
-        int varLocation = glGetUniformLocation(shaderProgram, varName);
-        FloatBuffer matBuffer = BufferUtils.createFloatBuffer(16);
-        mat4.get(matBuffer);
-        glUniformMatrix4fv(varLocation, false, matBuffer);
-    }
-
     public CounterDemoScene()
     {
-        System.out.println("Inside demo controller!");
+        System.out.println("Inside demo counter!");
 
     }
 
@@ -174,8 +167,8 @@ public class CounterDemoScene extends Scene {
 
         glUseProgram(shaderProgram);
 
-        uploadMat4f("uProjection", camera.getProjectionMatrix(), shaderProgram);
-        uploadMat4f("uView", camera.getViewMatrix(), shaderProgram);
+        Shader.uploadMat4f("uProjection", camera.getProjectionMatrix(), shaderProgram);
+        Shader.uploadMat4f("uView", camera.getViewMatrix(), shaderProgram);
 
         //Bind the VAO that we're using
         glBindVertexArray(vaoID);
@@ -184,7 +177,6 @@ public class CounterDemoScene extends Scene {
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
 
-        glDrawElements(GL_TRIANGLES, elementArray.length, GL_UNSIGNED_INT, 0);
         glDrawElements(GL_TRIANGLES, elementArray.length, GL_UNSIGNED_INT, 0);
 
         // Unbind everything

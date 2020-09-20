@@ -60,13 +60,6 @@ public class LevelScene extends Scene {
             0,1,3  //Bottom right triangle
     };
 
-    public void uploadMat4f(String varName, Matrix4f mat4, int shaderProgram) {
-        int varLocation = glGetUniformLocation(shaderProgram, varName);
-        FloatBuffer matBuffer = BufferUtils.createFloatBuffer(16);
-        mat4.get(matBuffer);
-        glUniformMatrix4fv(varLocation, false, matBuffer);
-    }
-
     public LevelScene()
     {
         System.out.println("Inside level!");
@@ -133,8 +126,8 @@ public class LevelScene extends Scene {
 
         glUseProgram(shader.getId());
 
-        uploadMat4f("uProjection", camera.getProjectionMatrix(), shader.getId());
-        uploadMat4f("uView", camera.getViewMatrix(), shader.getId());
+        Shader.uploadMat4f("uProjection", camera.getProjectionMatrix(), shader.getId());
+        Shader.uploadMat4f("uView", camera.getViewMatrix(), shader.getId());
 
         //Bind the VAO that we're using
         vao.bind();

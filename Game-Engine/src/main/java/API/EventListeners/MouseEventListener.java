@@ -57,7 +57,7 @@ public class MouseEventListener{
 
     public static void isScrolledCallback(long window, double xoffset, double yoffset){
 
-        getListener().scrollY = xoffset;
+        getListener().scrollX = xoffset;
         getListener().scrollY = yoffset;
     }
 

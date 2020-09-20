@@ -187,4 +187,11 @@ public class Shader {
             System.out.println("Failed to close shader file");
         }
     }
+
+    public static void uploadMat4f(String varName, Matrix4f mat4, int shaderProgram) {
+        int varLocation = glGetUniformLocation(shaderProgram, varName);
+        FloatBuffer matBuffer = BufferUtils.createFloatBuffer(16);
+        mat4.get(matBuffer);
+        glUniformMatrix4fv(varLocation, false, matBuffer);
+    }
 }
