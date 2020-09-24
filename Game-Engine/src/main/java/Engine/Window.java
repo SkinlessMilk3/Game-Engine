@@ -4,9 +4,11 @@ import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventListener;
 
 import Engine.Scenes.CounterDemoScene;
+import Engine.Scenes.ImguiTestScene;
 import Engine.Scenes.LevelEditorScene;
 import Engine.Scenes.LevelScene;
 import Renderer.Renderer;
+import imgui.ImGui;
 import org.lwjgl.Version;
 
 import org.lwjgl.glfw.GLFW;
@@ -129,6 +131,9 @@ public class Window {
 
         GL.createCapabilities();
 
+        //Sets starting scene
+        Window.ChangeScene(3);
+
         //TESTING GUI
         this.imGuiLayer = new ImGuiLayer(wnd);
         this.imGuiLayer.initImGui();
@@ -136,12 +141,11 @@ public class Window {
 
     private void loop() {
 
+
+
         float beginTime = (float) glfwGetTime();
         float endTime;
         float dt = -1.0f;
-
-        //Sets starting scene
-        //Window.ChangeScene(0);
 
         GL_LOG.Log_Data(Integer.toString(glGetError()));
 
@@ -166,12 +170,14 @@ public class Window {
 
             //Draws/updates current scene
             if (dt >= 0) {
-                //currentScene.update(dt);
+                currentScene.update(dt);
+
             }
 
             //System.out.println("Mouse is at x: "  + MouseEventListener.getX() + " y: " + MouseEventListener.getY());
 
-            this.imGuiLayer.update(dt);
+            this.imGuiLayer.update(dt, currentScene);
+
 
             glfwSwapBuffers(wnd);
 
@@ -190,7 +196,7 @@ public class Window {
     }
 
     public static void ChangeScene(int newScene) {
-        // Temporary switch case
+        // Temporary switch cases for testing
         switch (newScene) {
             case 0:
                 currentScene = new LevelEditorScene();
@@ -207,6 +213,10 @@ public class Window {
                 currentScene.init();
                 currentScene.start();
                 break;
+            case 3:
+                currentScene = new ImguiTestScene();
+                currentScene.init();
+                currentScene.start();
             default:
                 assert false : "Unknown scene '" + newScene + "'!";
                 break;
