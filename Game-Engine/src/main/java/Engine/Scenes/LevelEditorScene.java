@@ -44,12 +44,6 @@ public class LevelEditorScene extends Scene {
     private GameObject testObj;
     private boolean firstTime = false;
 
-    public void uploadMat4f(String varName, Matrix4f mat4, int shaderProgram) {
-        int varLocation = glGetUniformLocation(shaderProgram, varName);
-        FloatBuffer matBuffer = BufferUtils.createFloatBuffer(16);
-        mat4.get(matBuffer);
-        glUniformMatrix4fv(varLocation, false, matBuffer);
-    }
 
     public LevelEditorScene()
     {
@@ -132,8 +126,8 @@ public class LevelEditorScene extends Scene {
         }
 
         shader.bind();
-        uploadMat4f("uProjection", camera.getProjectionMatrix(), shader.getId());
-        uploadMat4f("uView", camera.getViewMatrix(), shader.getId());
+        Shader.uploadMat4f("uProjection", camera.getProjectionMatrix(), shader.getId());
+        Shader.uploadMat4f("uView", camera.getViewMatrix(), shader.getId());
 
         //Bind the VAO that we're using
         glBindVertexArray(vao);

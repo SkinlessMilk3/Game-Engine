@@ -76,7 +76,7 @@ public class MouseEventDispatcher{
         getListener().scrollY = yoffset;
 
         for(MouseEventListener tmp : scrollEventListeners){
-            tmp.scrolledEvent((float)getListener().scrollX /*- (float)getListener().prevScrollX*/, (float)getListener().scrollY /*- (float)getListener().prevScrollY*/);
+            tmp.onScrolledEvent((float)getListener().scrollX /*- (float)getListener().prevScrollX*/, (float)getListener().scrollY /*- (float)getListener().prevScrollY*/);
         }
     }
 

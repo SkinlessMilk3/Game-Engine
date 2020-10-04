@@ -34,7 +34,7 @@ public class CameraController implements MouseEventListener, WindowResizeListene
             }
         }
     }
-    public void scrolledEvent(float xoffset, float yoffset){
+    public void onScrolledEvent(float xoffset, float yoffset){
 
           if(zoomLevel > 1.0f)
             zoomLevel -= yoffset;

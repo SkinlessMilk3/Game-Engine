@@ -3,14 +3,18 @@ package Engine.Scenes;
 import Engine.Camera;
 import Engine.GameObject;
 
+import imgui.ImGui;
+
 import java.util.ArrayList;
 import java.util.List;
+
 
 public abstract class Scene {
 
     protected Camera camera;
     private boolean isRunning = false;
     protected List<GameObject> gameObjects = new ArrayList<>();
+    protected GameObject activeGameObject = null;
 
     public Scene() {
 
@@ -37,4 +41,21 @@ public abstract class Scene {
     }
 
     public abstract void update(float dt);
+
+    //Gets current "selected" object in gui
+    public void sceneImgui() {
+        if (activeGameObject != null)
+        {
+            ImGui.begin("Inspector");
+            activeGameObject.imgui();
+            ImGui.end();
+        }
+
+        imgui();
+    }
+
+    //The function that handles the layout of every imgui per scene
+    public void imgui() {
+
+    }
 }

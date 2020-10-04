@@ -9,6 +9,7 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
@@ -17,6 +18,7 @@ dependencies {
 
 project.ext.lwjglVersion = "3.2.3"
 project.ext.jomlVersion = "1.9.25"
+project.ext.imguiVersion = '1.76-0.9'
 //project.ext.lwjglNatives = "natives-linux"
 switch (OperatingSystem.current()) {
     case OperatingSystem.LINUX:
@@ -27,10 +29,33 @@ switch (OperatingSystem.current()) {
         break
 }
 repositories {
+    jcenter()
     mavenCentral()
 }
 
+switch (OperatingSystem.current()) {
+    case OperatingSystem.LINUX:
+        project.ext.imguiNatives = "natives-linux"
+        break
+    case OperatingSystem.MAC_OS:
+        project.ext.imguiNatives = "natives-macos"
+        break
+    case OperatingSystem.WINDOWS:
+        project.ext.imguiNatives = System.getProperty("os.arch").contains("64") ? "natives-windows" : "natives-windows-x86"
+        break
+}
+
 dependencies {
+    
+    //GSON
+    implementation 'com.google.code.gson:gson:2.8.6'
+
+    //ImGui
+    implementation "io.imgui.java:binding:$imguiVersion"
+    implementation "io.imgui.java:lwjgl3:$imguiVersion"
+    runtimeOnly "io.imgui.java:$imguiNatives:$imguiVersion"
+
+
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
 
     implementation "org.lwjgl:lwjgl"

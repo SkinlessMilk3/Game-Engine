@@ -1,5 +1,5 @@
 package API.EventListeners;
 
 public interface MouseEventListener {
-    public void scrolledEvent(float deltax, float deltay);
+    public void onScrolledEvent(float xoffset, float yoffset);
 }

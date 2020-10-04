@@ -14,7 +14,7 @@ public class TempCounter extends Component {
 
     @Override
     public void start() {
-        System.out.println("Controller added!");
+        System.out.println("Counter added!");
     }
 
     @Override
