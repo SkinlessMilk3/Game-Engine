@@ -1,5 +1,6 @@
 package Renderer;
 
+import Engine.GL_LOG;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -14,7 +15,7 @@ public class VBO {
     private int target;
     private FloatBuffer localBuffer;
 
-    public VBO(int target, final float[] buffer){
+    public VBO(final int target, final float[] buffer){
         this.target = target;
         localBuffer = BufferUtils.createFloatBuffer(buffer.length);
         localBuffer.put(buffer).flip();
@@ -23,12 +24,23 @@ public class VBO {
         glBindBuffer(this.target, renderId);
         glBufferData(GL_ARRAY_BUFFER, localBuffer, GL_STATIC_DRAW);
     }
+    public VBO(final long size){
+        renderId = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, renderId);
+        glBufferData(GL_ARRAY_BUFFER, size, GL_DYNAMIC_DRAW);
+    }
+    public void pushData(float[] data){
+        bind();
+        glBufferSubData(GL_ARRAY_BUFFER, 0, data);
+
+        GL_LOG.Log_Data("pushData error: 37 " + glGetError());
+    }
     public void bind(){
-        glBindBuffer(target, renderId);
+        glBindBuffer(GL_ARRAY_BUFFER, renderId);
     }
 
     public void unbind(){
-        glBindBuffer(target, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     public void delete(){

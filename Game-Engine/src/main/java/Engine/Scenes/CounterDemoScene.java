@@ -1,12 +1,10 @@
 package Engine.Scenes;
 
 import API.EventListeners.KeyEventListener;
-import API.EventListeners.MouseEventListener;
+import API.EventListeners.MouseEventDispatcher;
 import Components.TempCounter;
 import Engine.Camera;
 import Engine.GameObject;
-import Engine.Scene;
-import Engine.Window;
 import Renderer.Shader;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -149,11 +147,11 @@ public class CounterDemoScene extends Scene {
     @Override
     public void update(float dt)
     {
-        if (MouseEventListener.isDragging())
+        if (MouseEventDispatcher.isDragging())
         {
-            if (MouseEventListener.getDeltaX() != MouseEventListener.getX()) {
-                camera.position.x -= MouseEventListener.getDeltaX();
-                camera.position.y += MouseEventListener.getDeltaY();
+            if (MouseEventDispatcher.getDeltaX() != MouseEventDispatcher.getX()) {
+                camera.position.x -= MouseEventDispatcher.getDeltaX();
+                camera.position.y += MouseEventDispatcher.getDeltaY();
             }
         }
 

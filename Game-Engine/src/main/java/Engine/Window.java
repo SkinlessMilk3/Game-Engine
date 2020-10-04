@@ -1,12 +1,15 @@
 package Engine;
 
 import API.EventListeners.KeyEventListener;
-import API.EventListeners.MouseEventListener;
+import API.EventListeners.MouseEventDispatcher;
 
+import API.EventListeners.WindowResizeDispatcher;
 import Engine.Scenes.CounterDemoScene;
 import Engine.Scenes.LevelEditorScene;
 import Engine.Scenes.LevelScene;
-import Renderer.Renderer;
+import Engine.Scenes.Scene;
+import Renderer.Renderer2D;
+import org.joml.*;
 import org.lwjgl.Version;
 
 import org.lwjgl.glfw.GLFW;
@@ -103,9 +106,10 @@ public class Window {
 
         //Lambda Functions
         glfwSetKeyCallback(wnd, KeyEventListener::isKeyPressed);
-        glfwSetMouseButtonCallback(wnd, MouseEventListener::isPressedCallback);
-        glfwSetScrollCallback(wnd, MouseEventListener::isScrolledCallback);
-        glfwSetCursorPosCallback(wnd, MouseEventListener::isMovedCallback);
+        glfwSetMouseButtonCallback(wnd, MouseEventDispatcher::isPressedCallback);
+        glfwSetScrollCallback(wnd, MouseEventDispatcher::isScrolledCallback);
+        glfwSetCursorPosCallback(wnd, MouseEventDispatcher::isMovedCallback);
+        glfwSetWindowSizeCallback(wnd, WindowResizeDispatcher::WindowReizeCallback);
 
         //Make openGL context current
         glfwMakeContextCurrent(wnd);
@@ -130,9 +134,7 @@ public class Window {
         GL.createCapabilities();
 
         //Sets starting scene
-        //Window.ChangeScene(0);
-
-        GL_LOG.Log_Data(Integer.toString(glGetError()));
+        Window.ChangeScene(0);
 
         /*Note for the future. Draw calls need to happen after the glClear function in the loop
          * or nothing will be drawn.
@@ -140,14 +142,14 @@ public class Window {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        Renderer renderer = new Renderer();
-        Testing tst = new Testing();
-        //ExTexture tst = new ExTexture();
+
+
+        //currentScene = new LevelEditorScene();
+        Renderer2D.Init();
         while(!glfwWindowShouldClose(wnd)){
 
-            renderer.Clear();
-            //renderer.Draw();
-tst.onUpdate();
+            Renderer2D.Clear();
+
             Frame_Rate.Update_Frame_Rate_Counter();
 
             glfwPollEvents();
@@ -155,10 +157,10 @@ tst.onUpdate();
             //Draws/updates current scene
             if (dt >= 0)
             {
-                //currentScene.update(dt);
+                currentScene.update(dt);
             }
 
-            //System.out.println("Mouse is at x: "  + MouseEventListener.getX() + " y: " + MouseEventListener.getY());
+            //System.out.println("Mouse is at x: "  + MouseEventDispatcher.getX() + " y: " + MouseEventDispatcher.getY());
 
             glfwSwapBuffers(wnd);
 
@@ -166,6 +168,7 @@ tst.onUpdate();
             dt = endTime - beginTime;
             beginTime = endTime;
         }
+        Renderer2D.shutdown();
     }
 
     public static Window getWindow(){

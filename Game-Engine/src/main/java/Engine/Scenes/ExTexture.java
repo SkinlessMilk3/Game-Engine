@@ -1,5 +1,6 @@
-package Engine;
+package Engine.Scenes;
 
+import Engine.GL_LOG;
 import Renderer.*;
 
 import static org.lwjgl.opengl.GL20.*;
@@ -17,11 +18,11 @@ public class ExTexture {
     Texture texture;
     Shader shader;
     VAO vao;
-    private Renderer renderer;
+    private Renderer2D renderer;
     public ExTexture(){
         texture = new Texture("Assets/Textures/Fantasy-My-Hero-Academia.jpg");
         texture.bind(0);
-        renderer = new Renderer();
+        renderer = new Renderer2D();
 
         shader = new Shader("Assets/Texturing.vert");
 
@@ -56,7 +57,7 @@ public class ExTexture {
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);
 
-        renderer.Draw(vao, shader, 6);
+        //renderer.Draw(vao, shader, 6);
 
 
         //GL_LOG.Log_Data("Drawing triangles "+Integer.toString(glGetError()));

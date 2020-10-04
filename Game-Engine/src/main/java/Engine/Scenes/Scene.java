@@ -1,4 +1,7 @@
-package Engine;
+package Engine.Scenes;
+
+import Engine.Camera;
+import Engine.GameObject;
 
 import java.util.ArrayList;
 import java.util.List;

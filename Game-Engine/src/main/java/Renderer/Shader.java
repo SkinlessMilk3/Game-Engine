@@ -73,10 +73,10 @@ public class Shader {
     public void unbind(){
         glUseProgram(0);
     }
-
+    public void delete(){ glDeleteShader(renderid); }
     //find the uniform and give it 4 values of type float.
-    public void setUniform4f(int program, String u_name, float v1, float v2, float v3, float v4){
-        glUniform4f(glGetUniformLocation(program, u_name), v1, v2, v3, v4);
+    public void setUniform4f(String u_name, float v1, float v2, float v3, float v4){
+        glUniform4f(glGetUniformLocation(renderid, u_name), v1, v2, v3, v4);
     }
 
     //Find the uniform and give it a value of type float.

@@ -1,11 +1,8 @@
 package Engine.Scenes;
 
 import API.EventListeners.KeyEventListener;
-import API.EventListeners.MouseEventListener;
+import API.EventListeners.MouseEventDispatcher;
 import Engine.Camera;
-import Engine.GL_LOG;
-import Engine.Scene;
-import Engine.Window;
 import Renderer.*;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -13,19 +10,13 @@ import org.lwjgl.BufferUtils;
 
 import java.awt.event.KeyEvent;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
-import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL15.glBufferData;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class LevelScene extends Scene {
@@ -105,11 +96,11 @@ public class LevelScene extends Scene {
     @Override
     public void update(float dt)
     {
-        if (MouseEventListener.isDragging())
+        if (MouseEventDispatcher.isDragging())
         {
-            if (MouseEventListener.getDeltaX() != MouseEventListener.getX()) {
-                camera.position.x -= MouseEventListener.getDeltaX();
-                camera.position.y += MouseEventListener.getDeltaY();
+            if (MouseEventDispatcher.getDeltaX() != MouseEventDispatcher.getX()) {
+                camera.position.x -= MouseEventDispatcher.getDeltaX();
+                camera.position.y += MouseEventDispatcher.getDeltaY();
             }
         }
 
