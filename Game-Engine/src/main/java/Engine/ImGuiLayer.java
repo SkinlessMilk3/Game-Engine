@@ -1,5 +1,7 @@
 package Engine;
 
+import API.EventListeners.MouseEventDispatcher;
+import API.EventListeners.MouseEventListener;
 import Engine.Scenes.Scene;
 import imgui.*;
 import imgui.callbacks.ImStrConsumer;
@@ -103,26 +105,44 @@ public class ImGuiLayer {
         });
 
         glfwSetMouseButtonCallback(glfwWindow, (w, button, action, mods) -> {
-            final boolean[] mouseDown = new boolean[5];
 
-            mouseDown[0] = button == GLFW_MOUSE_BUTTON_1 && action != GLFW_RELEASE;
-            mouseDown[1] = button == GLFW_MOUSE_BUTTON_2 && action != GLFW_RELEASE;
-            mouseDown[2] = button == GLFW_MOUSE_BUTTON_3 && action != GLFW_RELEASE;
-            mouseDown[3] = button == GLFW_MOUSE_BUTTON_4 && action != GLFW_RELEASE;
-            mouseDown[4] = button == GLFW_MOUSE_BUTTON_5 && action != GLFW_RELEASE;
+            if(io.getWantCaptureMouse()) {
+                final boolean[] mouseDown = new boolean[5];
 
-            io.setMouseDown(mouseDown);
+                mouseDown[0] = button == GLFW_MOUSE_BUTTON_1 && action != GLFW_RELEASE;
+                mouseDown[1] = button == GLFW_MOUSE_BUTTON_2 && action != GLFW_RELEASE;
+                mouseDown[2] = button == GLFW_MOUSE_BUTTON_3 && action != GLFW_RELEASE;
+                mouseDown[3] = button == GLFW_MOUSE_BUTTON_4 && action != GLFW_RELEASE;
+                mouseDown[4] = button == GLFW_MOUSE_BUTTON_5 && action != GLFW_RELEASE;
 
-            if (!io.getWantCaptureMouse() && mouseDown[1]) {
-                ImGui.setWindowFocus(null);
+                io.setMouseDown(mouseDown);
+
+                if (!io.getWantCaptureMouse() && mouseDown[1]) {
+                    ImGui.setWindowFocus(null);
+                }
+            }
+            else{
+                MouseEventDispatcher.isPressedCallback(w, button, action, mods);
             }
         });
 
         glfwSetScrollCallback(glfwWindow, (w, xOffset, yOffset) -> {
-            io.setMouseWheelH(io.getMouseWheelH() + (float) xOffset);
-            io.setMouseWheel(io.getMouseWheel() + (float) yOffset);
+            if(io.getWantCaptureMouse()) {
+                io.setMouseWheelH(io.getMouseWheelH() + (float) xOffset);
+                io.setMouseWheel(io.getMouseWheel() + (float) yOffset);
+            }
+            else {
+                MouseEventDispatcher.isScrolledCallback(w, xOffset, yOffset);
+            }
         });
 
+        /**
+         * glfwSetScrollCallback(wnd, (glfwWns, xOffset, yOffset) ->{
+         * create a mouse scroll event
+         * Event scroll = new MouseScrolled(xOffset, yOffset);
+         * layerStack.onEvent(scroll);
+         * });
+         */
         io.setSetClipboardTextFn(new ImStrConsumer() {
             @Override
             public void accept(final String s) {

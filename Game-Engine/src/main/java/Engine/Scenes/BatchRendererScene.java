@@ -14,7 +14,7 @@ public class BatchRendererScene {
     private static Vector4d color = new Vector4d(1.0f, 0.0f, 0.0f, 1.0f);
     private static CameraController control = new CameraController((float) Window.getWidth()/(float)Window.getHeight());
 
-    static void onUpdate(float dt){
+    public static void onUpdate(float dt){
 
         control.onUpdate(dt);
         Renderer2D.beginScene(control.getCamera());

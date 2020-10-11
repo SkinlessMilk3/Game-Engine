@@ -35,7 +35,7 @@ public class CameraController implements MouseEventListener, WindowResizeListene
         }
     }
     public void onScrolledEvent(float xoffset, float yoffset){
-
+GL_LOG.Log_Data("adsfasfafa");
           if(zoomLevel > 1.0f)
             zoomLevel -= yoffset;
           else if(yoffset < 0)

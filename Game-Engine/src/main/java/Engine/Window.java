@@ -4,12 +4,8 @@ import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventDispatcher;
 
 import API.EventListeners.WindowResizeDispatcher;
-import Engine.Scenes.CounterDemoScene;
-import Engine.Scenes.ImguiTestScene;
-import Engine.Scenes.LevelEditorScene;
-import Engine.Scenes.LevelScene;
+import Engine.Scenes.*;
 
-import Engine.Scenes.Scene;
 import Renderer.Renderer2D;
 import org.joml.*;
 
@@ -160,7 +156,7 @@ public class Window {
         float endTime;
         float dt = -1.0f;
 
-        GL_LOG.Log_Data(Integer.toString(glGetError()));
+        GL_LOG.Log_Data("Run loop" + glGetError());
 
         /*Note for the future. Draw calls need to happen after the glClear function in the loop
          * or nothing will be drawn.
@@ -171,12 +167,11 @@ public class Window {
 
         //currentScene = new LevelEditorScene();
         Renderer2D.Init();
-
         while (!glfwWindowShouldClose(wnd)) {
 
             Renderer2D.Clear();
-            //renderer.Draw();
 
+            BatchRendererScene.onUpdate(dt);
             Frame_Rate.Update_Frame_Rate_Counter();
 
             glfwPollEvents();
@@ -188,7 +183,7 @@ public class Window {
 
             //System.out.println("Mouse is at x: "  + MouseEventDispatcher.getX() + " y: " + MouseEventDispatcher.getY());
 
-            //this.imGuiLayer.update(dt, currentScene);
+            this.imGuiLayer.update(dt, currentScene);
 
 
             glfwSwapBuffers(wnd);

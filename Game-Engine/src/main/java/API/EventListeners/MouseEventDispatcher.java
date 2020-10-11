@@ -1,29 +1,23 @@
 package API.EventListeners;
 //Need to add lwjgl to project
 
+import Engine.GL_LOG;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 public class MouseEventDispatcher{
-    private static MouseEventDispatcher ls;
+    private static MouseEventDispatcher la;
     private boolean isDragging;
     private double scrollX, scrollY, prevScrollX, prevScrollY;
     private double x, y, prevX, prevY;
     private boolean isPressed[] = new boolean[3];
     private static List<MouseEventListener> scrollEventListeners;
 
-    public static void addListener(MouseEventListener e){
-
-        if(scrollEventListeners == null){
-            scrollEventListeners = new ArrayList<>();
-        }
-        scrollEventListeners.add(e);
-    }
-
     private MouseEventDispatcher(){
-        ls = null;
+        la = null;
         isDragging = false;
         scrollX = 0;
         scrollY = 0;
@@ -33,97 +27,84 @@ public class MouseEventDispatcher{
         prevY = 0;
         prevScrollX = 0;
         prevScrollY = 0;
-
     }
-
-    public static MouseEventDispatcher getListener(){
-        if(ls == null){
-            ls = new MouseEventDispatcher();
+    public static void addListener(MouseEventListener tmp){
+        if(scrollEventListeners == null)
+            scrollEventListeners = new ArrayList<>();
+        scrollEventListeners.add(tmp);
+    }
+    public static MouseEventDispatcher getDispatcher(){
+        if(la == null){
+            la = new MouseEventDispatcher();
         }
-        return ls;
+        return la;
     }
 
     public static void isMovedCallback(long window, double xpos, double ypos){
 
-        getListener().prevX = getListener().x;
-        getListener().prevY = getListener().y;
-        getListener().x = xpos;
-        getListener().y = ypos;
-        getListener().isDragging = getListener().isPressed[0] || getListener().isPressed[1] || getListener().isPressed[2];
+        getDispatcher().prevX = getDispatcher().x;
+        getDispatcher().prevY = getDispatcher().y;
+        getDispatcher().x = xpos;
+        getDispatcher().y = ypos;
+        getDispatcher().isDragging = getDispatcher().isPressed[0] || getDispatcher().isPressed[1] || getDispatcher().isPressed[2];
     }
 
     public static void isPressedCallback(long window, int button, int action, int mods){
 
         if(GLFW_PRESS == action){
-            if(button < getListener().isPressed.length) {
-                getListener().isDragging = true;
-                getListener().isPressed[button] = true;
+            if(button < getDispatcher().isPressed.length) {
+                getDispatcher().isDragging = true;
+                getDispatcher().isPressed[button] = true;
             }
         }
         else if(GLFW_RELEASE == action){
-            if(button < getListener().isPressed.length) {
-                getListener().isDragging = false;
-                getListener().isPressed[button] = false;
+            if(button < getDispatcher().isPressed.length) {
+                getDispatcher().isDragging = false;
+                getDispatcher().isPressed[button] = false;
             }
         }
     }
 
     public static void isScrolledCallback(long window, double xoffset, double yoffset){
 
-        getListener().prevScrollX = getListener().scrollX;
-        getListener().prevScrollY = getListener().scrollY;
-        getListener().scrollY = xoffset;
-        getListener().scrollY = yoffset;
-
+        getDispatcher().prevScrollX = getDispatcher().scrollX;
+        getDispatcher().prevScrollY = getDispatcher().scrollY;
+        getDispatcher().scrollY = xoffset;
+        getDispatcher().scrollY = yoffset;
+        GL_LOG.Log_Data("mosu scrol");
         for(MouseEventListener tmp : scrollEventListeners){
-            tmp.onScrolledEvent((float)getListener().scrollX /*- (float)getListener().prevScrollX*/, (float)getListener().scrollY /*- (float)getListener().prevScrollY*/);
+            tmp.onScrolledEvent((float) getDispatcher().scrollX , (float) getDispatcher().scrollY);
         }
     }
 
     public static void endFrame(){
-        getListener().scrollY = 0;
-        getListener().scrollX = 0;
-        getListener().prevX = 0;
-        getListener().prevY = 0;
-        getListener().x = getListener().prevX;
-        getListener().y = getListener().prevY;
+        getDispatcher().scrollY = 0;
+        getDispatcher().scrollX = 0;
+        getDispatcher().prevX = 0;
+        getDispatcher().prevY = 0;
+        getDispatcher().x = getDispatcher().prevX;
+        getDispatcher().y = getDispatcher().prevY;
     }
 
     public static float getX(){
-        return (float)getListener().x;
+        return (float) getDispatcher().x;
     }
 
     public static float getY(){
-        return (float)getListener().y;
-    }
-
-    public static float getDeltaY(){
-        return (float)(getListener().prevY - getListener().y);
-    }
-
-    public static float getDeltaX(){
-        return (float)(getListener().prevX - getListener().x);
-    }
-
-    public static float getScrollY(){
-        return (float)getListener().scrollY;
-    }
-
-    public static float getScrollX(){
-        return (float)getListener().scrollX;
+        return (float) getDispatcher().y;
     }
 
     public static boolean isDragging(){
-        return getListener().isDragging;
+        return getDispatcher().isDragging;
     }
 
-    public static double getDeltaScrollX(){ return getListener().scrollX - getListener().prevScrollX; }
-
-    public static double getDeltaScrollY(){ return getListener().scrollY - getListener().prevScrollY; }
     public static boolean isPressed(int button){
-        if(button < getListener().isPressed.length){
-            return getListener().isPressed[button];
+        if(button < getDispatcher().isPressed.length){
+            return getDispatcher().isPressed[button];
         }
         return false;
     }
+    public static float getDeltaX(){ return (float) getDispatcher().x - (float)getDispatcher().prevX; }
+    public static float getDeltaY(){ return (float) getDispatcher().y - (float)getDispatcher().prevY; }
+
 }
