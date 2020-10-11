@@ -3,15 +3,12 @@ package Engine.Scenes;
 import Engine.CameraController;
 import Engine.Window;
 import Renderer.Renderer2D;
-import org.joml.Vector2d;
-import org.joml.Vector3d;
-import org.joml.Vector3f;
-import org.joml.Vector4d;
+import org.joml.*;
 
 public class BatchRendererScene {
-    private static Vector3d position = new Vector3d().set(0.0f, -1.0f, 0.0f);
-    private static Vector2d size = new Vector2d().set(0.25f, 0.25f);
-    private static Vector4d color = new Vector4d(1.0f, 0.0f, 0.0f, 1.0f);
+    private static Vector3f position = new Vector3f(0.0f, -1.0f, 0.0f);
+    private static Vector2f size = new Vector2f(0.25f, 0.25f);
+    private static Vector4f color = new Vector4f(1.0f, 0.0f, 0.0f, 1.0f);
     private static CameraController control = new CameraController((float) Window.getWidth()/(float)Window.getHeight());
 
     public static void onUpdate(float dt){

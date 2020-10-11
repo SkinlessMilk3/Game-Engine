@@ -30,7 +30,6 @@ public class Camera {
         viewMatrix.lookAt(new Vector3f(position.x, position.y, 1.0f),
                 cameraFront.add(position.x, position.y, 0.0f),
                 cameraUp);
-        this.viewMatrix.invert();//move things in the opposite direction
 
         return this.viewMatrix;
     }
