@@ -232,6 +232,11 @@ public class Window {
 
     }
 
+    public static Scene getScene()
+    {
+        return getWindow().currentScene;
+    }
+
     public static void setWidth(int newWidth) {
         width = newWidth;
     }

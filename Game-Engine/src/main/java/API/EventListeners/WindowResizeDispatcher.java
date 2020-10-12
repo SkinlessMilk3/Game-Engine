@@ -1,5 +1,7 @@
 package API.EventListeners;
 
+import Engine.Window;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +14,10 @@ public class WindowResizeDispatcher {
 
         for(WindowResizeListener tmp : listeners){
             tmp.onWindowResizeEvent(width, height);
+
         }
+        Window.setWidth(width);
+        Window.setHeight(height);
     }
 
     public static void addListener(WindowResizeListener ls){
