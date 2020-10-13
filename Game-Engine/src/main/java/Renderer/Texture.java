@@ -1,6 +1,6 @@
 package Renderer;
 
-import Engine.GL_LOG;
+import Utils.GL_LOG;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;

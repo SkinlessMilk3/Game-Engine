@@ -1,7 +1,7 @@
 package API.EventListeners;
 //Need to add lwjgl to project
 
-import Engine.GL_LOG;
+import Utils.GL_LOG;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +71,7 @@ public class MouseEventDispatcher{
         getDispatcher().prevScrollY = getDispatcher().scrollY;
         getDispatcher().scrollY = xoffset;
         getDispatcher().scrollY = yoffset;
-        GL_LOG.Log_Data("mosu scrol");
+
         for(MouseEventListener tmp : scrollEventListeners){
             tmp.onScrolledEvent((float) getDispatcher().scrollX , (float) getDispatcher().scrollY);
         }

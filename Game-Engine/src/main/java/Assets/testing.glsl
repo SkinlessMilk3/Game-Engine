@@ -3,7 +3,6 @@
 
 
 layout(location = 0) in vec3 points;
-//layout(location = 1) in vec2 texCoords;
 layout(location = 1) in vec4 color;
 layout(location = 2) in vec2 texCoords;
 
@@ -22,7 +21,6 @@ void main(){
 #shader fragment
 #version 330 core
 
-//uniform sampler2D u_texture;
 uniform vec4 u_color;
 uniform sampler2D u_texture;
 
@@ -31,5 +29,5 @@ in vec2 v_texCoords;
 in vec4 v_color;
 void main(){
     vec4 tex = texture(u_texture, v_texCoords);
-    fragColor = /*tex */ v_color;//u_color;///vec4(1.0,1.0,0.0,1.0);//
+    fragColor = tex * v_color;
 }

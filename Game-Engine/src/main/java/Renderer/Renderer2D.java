@@ -1,7 +1,7 @@
 package Renderer;
 
 import Engine.Camera;
-import Engine.GL_LOG;
+import Utils.GL_LOG;
 import org.joml.*;
 import org.lwjgl.BufferUtils;
 
@@ -11,6 +11,20 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 
+/**
+ * This is a renerer class specifically designed for 2D graphics. It will take various data and use
+ * it do draw things to the screen.
+ * How To Use - anything you want to submit to be drawn to the screen must be surrounded by
+ * beginScene() and endScene().
+ * Ex.
+ *      beginScene()
+ *      submit()
+ *      submit()
+ *      submit()
+ *      endScene()
+ *
+ * Once endScene() is called the items submitted will be drawn.
+ */
 public class Renderer2D {
 
     private static int maxSquares = 10000;
@@ -31,6 +45,10 @@ public class Renderer2D {
     private Vector2d texCoords;
     private static float[] vertexBuffer = new float[maxVertexCount];
 
+    /**
+     * Must be called before submitting data for render. If not then it could cause unexpected
+     * behavior. It only needs to be called once it shouldn't be inside a loop.
+     */
     public static void Init(){
 
         int sizeOfFloat = 4;
@@ -83,33 +101,28 @@ public class Renderer2D {
         whiteTextureData.flip();
 
         whiteTexture.setData(4, whiteTextureData);
-        /*
-       transform = new Matrix4f();
-
-        VBO vbo = new VBO(GL_ARRAY_BUFFER, points);
-
-       ibo = new IBO(indices);
-
-       vao = new VAO();
-
-
-*/
     }
 
+    /**
+     * Releases the resources allocated when we are done. It is best practice to do this whenever
+     * you are done rendering things to the screen. If this happens before then it will definitely
+     * break the porgram.
+     */
     public static void shutdown(){
         vao.delete();
         shader.delete();
         ibo.delete();
-        //
-        //whiteTexture.delete();
+        whiteTexture.delete();
     }
-    public static void Clear(){
-        glClearColor(0.8f, 1.8f, 0.8f,1.0f);
+
+    /**
+     * Sets the clear color and clears the screen.
+     */
+    public static void Clear(Vector4f vec){
+        glClearColor(vec.x, vec.y, vec.z, vec.w);
         glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
     }
     public static void beginScene(final Camera camera){
-//TODO figure out camera system
-        //Matrix4f projmatrix = new Matrix4f().identity().ortho(-1.0f, 1.0f/*Window.getWidth()*/, -1.0f, 1.0f/*Window.getHeight()*/, -1.0f, 1.0f);
 
         indexCount = 0;
         vertexCount = 0;
@@ -118,10 +131,15 @@ public class Renderer2D {
         shader.setUniformMat4("u_projection", camera.getProjectionMatrix());
         whiteTexture.bind(0);
         shader.setUniform1i("u_texture", 0);
-        //
-        //shader.setUniform4f("u_color", 1.0f, 1.0f, 0.0f, 1.0f);
-        GL_LOG.Log_Data("begin scene error: " + glGetError());
+
+        int check;
+        if((check = glGetError()) != 0)
+            GL_LOG.Log_Data("begin scene error: " + check);
     }
+
+    /**
+     * renders data to the screen.
+     */
     public static void endScene(){
 
         vao.bind();
@@ -130,6 +148,16 @@ public class Renderer2D {
         ibo.bind();
         Draw(indexCount);
     }
+
+    /**
+     * This function creates vertex data for a square including a square color and submits it to an
+     * array for drawing later. There are two options to choose from. A 2D option and a 3D option.
+     * The 2D option will be submitted to the 3D option, so it really is for convenience.
+     *
+     * @param position - a vector containing position data for the current screen.
+     * @param size - just a vector containing height and width data
+     * @param color - vector of data containing color values between 1.0 and 0.0
+     */
     public static void submit(final Vector2f position, final Vector2f size, final Vector4f color){
         submit(new Vector3f(position.x, position.y, 1.0f), size , color);
     }
@@ -139,31 +167,16 @@ public class Renderer2D {
 
         indexCount += 6;
         vertexCount += 9 * 4;
-        //
-        //whiteTexture.bind(0);
-        //
-        //shader.setUniform1i("u_texture", 0);
-        //
-        //shader.setUniform4f("u_color", (float)color.x, (float)color.y, (float)color.z, (float)color.w);
-        //GL_LOG.Log_Data("submission error: " + glGetError());
 
-        /*
-
-
-       transform.identity();
-
-       transform.translate((float)position.x, (float)position.y, (float)position.z)
-                .scale((float)size.x, (float)size.y, 1.0f);
-
-
-       ibo.bind();
-
-
-       shader.setUniformMat4("u_transform",
-       transform);
-
-        Draw();*/
     }
+
+    /**
+     * These function is similar to the one's before except these include a texture option.
+     * @param position - Contains position data of a single point on the screen.
+     * @param size - Contains data about the width and height of the square.
+     * @param texture - This is just a texture that should be loaded into memory before the function
+     *                call.
+     */
     public static void submit(final Vector2f position, final Vector2f size, final Texture texture){
         submit(new Vector3f(position.x, position.y, 1.0f), size, new Vector4f(0.0f, 0.0f, 0.0f, 1.0f) , texture);
     }
@@ -175,12 +188,25 @@ public class Renderer2D {
         CreateSquare(position, size, color);
     }
 
+    /**
+     * Helper function draws a square to the screen.
+     * @param count - the amount of indices in the index buffer to draw. If it is zero it will draw
+     *              all the indices.
+     */
     private static void Draw(int count){
         if(count == 0){
             count = ibo.getCount();
         }
         glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0);
     }
+
+    /**
+     * A helper function that does all the math and calculation for square vertex positions and
+     * puts them into the vertex buffer. It also does this for color and texture data.
+     * @param position - A single point on the screen to begin drawing a square.
+     * @param size - The height and width of the square.
+     * @param color - The color of the square.
+     */
     private static void CreateSquare(Vector3f position, Vector2f size, Vector4f color){
         int count = 0;
         for(int i = 0; i < 4; i++){
