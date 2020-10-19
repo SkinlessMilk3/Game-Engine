@@ -13,7 +13,7 @@ public abstract class Scene {
 
     protected Camera camera;
     private boolean isRunning = false;
-    protected List<GameObject> gameObjects = new ArrayList<>();
+    public List<GameObject> gameObjects = new ArrayList<>();
     protected GameObject activeGameObject = null;
 
     public Scene() {

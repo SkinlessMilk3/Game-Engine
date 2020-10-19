@@ -5,7 +5,7 @@ import java.util.List;
 
 public class GameObject {
 
-    private String name;
+    public String name;
     public Transform transform;
     private List<Component> components;
 

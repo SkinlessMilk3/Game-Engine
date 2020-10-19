@@ -1,10 +1,14 @@
 package Components;
 
 import API.EventListeners.KeyEventListener;
+import API.EventListeners.MouseEventDispatcher;
+import API.EventListeners.MouseEventListener;
 import Engine.Component;
 import Engine.GameObject;
 
 import java.awt.event.KeyEvent;
+
+import static org.lwjgl.glfw.GLFW.*;
 
 public class TempCounter extends Component {
 
@@ -14,20 +18,16 @@ public class TempCounter extends Component {
 
     @Override
     public void start() {
-        System.out.println("Counter added!");
+        System.out.println("Object added!");
     }
 
     @Override
     public void update(float dt) {
-        float movingX = (float)Math.floor((Math.random() * 10) + 1);
-        float movingY = movingX;
 
-        x += movingX;
-        y += movingY;
-        if (KeyEventListener.isKeyPressed(KeyEvent.VK_2)){
-            System.out.println("x: " + x);
-            System.out.println("y: " + y);
+        x += 0.01;
+        if (MouseEventDispatcher.isPressed(GLFW_MOUSE_BUTTON_2))
+        {
+            System.out.println("x:" + x);
         }
-
     }
 }
