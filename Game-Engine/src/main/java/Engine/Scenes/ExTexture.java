@@ -1,6 +1,6 @@
 package Engine.Scenes;
 
-import Engine.GL_LOG;
+import Utils.GL_LOG;
 import Renderer.*;
 
 import static org.lwjgl.opengl.GL20.*;

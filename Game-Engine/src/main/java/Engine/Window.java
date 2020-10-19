@@ -7,17 +7,14 @@ import API.EventListeners.WindowResizeDispatcher;
 import Engine.Scenes.*;
 
 import Renderer.Renderer2D;
-import org.joml.*;
+import Utils.GL_LOG;
 
-import Renderer.Renderer2D;
-import imgui.ImGui;
-
+import org.joml.Vector4f;
 import org.lwjgl.Version;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.system.CallbackI;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -167,9 +164,11 @@ public class Window {
 
         //currentScene = new LevelEditorScene();
         Renderer2D.Init();
+        Vector4f clearColor = new Vector4f(0.0f, 1.0f, 0.8f, 1.0f);
+
         while (!glfwWindowShouldClose(wnd)) {
 
-            Renderer2D.Clear();
+            Renderer2D.Clear(clearColor);
 
             BatchRendererScene.onUpdate(dt);
             Frame_Rate.Update_Frame_Rate_Counter();

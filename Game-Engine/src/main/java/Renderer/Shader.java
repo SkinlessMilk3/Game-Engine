@@ -1,7 +1,7 @@
 package Renderer;
 
 import static org.lwjgl.opengl.GL20.*;
-import Engine.GL_LOG;
+import Utils.GL_LOG;
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 
