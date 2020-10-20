@@ -7,18 +7,22 @@ public class GameObjectData {
 
     public String name;
     private Texture sprite;
-    private String tag;
     //private Transform transform;
 
-    public GameObjectData(String n)
+    public GameObjectData()
     {
-        name = n;
+        name = "default";
 
+    }
+
+    public void setName(String n)
+    {
+        this.name = n;
     }
 
     public GameObject GenerateGameObject()
     {
-        GameObject obj = new GameObject("Test");
+        GameObject obj = new GameObject(name);
         TempCounter temp = new TempCounter();
 
         obj.addComponent(temp);
