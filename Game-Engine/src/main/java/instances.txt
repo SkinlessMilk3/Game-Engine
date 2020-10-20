@@ -15,7 +15,29 @@
       {
         "type": "Components.TempCounter",
         "properties": {
-          "x": 361.75174,
+          "x": 382.7322,
+          "y": 0.0
+        }
+      }
+    ]
+  },
+  {
+    "name": "obj_test21",
+    "transform": {
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "scale": {
+        "x": 0.0,
+        "y": 0.0
+      }
+    },
+    "components": [
+      {
+        "type": "Components.TempCounter",
+        "properties": {
+          "x": 8.930109,
           "y": 0.0
         }
       }

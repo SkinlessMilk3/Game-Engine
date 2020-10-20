@@ -99,7 +99,7 @@ public class Shader {
 
     //A helper function for compiling opengl shaders as well as error checking.
     //Will call compileProgram for program compilation.
-    private void compileShader(){
+    public void compileShader(){
 
         int v_shader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(v_shader ,shaders[0]);

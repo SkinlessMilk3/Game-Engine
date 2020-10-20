@@ -2,6 +2,7 @@ package Renderer;
 
 import Components.SpriteRenderer;
 import Engine.Camera;
+import Utils.AssetPool;
 import Utils.GL_LOG;
 import org.joml.*;
 import org.lwjgl.BufferUtils;
@@ -69,7 +70,7 @@ public class Renderer2D {
         final int vertexSizeBytes = vertexSize * sizeOfFloat;
 
 
-        shader = new Shader("Assets/testing.glsl");
+        shader = AssetPool.getShader("Assets/testing.glsl");
         vao = new VAO();
         vbo = new VBO(maxVertexCount * sizeOfFloat);
 
