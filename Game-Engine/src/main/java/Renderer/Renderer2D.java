@@ -1,5 +1,6 @@
 package Renderer;
 
+import Components.SpriteRenderer;
 import Engine.Camera;
 import Utils.GL_LOG;
 import org.joml.*;
@@ -43,6 +44,10 @@ public class Renderer2D {
     private Vector3d positions;
     private Vector4d color;
     private Vector2d texCoords;
+
+    private SpriteRenderer[] sprites;
+    private int spriteNum;
+
     private static float[] vertexBuffer = new float[maxVertexCount];
 
     /**
@@ -62,6 +67,7 @@ public class Renderer2D {
         final int stride = (posSize + colorSize + textureSize) * sizeOfFloat;
         final int vertexSize = posSize + colorSize + textureSize;
         final int vertexSizeBytes = vertexSize * sizeOfFloat;
+
 
         shader = new Shader("Assets/testing.glsl");
         vao = new VAO();

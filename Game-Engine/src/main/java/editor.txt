@@ -1,0 +1,46 @@
+[
+  {
+    "name": "obj_test",
+    "transform": {
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "scale": {
+        "x": 0.0,
+        "y": 0.0
+      }
+    },
+    "components": [
+      {
+        "type": "Components.TempCounter",
+        "properties": {
+          "x": 3.1299975,
+          "y": 0.0
+        }
+      }
+    ]
+  },
+  {
+    "name": "obj_test2",
+    "transform": {
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "scale": {
+        "x": 0.0,
+        "y": 0.0
+      }
+    },
+    "components": [
+      {
+        "type": "Components.TempCounter",
+        "properties": {
+          "x": 1.6199988,
+          "y": 0.0
+        }
+      }
+    ]
+  }
+]

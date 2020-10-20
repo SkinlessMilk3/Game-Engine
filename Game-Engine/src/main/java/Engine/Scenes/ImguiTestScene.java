@@ -1,6 +1,6 @@
 package Engine.Scenes;
 
-import Engine.Window;
+import Engine.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import imgui.ImGui;
@@ -12,18 +12,53 @@ import imgui.enums.ImGuiTreeNodeFlags;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
+
 public class ImguiTestScene extends Scene {
+
+    private List<GameObjectData> objectData;
+    private List<GameObjectData> spriteData;
+    private List<GameObjectData> fontData;
+    private List<GameObjectData> scriptData;
+    private List<GameObjectData> roomData;
+
+    private GameObjectData selectedObject = null;
 
     @Override
     public void init() {
 
+        if (levelLoaded) {
+            return;
+        }
+
+        this.objectData = new ArrayList<>();
+        this.spriteData = new ArrayList<>();
+        this.fontData = new ArrayList<>();
+        this.scriptData = new ArrayList<>();
+        this.roomData = new ArrayList<>();
+
+        objectDataCatagories.add(objectData);
+        objectDataCatagories.add(spriteData);
+        objectDataCatagories.add(fontData);
+        objectDataCatagories.add(scriptData);
+        objectDataCatagories.add(roomData);
+
         levelLayerLabels.add("Default Layer");
         levelLayerLabels.add("Background Layer");
+
+
+
+
     }
 
 
     @Override
     public void update(float dt) {
+
+        for (GameObject go : this.gameObjects)
+        {
+            go.update(dt);
+        }
 
     }
 
@@ -61,9 +96,15 @@ public class ImguiTestScene extends Scene {
         MainMenuBarImGui();
         RoomEditorImGui();
         assetBrowserImGui();
+        if (activeGameObject != null)
+        {
+            ImGui.begin("Inspector");
+            activeGameObject.imgui();
+            ImGui.end();
+        }
     }
 
-    private int addNewAsset(List<String> labels, int counter)
+    private int addNewAsset(List<String> labels, int counter, String tag)
     {
         if (ImGui.beginPopupContextItem())
         {
@@ -75,9 +116,17 @@ public class ImguiTestScene extends Scene {
                 if (!assetName.isEmpty()) {
                     counter++;
                     labels.add(assetName);
+                    if (tag.equals("Sprite")) { GameObjectData sprData = new GameObjectData(); sprData.setName(assetName); spriteData.add(sprData);}
+                    if (tag.equals("Object")) { GameObjectData objData = new GameObjectData(); objData.setName(assetName); objectData.add(objData);}
+                    if (tag.equals("Font")) { GameObjectData fntData = new GameObjectData(); fntData.setName(assetName); fontData.add(fntData);}
+                    if (tag.equals("Script")) { GameObjectData scptData = new GameObjectData(); scptData.setName(assetName); scriptData.add(scptData);}
+                    if (tag.equals("Room")) { GameObjectData rmData = new GameObjectData(); rmData.setName(assetName); roomData.add(rmData);}
                     assetName = "";
                     name.set("");
                 }
+                //ImGui.openPopupOnItemClick(" ");
+                //popObjectInspector(objectData.get(objectDataCount));
+
                 ImGui.closeCurrentPopup();
             }
             ImGui.endPopup();
@@ -97,12 +146,12 @@ public class ImguiTestScene extends Scene {
             //Button for adding new sprites
             ImGui.smallButton("Add Sprite");
             ImGui.openPopupOnItemClick("Add Sprite", 0);
-            spriteCount = addNewAsset(spriteLabels, spriteCount);
+            spriteCount = addNewAsset(spriteLabels, spriteCount, "Sprite");
 
             //Display all created sprites
             for (int i = 0; i < spriteCount; i++)
             {
-                ImGui.bulletText(spriteLabels.get(i));
+                ImGui.bulletText(spriteData.get(i).name);
             }
 
             ImGui.treePop();
@@ -113,12 +162,29 @@ public class ImguiTestScene extends Scene {
             //Button for adding new objects
             ImGui.smallButton("Add Object");
             ImGui.openPopupOnItemClick("Add Object", 0);
-            objectCount = addNewAsset(objectLabels, objectCount);
+            objectCount = addNewAsset(objectLabels, objectCount, "Object");
+
+            if(ImGui.beginPopupContextItem("Add to Scene"))
+            {
+                if(ImGui.button("Add to scene"))
+                {
+                    GameObject newObj = selectedObject.GenerateGameObject();
+                    addGameObjectToScene(newObj);
+                    activeGameObject = newObj;
+                    ImGui.closeCurrentPopup();
+                }
+                ImGui.endPopup();
+            }
 
             //Display all created objects
             for (int i = 0; i < objectCount; i++)
             {
-                ImGui.bulletText(objectLabels.get(i));
+                ImGui.bulletText(objectData.get(i).name);
+                if (ImGui.isItemHovered())
+                {
+                    selectedObject = objectData.get(i);
+                    ImGui.openPopupOnItemClick("Add to Scene", 1);
+                }
             }
 
             ImGui.treePop();
@@ -129,12 +195,12 @@ public class ImguiTestScene extends Scene {
             //Button for adding new scripts
             ImGui.smallButton("Add Script");
             ImGui.openPopupOnItemClick("Add Script", 0);
-            scriptCount = addNewAsset(scriptLabels, scriptCount);
+            scriptCount = addNewAsset(scriptLabels, scriptCount, "Script");
 
             //Display all created scripts
             for (int i = 0; i < scriptCount; i++)
             {
-                ImGui.bulletText(scriptLabels.get(i));
+                ImGui.bulletText(scriptData.get(i).name);
             }
 
             ImGui.treePop();
@@ -145,12 +211,12 @@ public class ImguiTestScene extends Scene {
             //Button for adding new fonts
             ImGui.smallButton("Add Font");
             ImGui.openPopupOnItemClick("Add Font", 0);
-            fontCount = addNewAsset(fontLabels, fontCount);
+            fontCount = addNewAsset(fontLabels, fontCount, "Font");
 
             //Display all created fonts
             for (int i = 0; i < fontCount; i++)
             {
-                ImGui.bulletText(fontLabels.get(i));
+                ImGui.bulletText(fontData.get(i).name);
             }
 
             ImGui.treePop();
@@ -161,12 +227,12 @@ public class ImguiTestScene extends Scene {
             //Button for adding new rooms
             ImGui.smallButton("Add Room");
             ImGui.openPopupOnItemClick("Add Room", 0);
-            roomCount = addNewAsset(roomLabels, roomCount);
+            roomCount = addNewAsset(roomLabels, roomCount, "Room");
 
             //Display all created rooms
             for (int i = 0; i < roomCount; i++)
             {
-                ImGui.bulletText(roomLabels.get(i));
+                ImGui.bulletText(roomData.get(i).name);
             }
 
             ImGui.treePop();
@@ -233,7 +299,7 @@ public class ImguiTestScene extends Scene {
 
             ImGui.button("Add Layer");
             ImGui.openPopupOnItemClick("Add Layer", 0);
-            levelLayerCount = addNewAsset(levelLayerLabels, levelLayerCount);
+            levelLayerCount = addNewAsset(levelLayerLabels, levelLayerCount, "Layer");
             ImGui.spacing(); ImGui.spacing();
 
 
@@ -257,7 +323,11 @@ public class ImguiTestScene extends Scene {
         if (ImGui.treeNodeEx("Layer Objects", 2)){
 
             ImGui.button(levelLayerLabels.get(selectedLayer) + " Objects", 150, 20);
-            ImGui.text("Level/room objects would be listed here");
+            for (GameObject go : gameObjects)
+            {
+                ImGui.bulletText(go.name);
+            }
+            //ImGui.text("Level/room objects would be listed here");
 
 
             ImGui.treePop();
@@ -293,5 +363,12 @@ public class ImguiTestScene extends Scene {
                                         Window.ChangeScene(0);
                             }
         ImGui.end();
+    }
+
+    public void ObjectInspectorImGui(GameObjectData objData)
+    {
+
+
+
     }
 }

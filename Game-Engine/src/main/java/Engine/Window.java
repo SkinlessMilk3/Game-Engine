@@ -136,8 +136,6 @@ public class Window {
 
         //Sets starting scene
 
-        Window.ChangeScene(0);
-
         Window.ChangeScene(3);
 
         //TESTING GUI
@@ -166,6 +164,8 @@ public class Window {
         Renderer2D.Init();
         Vector4f clearColor = new Vector4f(0.0f, 1.0f, 0.8f, 1.0f);
 
+        currentScene.load();
+
         while (!glfwWindowShouldClose(wnd)) {
 
             Renderer2D.Clear(clearColor);
@@ -191,6 +191,8 @@ public class Window {
             dt = endTime - beginTime;
             beginTime = endTime;
         }
+
+        currentScene.saveExit();
         Renderer2D.shutdown();
     }
 
@@ -229,6 +231,11 @@ public class Window {
                 break;
         }
 
+    }
+
+    public static Scene getScene()
+    {
+        return getWindow().currentScene;
     }
 
     public static void setWidth(int newWidth) {

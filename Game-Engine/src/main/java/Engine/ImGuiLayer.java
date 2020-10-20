@@ -230,6 +230,10 @@ public class ImGuiLayer {
         if (ImGui.button("ImGui")){
             Window.ChangeScene(3);
         }
+        ImGui.sameLine();
+        if (ImGui.button("Batch")){
+            Window.ChangeScene(4);
+        }
         ImGui.end();
         //----------------------------------------------------------------------
 
