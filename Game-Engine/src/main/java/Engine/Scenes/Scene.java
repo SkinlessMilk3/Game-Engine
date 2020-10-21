@@ -22,7 +22,7 @@ public abstract class Scene {
     protected Camera camera;
     private boolean isRunning = false;
     public List<GameObject> gameObjects = new ArrayList<>();
-    ArrayList<List<GameObjectData>> objectDataCatagories = new ArrayList<List<GameObjectData>>();
+    public ArrayList<List<GameObjectData>> objectDataCatagories = new ArrayList<List<GameObjectData>>();
     protected GameObject activeGameObject = null;
     protected boolean levelLoaded = false;
 
@@ -121,15 +121,23 @@ public abstract class Scene {
         }
 
         if (!inFile.equals("")) {
-            Type listOfMyClassObject = new TypeToken<List<List<GameObjectData>>>() {}.getType();
-            ArrayList<List<GameObjectData>> objData = gson.fromJson(inFile, listOfMyClassObject);
+            GameObjectData[][] objData = gson.fromJson(inFile, GameObjectData[][].class);
 
-            //List<GameObjectData> test = objData.get(0);
-
-           // test = objectDataCatagories.get(0);
-            //objectDataCatagories.get(0) = test;
+           deserializeObjectData(objData, objectDataCatagories, 0);
+           deserializeObjectData(objData, objectDataCatagories, 1);
+           deserializeObjectData(objData, objectDataCatagories, 2);
+           deserializeObjectData(objData, objectDataCatagories, 3);
+           deserializeObjectData(objData, objectDataCatagories, 4);
 
             this.levelLoaded = true;
+        }
+    }
+
+    public void deserializeObjectData(GameObjectData[][] gson, ArrayList<List<GameObjectData>> sceneData, int listNum)
+    {
+        for (int i = 0; i < gson[listNum].length; i++)
+        {
+            sceneData.get(listNum).add(gson[listNum][i]);
         }
     }
 }

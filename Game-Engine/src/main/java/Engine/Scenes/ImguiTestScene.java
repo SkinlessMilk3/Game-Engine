@@ -16,32 +16,27 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
 
 public class ImguiTestScene extends Scene {
 
-    private List<GameObjectData> objectData;
-    private List<GameObjectData> spriteData;
-    private List<GameObjectData> fontData;
-    private List<GameObjectData> scriptData;
-    private List<GameObjectData> roomData;
+    public List<GameObjectData> objectData = new ArrayList<>();
+    public List<GameObjectData> spriteData = new ArrayList<>();
+    public List<GameObjectData> fontData = new ArrayList<>();
+    public List<GameObjectData> scriptData = new ArrayList<>();
+    public List<GameObjectData> roomData = new ArrayList<>();
+    boolean firstUpdate = true;
 
     private GameObjectData selectedObject = null;
 
     @Override
     public void init() {
 
-        if (levelLoaded) {
-            return;
-        }
-
-        this.objectData = new ArrayList<>();
-        this.spriteData = new ArrayList<>();
-        this.fontData = new ArrayList<>();
-        this.scriptData = new ArrayList<>();
-        this.roomData = new ArrayList<>();
-
         objectDataCatagories.add(objectData);
         objectDataCatagories.add(spriteData);
         objectDataCatagories.add(fontData);
         objectDataCatagories.add(scriptData);
         objectDataCatagories.add(roomData);
+
+        if (levelLoaded) {
+            return;
+        }
 
         levelLayerLabels.add("Default Layer");
         levelLayerLabels.add("Background Layer");
@@ -54,6 +49,15 @@ public class ImguiTestScene extends Scene {
 
     @Override
     public void update(float dt) {
+
+        if (firstUpdate) {
+            objectCount = objectData.size();
+            spriteCount = spriteData.size();
+            fontCount = fontData.size();
+            scriptCount = scriptData.size();
+            roomCount = roomData.size();
+            firstUpdate = false;
+        }
 
         for (GameObject go : this.gameObjects)
         {
