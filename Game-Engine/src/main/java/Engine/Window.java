@@ -26,6 +26,7 @@ public class Window {
     private static Window window = null;
     private static Scene currentScene;
     private static int width, height;
+    private static boolean saving;
     String title;
     private ImGuiLayer imGuiLayer;
 
@@ -81,6 +82,8 @@ public class Window {
     }
 
     private void init() {
+
+        saving = false;
 
         //print any glfw errors to a log txt
         glfwSetErrorCallback((errcode, dsc) -> {
@@ -138,10 +141,10 @@ public class Window {
 
         Window.ChangeScene(3);
 
-
-        //TESTING GUI
         this.imGuiLayer = new ImGuiLayer(wnd);
         this.imGuiLayer.initImGui();
+
+        currentScene.load();
     }
 
     private void loop() {
@@ -165,7 +168,6 @@ public class Window {
         Renderer2D.Init();
         Vector4f clearColor = new Vector4f(0.0f, 1.0f, 0.8f, 1.0f);
 
-        currentScene.load();
 
         while (!glfwWindowShouldClose(wnd)) {
 
@@ -193,7 +195,12 @@ public class Window {
             beginTime = endTime;
         }
 
-        currentScene.saveExit();
+        if (saving)
+        {
+            currentScene.saveExit();
+            saving = false;
+        }
+
         Renderer2D.shutdown();
     }
 
@@ -245,5 +252,9 @@ public class Window {
 
     public static void setHeight(int newHeight) {
         height = newHeight;
+    }
+
+    public static void setSaving() {
+        saving = true;
     }
 }

@@ -78,7 +78,7 @@ public abstract class Scene {
                 .create();
 
         try {
-            //Save current objects in scenee
+            //Save current objects in scene
             FileWriter writer = new FileWriter("instances.txt");
             writer.write(gson.toJson(this.gameObjects));
             writer.close();

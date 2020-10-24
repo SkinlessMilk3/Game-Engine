@@ -1,6 +1,6 @@
 [
   {
-    "name": "gg",
+    "name": "obj_test",
     "transform": {
       "position": {
         "x": 0.0,
@@ -15,14 +15,14 @@
       {
         "type": "Components.TempCounter",
         "properties": {
-          "x": 24.610468,
+          "x": 142.0,
           "y": 0.0
         }
       }
     ]
   },
   {
-    "name": "sdfsdf",
+    "name": "obj_test2",
     "transform": {
       "position": {
         "x": 0.0,
@@ -37,7 +37,29 @@
       {
         "type": "Components.TempCounter",
         "properties": {
-          "x": 22.850428,
+          "x": 142.0,
+          "y": 0.0
+        }
+      }
+    ]
+  },
+  {
+    "name": "obj_test3",
+    "transform": {
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "scale": {
+        "x": 0.0,
+        "y": 0.0
+      }
+    },
+    "components": [
+      {
+        "type": "Components.TempCounter",
+        "properties": {
+          "x": -67.0,
           "y": 0.0
         }
       }

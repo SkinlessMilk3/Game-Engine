@@ -1,32 +1,19 @@
 [
   [
     {
-      "name": "g"
+      "name": "obj_test"
     },
     {
-      "name": "gg"
+      "name": "obj_test2"
     },
     {
-      "name": "f"
+      "name": "obj_test"
     },
     {
-      "name": "g"
-    },
-    {
-      "name": "gg"
-    },
-    {
-      "name": "f"
-    },
-    {
-      "name": "sdfsdf"
+      "name": "obj_test3"
     }
   ],
-  [
-    {
-      "name": "spr_test"
-    }
-  ],
+  [],
   [],
   [],
   []

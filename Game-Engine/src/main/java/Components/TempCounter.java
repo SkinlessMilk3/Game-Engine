@@ -24,10 +24,14 @@ public class TempCounter extends Component {
     @Override
     public void update(float dt) {
 
-        x += 0.01;
         if (MouseEventDispatcher.isPressed(GLFW_MOUSE_BUTTON_2))
         {
-            System.out.println("x:" + x);
+            x += 1;
         }
+        if (MouseEventDispatcher.isPressed(GLFW_MOUSE_BUTTON_1))
+        {
+            x -= 1;
+        }
+        System.out.println("object x: " + x);
     }
 }

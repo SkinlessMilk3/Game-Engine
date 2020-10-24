@@ -1,5 +1,6 @@
 package Engine.Scenes;
 
+import API.EventListeners.KeyEventListener;
 import Engine.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -12,7 +13,7 @@ import imgui.enums.ImGuiTreeNodeFlags;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class ImguiTestScene extends Scene {
 
@@ -63,6 +64,8 @@ public class ImguiTestScene extends Scene {
         {
             go.update(dt);
         }
+
+        //if (ImGui.isKeyPressed(GLFW_KEY_LEFT_SHIFT) && ImGui.isKeyPressed(GLFW_KEY_S)) { Window.setSaving(); }
 
     }
 
@@ -255,7 +258,7 @@ public class ImguiTestScene extends Scene {
                 if (ImGui.menuItem("New Project")) {}
                 if (ImGui.menuItem("Open Project")) {}
                 ImGui.separator();
-                if (ImGui.menuItem("Save Project", "CTRL+S")) {}
+                if (ImGui.menuItem("Save Project", "CTRL+S")) { Window.setSaving(); }
                 if (ImGui.menuItem("Save Project As", "CTRL+SHIFT+S")) {}
                 ImGui.separator();
                 if (ImGui.menuItem("Settings")) {}
