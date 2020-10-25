@@ -19,8 +19,8 @@ import java.util.Map;
     "garbage collecting" language)
  */
 public class AssetPool {
-    private static Map<String, Shader> shaders = new HashMap<>();
-    private static Map<String, Texture> textures = new HashMap<>();
+    public static Map<String, Shader> shaders = new HashMap<>();
+    public static Map<String, Texture> textures = new HashMap<>();
 
 
     public static Shader getShader(String resourceName) {

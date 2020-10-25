@@ -15,51 +15,7 @@
       {
         "type": "Components.TempCounter",
         "properties": {
-          "x": 142.0,
-          "y": 0.0
-        }
-      }
-    ]
-  },
-  {
-    "name": "obj_test2",
-    "transform": {
-      "position": {
-        "x": 0.0,
-        "y": 0.0
-      },
-      "scale": {
-        "x": 0.0,
-        "y": 0.0
-      }
-    },
-    "components": [
-      {
-        "type": "Components.TempCounter",
-        "properties": {
-          "x": 142.0,
-          "y": 0.0
-        }
-      }
-    ]
-  },
-  {
-    "name": "obj_test3",
-    "transform": {
-      "position": {
-        "x": 0.0,
-        "y": 0.0
-      },
-      "scale": {
-        "x": 0.0,
-        "y": 0.0
-      }
-    },
-    "components": [
-      {
-        "type": "Components.TempCounter",
-        "properties": {
-          "x": -67.0,
+          "x": 0.0,
           "y": 0.0
         }
       }

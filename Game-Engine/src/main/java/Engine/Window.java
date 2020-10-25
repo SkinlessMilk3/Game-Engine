@@ -30,6 +30,8 @@ public class Window {
     String title;
     private ImGuiLayer imGuiLayer;
 
+    private static ImguiTestScene editor = new ImguiTestScene();
+
     //used to calculate frame rate
     static class Frame_Rate {
         private static int frame_count;
@@ -149,7 +151,7 @@ public class Window {
 
     private void loop() {
 
-
+        //currentScene.load();
 
         float beginTime = (float) glfwGetTime();
         float endTime;
@@ -231,7 +233,7 @@ public class Window {
                 currentScene.start();
                 break;
             case 3:
-                currentScene = new ImguiTestScene();
+                currentScene = editor;
                 currentScene.init();
                 currentScene.start();
             default:
