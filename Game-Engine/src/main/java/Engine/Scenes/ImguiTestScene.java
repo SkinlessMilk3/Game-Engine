@@ -289,9 +289,10 @@ public class ImguiTestScene extends Scene {
     {
         ImGui.begin("Scene Selector");
         ImGui.textColored(44, 244, 193, 100, "Choose Scene!");
-        ImGui.sameLine(); if (ImGui.button("Triangle")){
-                                        Window.ChangeScene(0);
-                            }
+        ImGui.sameLine();
+        if (ImGui.button("Triangle")){
+            Window.ChangeScene(0);
+        }
         ImGui.end();
     }
 }

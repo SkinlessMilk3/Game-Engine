@@ -65,6 +65,8 @@ public class Window {
         return height;
     }
 
+    public static float getAspectRatio(){ return (float)width/(float)height; }
+
     public void run() {
         System.out.println("Started LWJGL" + Version.getVersion() + "!");
 
@@ -161,7 +163,7 @@ public class Window {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-
+        //GameObjectsScene goScene = new GameObjectsScene();
         //currentScene = new LevelEditorScene();
         Renderer2D.Init();
         Vector4f clearColor = new Vector4f(0.0f, 1.0f, 0.8f, 1.0f);
@@ -171,6 +173,8 @@ public class Window {
             Renderer2D.Clear(clearColor);
 
             BatchRendererScene.onUpdate(dt);
+            //goScene.update(dt);
+
             Frame_Rate.Update_Frame_Rate_Counter();
 
             glfwPollEvents();
@@ -224,6 +228,12 @@ public class Window {
                 currentScene = new ImguiTestScene();
                 currentScene.init();
                 currentScene.start();
+                break;
+            case 4:
+                currentScene = new GameObjectsScene();
+                currentScene.init();
+                currentScene.start();
+                break;
             default:
                 assert false : "Unknown scene '" + newScene + "'!";
                 break;

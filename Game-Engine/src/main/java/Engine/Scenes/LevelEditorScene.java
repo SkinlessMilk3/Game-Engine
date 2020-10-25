@@ -55,7 +55,8 @@ public class LevelEditorScene extends Scene {
     {
         System.out.println("Creating Test object!");
         this.testObj = new GameObject("test object");
-        this.testObj.addComponent(new SpriteRenderer());
+        this.testObj.addComponent(new SpriteRenderer(testObj, new Texture("/Assets/Textures/RPGpack_sheet_2X.png")));
+
         this.addGameObjectToScene(this.testObj);
 
         //Initializes camera
