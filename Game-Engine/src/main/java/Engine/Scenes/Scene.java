@@ -1,7 +1,9 @@
 package Engine.Scenes;
 
+import Components.SpriteRenderer;
 import Engine.*;
 
+import Renderer.Renderer2D;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -37,6 +39,7 @@ public abstract class Scene {
     public void start() {
         for (GameObject go : gameObjects) {
             go.start();
+            addGOtoRenderer(go);
         }
         isRunning = true;
     }
@@ -47,6 +50,7 @@ public abstract class Scene {
         } else {
             gameObjects.add(go);
             go.start();
+            addGOtoRenderer(go);
         }
     }
 
@@ -138,6 +142,31 @@ public abstract class Scene {
         for (int i = 0; i < gson[listNum].length; i++)
         {
             sceneData.get(listNum).add(gson[listNum][i]);
+        }
+    }
+
+    public void addGOtoRenderer(GameObject go)
+    {
+        SpriteRenderer spr = go.getComponent(SpriteRenderer.class);
+        if (spr != null)
+        {
+            addSprRentoRenderer(spr);
+        }
+    }
+
+    public void addSprRentoRenderer(SpriteRenderer sprite)
+    {
+        //If we already have maxSquare sprites, then we catch the error
+        try {
+            Renderer2D.addSprite(sprite);
+        } catch (IndexOutOfBoundsException e)
+        {
+            e.printStackTrace();
+        }
+        catch (Error e)
+        {
+            System.out.println("Unknown Error!");
+            e.printStackTrace();
         }
     }
 }

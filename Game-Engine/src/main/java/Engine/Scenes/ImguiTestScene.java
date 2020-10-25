@@ -1,7 +1,9 @@
 package Engine.Scenes;
 
 import API.EventListeners.KeyEventListener;
+import Components.SpriteRenderer;
 import Engine.*;
+import Renderer.Renderer2D;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import imgui.ImGui;
@@ -9,6 +11,9 @@ import imgui.ImString;
 import imgui.ImVec2;
 import imgui.enums.ImGuiCond;
 import imgui.enums.ImGuiTreeNodeFlags;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +21,8 @@ import java.util.List;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class ImguiTestScene extends Scene {
+
+    private static CameraController control = new CameraController((float) Window.getWidth()/(float)Window.getHeight());
 
     public List<GameObjectData> objectData = new ArrayList<>();
     public List<GameObjectData> spriteData = new ArrayList<>();
@@ -42,14 +49,30 @@ public class ImguiTestScene extends Scene {
         levelLayerLabels.add("Default Layer");
         levelLayerLabels.add("Background Layer");
 
+        GameObject go = new GameObject("test", new Transform(new Vector2f(0.0f, 0.0f), size));
+        go.addComponent(new SpriteRenderer(color));
+        this.addGameObjectToScene(go);
 
-
+        color = new Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
+        GameObject go2 = new GameObject("test2", new Transform(new Vector2f(0.26f, 1.0f), size));
+        go2.addComponent(new SpriteRenderer(color));
+        this.addGameObjectToScene(go2);
 
     }
+    private static Vector2f position = new Vector2f(0.0f, -1.0f);
+    private static Vector2f size = new Vector2f(0.25f, 0.25f);
+    private static Vector4f color = new Vector4f(1.0f, 0.0f, 1.0f, 1.0f);
+
 
 
     @Override
     public void update(float dt) {
+
+        control.onUpdate(dt);
+
+        Renderer2D.beginScene(control.getCamera());
+
+
 
         if (firstUpdate) {
             objectCount = objectData.size();
@@ -66,6 +89,9 @@ public class ImguiTestScene extends Scene {
         }
 
         //if (ImGui.isKeyPressed(GLFW_KEY_LEFT_SHIFT) && ImGui.isKeyPressed(GLFW_KEY_S)) { Window.setSaving(); }
+
+
+        Renderer2D.endScene();
 
     }
 

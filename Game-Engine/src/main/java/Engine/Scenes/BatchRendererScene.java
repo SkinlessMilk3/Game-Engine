@@ -17,7 +17,7 @@ public class BatchRendererScene {
         Renderer2D.beginScene(control.getCamera());
         for(int y = 0; y < 15; y++) {
             for (int x = 0; x < 15; x+= 1) {
-                Renderer2D.submit(position, size, color);
+                //Renderer2D.submit(position, size, color);
                 position.x += 0.26f;
             }
             position.y += 0.26f;
