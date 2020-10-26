@@ -2,7 +2,6 @@ package Engine.Scenes;
 
 import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventDispatcher;
-import Components.SpriteRenderer;
 import Engine.*;
 import Renderer.*;
 import org.joml.Matrix4f;
@@ -55,7 +54,7 @@ public class LevelEditorScene extends Scene {
     {
         System.out.println("Creating Test object!");
         this.testObj = new GameObject("test object");
-        this.testObj.addComponent(new SpriteRenderer(testObj, new Texture("/Assets/Textures/RPGpack_sheet_2X.png")));
+        //this.testObj.addComponent(new SpriteRenderer());
 
         this.addGameObjectToScene(this.testObj);
 
