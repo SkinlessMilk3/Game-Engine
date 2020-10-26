@@ -2,15 +2,6 @@
   [
     {
       "name": "obj_test"
-    },
-    {
-      "name": "obj_test2"
-    },
-    {
-      "name": "obj_test"
-    },
-    {
-      "name": "obj_test3"
     }
   ],
   [],

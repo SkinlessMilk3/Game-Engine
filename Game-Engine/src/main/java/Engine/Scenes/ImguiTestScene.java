@@ -4,6 +4,8 @@ import API.EventListeners.KeyEventListener;
 import Components.SpriteRenderer;
 import Engine.*;
 import Renderer.Renderer2D;
+
+import Utils.AssetPool;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import imgui.ImGui;
@@ -88,7 +90,7 @@ public class ImguiTestScene extends Scene {
             go.update(dt);
         }
 
-        //if (ImGui.isKeyPressed(GLFW_KEY_LEFT_SHIFT) && ImGui.isKeyPressed(GLFW_KEY_S)) { Window.setSaving(); }
+
 
 
         Renderer2D.endScene();
@@ -167,6 +169,35 @@ public class ImguiTestScene extends Scene {
         return counter;
     }
 
+    private void deleteAsset(GameObjectData asset, String tag)
+    {
+        if (tag.equals("Sprite")) {
+            //AssetPool.textures.remove(obj.texture);
+            spriteData.remove(asset);
+            spriteCount--;
+        }
+        if (tag.equals("Object")) {
+            gameObjects.removeIf(go -> go.name.equals(asset.name));
+            objectData.remove(asset);
+            objectCount--;
+        }
+        if (tag.equals("Font")) {
+
+            fontData.remove(asset);
+            fontCount--;
+        }
+        if (tag.equals("Script")) {
+
+            scriptData.remove(asset);
+            scriptCount--;
+        }
+        if (tag.equals("Room")) {
+
+            roomData.remove(asset);
+            roomCount--;
+        }
+    }
+
     private void assetBrowserImGui()
     {
         //For accessing game assets like objects and sprites
@@ -197,13 +228,43 @@ public class ImguiTestScene extends Scene {
             ImGui.openPopupOnItemClick("Add Object", 0);
             objectCount = addNewAsset(objectLabels, objectCount, "Object");
 
-            if(ImGui.beginPopupContextItem("Add to Scene"))
+            if(ImGui.beginPopupContextItem("Object Data Options"))
             {
+                ImGui.text(selectedObject.name + ":");
+                if (ImGui.beginPopup("Delete Confirmation"))
+                {
+                    ImGui.text("Are you sure?");
+                    ImGui.text("(This will delete all instances of this object)");
+                    if (ImGui.button("Yes"))
+                    {
+                        if (activeGameObject.name == selectedObject.name)
+                        {
+                            activeGameObject = null;
+                        }
+                        deleteAsset(selectedObject, "Object");
+                        selectedObject = null;
+                        ImGui.closeCurrentPopup();
+                    }
+                    ImGui.sameLine();
+                    if (ImGui.button("No"))
+                    {
+                        ImGui.closeCurrentPopup();
+                    }
+                    ImGui.endPopup();
+                }
                 if(ImGui.button("Add to scene"))
                 {
                     GameObject newObj = selectedObject.GenerateGameObject();
                     addGameObjectToScene(newObj);
                     activeGameObject = newObj;
+                    ImGui.closeCurrentPopup();
+                }
+                if(ImGui.button("Delete"))
+                {
+                    ImGui.openPopup("Delete Confirmation");
+                }
+                if (selectedObject == null)
+                {
                     ImGui.closeCurrentPopup();
                 }
                 ImGui.endPopup();
@@ -216,7 +277,7 @@ public class ImguiTestScene extends Scene {
                 if (ImGui.isItemHovered())
                 {
                     selectedObject = objectData.get(i);
-                    ImGui.openPopupOnItemClick("Add to Scene", 1);
+                    ImGui.openPopupOnItemClick("Object Data Options", 1);
                 }
             }
 
@@ -358,7 +419,8 @@ public class ImguiTestScene extends Scene {
             ImGui.button(levelLayerLabels.get(selectedLayer) + " Objects", 150, 20);
             for (GameObject go : gameObjects)
             {
-                ImGui.bulletText(go.name);
+                ImGui.bullet();
+                ImGui.selectable(go.name);
             }
             //ImGui.text("Level/room objects would be listed here");
 
