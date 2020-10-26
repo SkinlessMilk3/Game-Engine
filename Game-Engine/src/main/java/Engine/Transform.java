@@ -23,7 +23,8 @@ public class Transform {
     }
 
     public void init(Vector2f position, Vector2f scale) {
-        this.position = new Vector2f();
-        this.scale = new Vector2f();
+        System.out.println("x: " + position.x + " y: " + position.y);
+        this.position = new Vector2f(position.x, position.y);
+        this.scale = new Vector2f(0.25f, 0.25f);
     }
 }

@@ -32,6 +32,6 @@ public class TempCounter extends Component {
         {
             x -= 1;
         }
-        System.out.println("object x: " + x);
+        //System.out.println("object x: " + x);
     }
 }
