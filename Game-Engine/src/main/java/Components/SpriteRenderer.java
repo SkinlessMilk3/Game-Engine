@@ -1,14 +1,3 @@
-/*
-*
-*
-*
-* CURRENTLY DOES NOTHING BUT PRINTS WHEN ATTACHED TO GAME OBJECT
-*
-*
-*
-*
- */
-
 package Components;
 
 import Engine.Component;

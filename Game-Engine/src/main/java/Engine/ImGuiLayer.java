@@ -232,10 +232,11 @@ public class ImGuiLayer {
             Window.ChangeScene(3);
         }
         ImGui.sameLine();
+
         if (ImGui.button("Batch")){
             Window.ChangeScene(4);
         }
-        ImGui.end();
+       ImGui.end();
         //----------------------------------------------------------------------
 
         currentScene.sceneImgui();
@@ -248,11 +249,12 @@ public class ImGuiLayer {
 
     private void startFrame(final float deltaTime) {
         // Get window properties and mouse position
-        float[] winWidth = {Window.getWidth()};
-        float[] winHeight = {Window.getHeight()};
+        int[] winWidth = new int[1];
+        int[] winHeight = new int[1];
         double[] mousePosX = {0};
         double[] mousePosY = {0};
         glfwGetCursorPos(glfwWindow, mousePosX, mousePosY);
+        glfwGetWindowSize(glfwWindow, winWidth, winHeight);
 
         // We SHOULD call those methods to update Dear ImGui state for the current frame
         final ImGuiIO io = ImGui.getIO();

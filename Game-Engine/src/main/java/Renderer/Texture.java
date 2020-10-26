@@ -94,4 +94,10 @@ public class Texture {
         else
             glTextureSubImage2D(render_id, 0,0,0, this.width[0], this.height[0], dataFormat, GL_FLOAT, data);
     }
+    public int getWidth(){
+        return width[0];
+    }
+    public int getHeight(){
+        return height[0];
+    }
 }

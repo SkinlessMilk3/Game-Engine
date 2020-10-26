@@ -2,7 +2,6 @@ package Engine.Scenes;
 
 import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventDispatcher;
-import Components.SpriteRenderer;
 import Engine.*;
 import Renderer.*;
 import Utils.AssetPool;
@@ -57,6 +56,7 @@ public class LevelEditorScene extends Scene {
         System.out.println("Creating Test object!");
         this.testObj = new GameObject("test object");
         //this.testObj.addComponent(new SpriteRenderer());
+
         this.addGameObjectToScene(this.testObj);
 
         //Initializes camera
