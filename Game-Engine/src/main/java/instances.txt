@@ -1,0 +1,25 @@
+[
+  {
+    "name": "obj_test",
+    "transform": {
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "scale": {
+        "x": 0.0,
+        "y": 0.0
+      }
+    },
+    "components": [
+      {
+        "type": "Components.TempCounter",
+        "properties": {
+          "x": 0.0,
+          "y": 0.0
+        }
+      }
+    ]
+  }
+]
+

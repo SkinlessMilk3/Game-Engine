@@ -4,6 +4,7 @@ import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventDispatcher;
 import Engine.*;
 import Renderer.*;
+import Utils.AssetPool;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
@@ -94,6 +95,12 @@ public class LevelEditorScene extends Scene {
         glEnableVertexAttribArray(1);
 
         shader = new Shader("Assets/first.vert");
+
+        loadResources();
+    }
+
+    private void loadResources() {
+        AssetPool.getShader("Assets/testing.glsl");
     }
 
 

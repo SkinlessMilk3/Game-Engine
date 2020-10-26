@@ -26,8 +26,11 @@ public class Window {
     private static Window window = null;
     private static Scene currentScene;
     private static int width, height;
+    private static boolean saving;
     String title;
     private ImGuiLayer imGuiLayer;
+
+    private static ImguiTestScene editor = new ImguiTestScene();
 
     //used to calculate frame rate
     static class Frame_Rate {
@@ -84,6 +87,8 @@ public class Window {
 
     private void init() {
 
+        saving = false;
+
         //print any glfw errors to a log txt
         glfwSetErrorCallback((errcode, dsc) -> {
             GL_LOG.Log_Data(errcode + " " + GLFWErrorCallback.getDescription(dsc));
@@ -138,18 +143,21 @@ public class Window {
 
         //Sets starting scene
 
-        Window.ChangeScene(0);
-
         Window.ChangeScene(3);
 
-        //TESTING GUI
         this.imGuiLayer = new ImGuiLayer(wnd);
         this.imGuiLayer.initImGui();
+
+        currentScene.load();
+
+        Renderer2D.Init();
     }
 
     private void loop() {
 
-        float beginTime = (float) glfwGetTime();
+        //currentScene.load();
+
+      float beginTime = (float) glfwGetTime();
         float endTime;
         float dt = -1.0f;
 
@@ -162,14 +170,12 @@ public class Window {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         //currentScene = new LevelEditorScene();
-        Renderer2D.Init();
         Vector4f clearColor = new Vector4f(0.0f, 1.0f, 0.8f, 1.0f);
+
 
         while (!glfwWindowShouldClose(wnd)) {
 
             Renderer2D.Clear(clearColor);
-
-            BatchRendererScene.onUpdate(dt);
 
             Frame_Rate.Update_Frame_Rate_Counter();
 
@@ -191,6 +197,13 @@ public class Window {
             dt = endTime - beginTime;
             beginTime = endTime;
         }
+
+        if (saving)
+        {
+            currentScene.saveExit();
+            saving = false;
+        }
+
         Renderer2D.shutdown();
     }
 
@@ -221,7 +234,7 @@ public class Window {
                 currentScene.start();
                 break;
             case 3:
-                currentScene = new ImguiTestScene();
+                currentScene = editor;
                 currentScene.init();
                 currentScene.start();
                 break;
@@ -233,11 +246,20 @@ public class Window {
 
     }
 
+    public static Scene getScene()
+    {
+        return getWindow().currentScene;
+    }
+
     public static void setWidth(int newWidth) {
         width = newWidth;
     }
 
     public static void setHeight(int newHeight) {
         height = newHeight;
+    }
+
+    public static void setSaving() {
+        saving = true;
     }
 }

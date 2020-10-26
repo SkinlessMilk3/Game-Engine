@@ -1,6 +1,11 @@
 package Engine.Scenes;
 
-import Engine.Window;
+import API.EventListeners.KeyEventListener;
+import Components.SpriteRenderer;
+import Engine.*;
+import Renderer.Renderer2D;
+
+import Utils.AssetPool;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import imgui.ImGui;
@@ -8,22 +13,87 @@ import imgui.ImString;
 import imgui.ImVec2;
 import imgui.enums.ImGuiCond;
 import imgui.enums.ImGuiTreeNodeFlags;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.lwjgl.glfw.GLFW.*;
+
 public class ImguiTestScene extends Scene {
+
+    private static CameraController control = new CameraController((float) Window.getWidth()/(float)Window.getHeight());
+
+    public List<GameObjectData> objectData = new ArrayList<>();
+    public List<GameObjectData> spriteData = new ArrayList<>();
+    public List<GameObjectData> fontData = new ArrayList<>();
+    public List<GameObjectData> scriptData = new ArrayList<>();
+    public List<GameObjectData> roomData = new ArrayList<>();
+    boolean firstUpdate = true;
+
+    private GameObjectData selectedObject = null;
 
     @Override
     public void init() {
 
+        objectDataCatagories.add(objectData);
+        objectDataCatagories.add(spriteData);
+        objectDataCatagories.add(fontData);
+        objectDataCatagories.add(scriptData);
+        objectDataCatagories.add(roomData);
+
+        if (levelLoaded) {
+            return;
+        }
+
         levelLayerLabels.add("Default Layer");
         levelLayerLabels.add("Background Layer");
+
+        GameObject go = new GameObject("test", new Transform(new Vector2f(0.0f, 0.0f), size));
+        go.addComponent(new SpriteRenderer(color));
+        this.addGameObjectToScene(go);
+
+        color = new Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
+        GameObject go2 = new GameObject("test2", new Transform(new Vector2f(0.26f, 1.0f), size));
+        go2.addComponent(new SpriteRenderer(color));
+        this.addGameObjectToScene(go2);
+
     }
+    private static Vector2f position = new Vector2f(0.0f, -1.0f);
+    private static Vector2f size = new Vector2f(0.25f, 0.25f);
+    private static Vector4f color = new Vector4f(1.0f, 0.0f, 1.0f, 1.0f);
+
 
 
     @Override
     public void update(float dt) {
+
+        control.onUpdate(dt);
+
+        Renderer2D.beginScene(control.getCamera());
+
+
+
+        if (firstUpdate) {
+            objectCount = objectData.size();
+            spriteCount = spriteData.size();
+            fontCount = fontData.size();
+            scriptCount = scriptData.size();
+            roomCount = roomData.size();
+            firstUpdate = false;
+        }
+
+        for (GameObject go : this.gameObjects)
+        {
+            go.update(dt);
+        }
+
+
+
+
+        Renderer2D.endScene();
 
     }
 
@@ -61,9 +131,15 @@ public class ImguiTestScene extends Scene {
         MainMenuBarImGui();
         RoomEditorImGui();
         assetBrowserImGui();
+        if (activeGameObject != null)
+        {
+            ImGui.begin("Inspector");
+            activeGameObject.imgui();
+            ImGui.end();
+        }
     }
 
-    private int addNewAsset(List<String> labels, int counter)
+    private int addNewAsset(List<String> labels, int counter, String tag)
     {
         if (ImGui.beginPopupContextItem())
         {
@@ -75,14 +151,51 @@ public class ImguiTestScene extends Scene {
                 if (!assetName.isEmpty()) {
                     counter++;
                     labels.add(assetName);
+                    if (tag.equals("Sprite")) { GameObjectData sprData = new GameObjectData(); sprData.setName(assetName); spriteData.add(sprData);}
+                    if (tag.equals("Object")) { GameObjectData objData = new GameObjectData(); objData.setName(assetName); objectData.add(objData);}
+                    if (tag.equals("Font")) { GameObjectData fntData = new GameObjectData(); fntData.setName(assetName); fontData.add(fntData);}
+                    if (tag.equals("Script")) { GameObjectData scptData = new GameObjectData(); scptData.setName(assetName); scriptData.add(scptData);}
+                    if (tag.equals("Room")) { GameObjectData rmData = new GameObjectData(); rmData.setName(assetName); roomData.add(rmData);}
                     assetName = "";
                     name.set("");
                 }
+                //ImGui.openPopupOnItemClick(" ");
+                //popObjectInspector(objectData.get(objectDataCount));
+
                 ImGui.closeCurrentPopup();
             }
             ImGui.endPopup();
         }
         return counter;
+    }
+
+    private void deleteAsset(GameObjectData asset, String tag)
+    {
+        if (tag.equals("Sprite")) {
+            //AssetPool.textures.remove(obj.texture);
+            spriteData.remove(asset);
+            spriteCount--;
+        }
+        if (tag.equals("Object")) {
+            gameObjects.removeIf(go -> go.name.equals(asset.name));
+            objectData.remove(asset);
+            objectCount--;
+        }
+        if (tag.equals("Font")) {
+
+            fontData.remove(asset);
+            fontCount--;
+        }
+        if (tag.equals("Script")) {
+
+            scriptData.remove(asset);
+            scriptCount--;
+        }
+        if (tag.equals("Room")) {
+
+            roomData.remove(asset);
+            roomCount--;
+        }
     }
 
     private void assetBrowserImGui()
@@ -97,12 +210,12 @@ public class ImguiTestScene extends Scene {
             //Button for adding new sprites
             ImGui.smallButton("Add Sprite");
             ImGui.openPopupOnItemClick("Add Sprite", 0);
-            spriteCount = addNewAsset(spriteLabels, spriteCount);
+            spriteCount = addNewAsset(spriteLabels, spriteCount, "Sprite");
 
             //Display all created sprites
             for (int i = 0; i < spriteCount; i++)
             {
-                ImGui.bulletText(spriteLabels.get(i));
+                ImGui.bulletText(spriteData.get(i).name);
             }
 
             ImGui.treePop();
@@ -113,12 +226,59 @@ public class ImguiTestScene extends Scene {
             //Button for adding new objects
             ImGui.smallButton("Add Object");
             ImGui.openPopupOnItemClick("Add Object", 0);
-            objectCount = addNewAsset(objectLabels, objectCount);
+            objectCount = addNewAsset(objectLabels, objectCount, "Object");
+
+            if(ImGui.beginPopupContextItem("Object Data Options"))
+            {
+                ImGui.text(selectedObject.name + ":");
+                if (ImGui.beginPopup("Delete Confirmation"))
+                {
+                    ImGui.text("Are you sure?");
+                    ImGui.text("(This will delete all instances of this object)");
+                    if (ImGui.button("Yes"))
+                    {
+                        if (activeGameObject.name == selectedObject.name)
+                        {
+                            activeGameObject = null;
+                        }
+                        deleteAsset(selectedObject, "Object");
+                        selectedObject = null;
+                        ImGui.closeCurrentPopup();
+                    }
+                    ImGui.sameLine();
+                    if (ImGui.button("No"))
+                    {
+                        ImGui.closeCurrentPopup();
+                    }
+                    ImGui.endPopup();
+                }
+                if(ImGui.button("Add to scene"))
+                {
+                    GameObject newObj = selectedObject.GenerateGameObject();
+                    addGameObjectToScene(newObj);
+                    activeGameObject = newObj;
+                    ImGui.closeCurrentPopup();
+                }
+                if(ImGui.button("Delete"))
+                {
+                    ImGui.openPopup("Delete Confirmation");
+                }
+                if (selectedObject == null)
+                {
+                    ImGui.closeCurrentPopup();
+                }
+                ImGui.endPopup();
+            }
 
             //Display all created objects
             for (int i = 0; i < objectCount; i++)
             {
-                ImGui.bulletText(objectLabels.get(i));
+                ImGui.bulletText(objectData.get(i).name);
+                if (ImGui.isItemHovered())
+                {
+                    selectedObject = objectData.get(i);
+                    ImGui.openPopupOnItemClick("Object Data Options", 1);
+                }
             }
 
             ImGui.treePop();
@@ -129,12 +289,12 @@ public class ImguiTestScene extends Scene {
             //Button for adding new scripts
             ImGui.smallButton("Add Script");
             ImGui.openPopupOnItemClick("Add Script", 0);
-            scriptCount = addNewAsset(scriptLabels, scriptCount);
+            scriptCount = addNewAsset(scriptLabels, scriptCount, "Script");
 
             //Display all created scripts
             for (int i = 0; i < scriptCount; i++)
             {
-                ImGui.bulletText(scriptLabels.get(i));
+                ImGui.bulletText(scriptData.get(i).name);
             }
 
             ImGui.treePop();
@@ -145,12 +305,12 @@ public class ImguiTestScene extends Scene {
             //Button for adding new fonts
             ImGui.smallButton("Add Font");
             ImGui.openPopupOnItemClick("Add Font", 0);
-            fontCount = addNewAsset(fontLabels, fontCount);
+            fontCount = addNewAsset(fontLabels, fontCount, "Font");
 
             //Display all created fonts
             for (int i = 0; i < fontCount; i++)
             {
-                ImGui.bulletText(fontLabels.get(i));
+                ImGui.bulletText(fontData.get(i).name);
             }
 
             ImGui.treePop();
@@ -161,12 +321,12 @@ public class ImguiTestScene extends Scene {
             //Button for adding new rooms
             ImGui.smallButton("Add Room");
             ImGui.openPopupOnItemClick("Add Room", 0);
-            roomCount = addNewAsset(roomLabels, roomCount);
+            roomCount = addNewAsset(roomLabels, roomCount, "Room");
 
             //Display all created rooms
             for (int i = 0; i < roomCount; i++)
             {
-                ImGui.bulletText(roomLabels.get(i));
+                ImGui.bulletText(roomData.get(i).name);
             }
 
             ImGui.treePop();
@@ -185,7 +345,7 @@ public class ImguiTestScene extends Scene {
                 if (ImGui.menuItem("New Project")) {}
                 if (ImGui.menuItem("Open Project")) {}
                 ImGui.separator();
-                if (ImGui.menuItem("Save Project", "CTRL+S")) {}
+                if (ImGui.menuItem("Save Project", "CTRL+S")) { Window.setSaving(); }
                 if (ImGui.menuItem("Save Project As", "CTRL+SHIFT+S")) {}
                 ImGui.separator();
                 if (ImGui.menuItem("Settings")) {}
@@ -233,7 +393,7 @@ public class ImguiTestScene extends Scene {
 
             ImGui.button("Add Layer");
             ImGui.openPopupOnItemClick("Add Layer", 0);
-            levelLayerCount = addNewAsset(levelLayerLabels, levelLayerCount);
+            levelLayerCount = addNewAsset(levelLayerLabels, levelLayerCount, "Layer");
             ImGui.spacing(); ImGui.spacing();
 
 
@@ -257,7 +417,12 @@ public class ImguiTestScene extends Scene {
         if (ImGui.treeNodeEx("Layer Objects", 2)){
 
             ImGui.button(levelLayerLabels.get(selectedLayer) + " Objects", 150, 20);
-            ImGui.text("Level/room objects would be listed here");
+            for (GameObject go : gameObjects)
+            {
+                ImGui.bullet();
+                ImGui.selectable(go.name);
+            }
+            //ImGui.text("Level/room objects would be listed here");
 
 
             ImGui.treePop();
@@ -294,5 +459,12 @@ public class ImguiTestScene extends Scene {
             Window.ChangeScene(0);
         }
         ImGui.end();
+    }
+
+    public void ObjectInspectorImGui(GameObjectData objData)
+    {
+
+
+
     }
 }

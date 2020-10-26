@@ -1,5 +1,6 @@
 package Engine;
 
+import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventDispatcher;
 import API.EventListeners.MouseEventListener;
 import Engine.Scenes.Scene;
@@ -231,9 +232,11 @@ public class ImGuiLayer {
             Window.ChangeScene(3);
         }
         ImGui.sameLine();
-        if(ImGui.button("GameObject"))
+
+        if (ImGui.button("Batch")){
             Window.ChangeScene(4);
-        ImGui.end();
+        }
+       ImGui.end();
         //----------------------------------------------------------------------
 
         currentScene.sceneImgui();
