@@ -49,10 +49,12 @@ public class Renderer2D {
     private Vector2d texCoords;
 
     private static SpriteRenderer[] sprites = new SpriteRenderer[maxSquares];
-    private static int spriteNum;
+    private static int spriteNum = 0;
     public static boolean hasRoom;
 
     private static float[] vertexBuffer = new float[maxVertexCount];
+
+    private static boolean rebuferData = false;
 
     /**
      * Must be called before submitting data for render. If not then it could cause unexpected
@@ -72,7 +74,6 @@ public class Renderer2D {
         final int vertexSize = posSize + colorSize + textureSize;
         final int vertexSizeBytes = vertexSize * sizeOfFloat;
 
-        spriteNum = 0;
         hasRoom = true;
 
         shader = AssetPool.getShader("Assets/testing.glsl");
@@ -137,8 +138,22 @@ public class Renderer2D {
 
     public static void beginScene(final Camera camera) {
 
-        indexCount = 0;
-        vertexCount = 0;
+        //indexCount = 0;
+        // vertexCount = 0;
+        rebuferData = false;
+        for (int i = 0; i < spriteNum; i++)
+        {
+            SpriteRenderer spr = sprites[i];
+            if (spr.isDirty()) {
+                System.out.println("Changing!");
+                System.out.println(sprites[i].gameObject.name);
+                System.out.println(sprites[i].gameObject.transform.position.x);
+                CreateSquare(i);
+                spr.setClean();
+                rebuferData = true;
+            }
+        }
+        vbo.pushData(vertexBuffer);
         shader.bind();
         shader.setUniformMat4("u_view", camera.getViewMatrix());
         shader.setUniformMat4("u_projection", camera.getProjectionMatrix());
@@ -157,7 +172,8 @@ public class Renderer2D {
 
         vao.bind();
 
-        vbo.pushData(vertexBuffer);
+
+
         ibo.bind();
         Draw(indexCount);
     }
@@ -175,7 +191,6 @@ public class Renderer2D {
     public static void submit(int spriteIndex) {
 
         CreateSquare(spriteIndex);
-
         indexCount += 6;
         vertexCount += 9 * 4;
     }
@@ -215,7 +230,6 @@ public class Renderer2D {
 
     public static void addSprite(SpriteRenderer spr) {
         int index = spriteNum;
-
         sprites[index] = spr;
         spriteNum++;
 
@@ -227,6 +241,10 @@ public class Renderer2D {
         }
     }
 
+    public static void removedSprite(SpriteRenderer spr) {
+
+    }
+
     /**
      * A helper function that does all the math and calculation for square vertex positions and
      * puts them into the vertex buffer. It also does this for color and texture data.
@@ -235,6 +253,8 @@ public class Renderer2D {
         SpriteRenderer sprite = sprites[index];
 
         Vector4f color = sprite.getColor();
+
+        int offset = index * 4 * 9;
 
         float xAdd = 1.0f;
         float yAdd = 1.0f;
@@ -254,24 +274,30 @@ public class Renderer2D {
                 yAdd = 1.0f;
                 ty = 1.0f;
             }
-            vertexBuffer[count + vertexCount] = sprite.gameObject.transform.position.x + (xAdd * sprite.gameObject.transform.scale.x);
+            System.out.println("cnt + vxcnt: " + (count + vertexCount));
+            System.out.println("offset: " + offset);
+            vertexBuffer[offset + 0] = sprite.gameObject.transform.position.x + (xAdd * sprite.gameObject.transform.scale.x);
             count++;
-            vertexBuffer[count + vertexCount] = sprite.gameObject.transform.position.y + (yAdd * sprite.gameObject.transform.scale.y);
+            vertexBuffer[offset + 1] = sprite.gameObject.transform.position.y + (yAdd * sprite.gameObject.transform.scale.y);
             count++;
-            vertexBuffer[count + vertexCount] = 0.0f;
+            vertexBuffer[offset + 2] = 0.0f;
             count++;
-            vertexBuffer[count + vertexCount] = color.x;
+            vertexBuffer[offset + 3] = color.x;
             count++;
-            vertexBuffer[count + vertexCount] = color.y;
+            vertexBuffer[offset + 4] = color.y;
             count++;
-            vertexBuffer[count + vertexCount] = color.z;
+            vertexBuffer[offset + 5] = color.z;
             count++;
-            vertexBuffer[count + vertexCount] = color.w;
+            vertexBuffer[offset + 6] = color.w;
             count++;
-            vertexBuffer[count + vertexCount] = tx;
+            vertexBuffer[offset + 7] = tx;
             count++;
-            vertexBuffer[count + vertexCount] = ty;
+            vertexBuffer[offset + 9] = ty;
             count++;
+
+            offset += 9;
         }
     }
+
+
 }

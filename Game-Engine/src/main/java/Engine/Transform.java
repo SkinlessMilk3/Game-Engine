@@ -22,8 +22,27 @@ public class Transform {
         init(position, scale);
     }
 
+    public Transform copy()
+    {
+        return new Transform(new Vector2f(this.position), new Vector2f(this.scale));
+    }
+
+    public void copy(Transform to)
+    {
+        to.position.set(this.position);
+        to.scale.set(this.scale);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (!(o instanceof Transform)) return false;
+
+        Transform t = (Transform)o;
+        return t.position.equals(this.position) && (t.scale.equals(this.scale));
+    }
+
     public void init(Vector2f position, Vector2f scale) {
-        System.out.println("x: " + position.x + " y: " + position.y);
         this.position = new Vector2f(position.x, position.y);
         this.scale = new Vector2f(0.25f, 0.25f);
     }

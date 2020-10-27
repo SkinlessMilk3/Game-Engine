@@ -142,6 +142,7 @@ public class Window {
         GL.createCapabilities();
 
         //Sets starting scene
+        Renderer2D.Init();
 
         Window.ChangeScene(3);
 
@@ -150,7 +151,6 @@ public class Window {
 
         currentScene.load();
 
-        Renderer2D.Init();
     }
 
     private void loop() {

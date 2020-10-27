@@ -42,12 +42,13 @@ public class CameraController implements MouseEventListener, WindowResizeListene
 
         if (MouseEventDispatcher.isDragging())
         {
-            if (MouseEventDispatcher.getDeltaX() != 0){
+            if (MouseEventDispatcher.getDeltaX() != 0 && MouseEventDispatcher.getDeltaY() != 0){
                 camera.position.x -= MouseEventDispatcher.getDeltaX() * dt * zoomLevel * speed;
                 camera.position.y += MouseEventDispatcher.getDeltaY() * dt * zoomLevel * speed;
             }
         }
     }
+
 
     /**
      * Zooms the screen in and out.

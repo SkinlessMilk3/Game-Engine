@@ -33,7 +33,10 @@ public class ImguiTestScene extends Scene {
     public List<GameObjectData> roomData = new ArrayList<>();
     boolean firstUpdate = true;
 
+    int objectsInScene = gameObjects.size();
+
     private GameObjectData selectedObject = null;
+    private GameObject selectedInstance = null;
 
     @Override
     public void init() {
@@ -59,6 +62,13 @@ public class ImguiTestScene extends Scene {
         GameObject go2 = new GameObject("test2", new Transform(new Vector2f(0.26f, 1.0f), size));
         go2.addComponent(new SpriteRenderer(color));
         this.addGameObjectToScene(go2);
+/*
+        color = new Vector4f(0.0f, 0.0f, 1.0f, 1.0f);
+        GameObject go3 = new GameObject("test3", new Transform(new Vector2f(0.0f, -1.0f), size));
+        go3.addComponent(new SpriteRenderer(color));
+        this.addGameObjectToScene(go3);*/
+
+        objectsInScene = gameObjects.size();
 
     }
     private static Vector2f position = new Vector2f(0.0f, -1.0f);
@@ -71,6 +81,8 @@ public class ImguiTestScene extends Scene {
     public void update(float dt) {
 
         control.onUpdate(dt);
+
+        objectsInScene = gameObjects.size();
 
         Renderer2D.beginScene(control.getCamera());
 
@@ -237,7 +249,7 @@ public class ImguiTestScene extends Scene {
                     ImGui.text("(This will delete all instances of this object)");
                     if (ImGui.button("Yes"))
                     {
-                        if (activeGameObject.name == selectedObject.name)
+                        if (activeGameObject != null && activeGameObject.name.equals(selectedObject.name))
                         {
                             activeGameObject = null;
                         }
@@ -254,7 +266,9 @@ public class ImguiTestScene extends Scene {
                 }
                 if(ImGui.button("Add to scene"))
                 {
-                    GameObject newObj = selectedObject.GenerateGameObject();
+                    GameObject newObj = selectedObject.GenerateGameObject(new Transform(position, size));
+                    position.y += 1;
+                    objectsInScene++;
                     addGameObjectToScene(newObj);
                     activeGameObject = newObj;
                     ImGui.closeCurrentPopup();
@@ -382,6 +396,19 @@ public class ImguiTestScene extends Scene {
         }
     }
 
+    public void instanceMenuImGui(int goIndex){
+        if (ImGui.beginPopupContextItem("Instance Menu"))
+        {
+            ImGui.text("Instance: " + gameObjects.get(goIndex).name);
+            ImGui.button("Delete");
+            ImGui.sameLine();
+            if (ImGui.button("Inspect")){
+                activeGameObject = gameObjects.get(goIndex);
+            }
+            ImGui.endPopup();
+        }
+    }
+
     public void RoomEditorImGui()
     {
         ImGui.begin("Room/Level Editor");
@@ -417,10 +444,31 @@ public class ImguiTestScene extends Scene {
         if (ImGui.treeNodeEx("Layer Objects", 2)){
 
             ImGui.button(levelLayerLabels.get(selectedLayer) + " Objects", 150, 20);
-            for (GameObject go : gameObjects)
+            boolean instanceSelections[] = new boolean[gameObjects.size()];
+            if (ImGui.beginPopupContextItem("Instance Menu"))
+            {
+                ImGui.text("Instance: " + selectedInstance.name);
+                if (ImGui.button("Delete")) {
+                    objectsInScene--;
+                    gameObjects.remove(selectedInstance);
+                    ImGui.closeCurrentPopup();
+                }
+                ImGui.sameLine();
+                if (ImGui.button("Inspect")){
+                    activeGameObject = selectedInstance;
+                    ImGui.closeCurrentPopup();
+                }
+                ImGui.endPopup();
+            }
+            for (int i = 0; i < objectsInScene; i++)
             {
                 ImGui.bullet();
-                ImGui.selectable(go.name);
+                ImGui.selectable(gameObjects.get(i).name, instanceSelections[i]);
+                if (ImGui.isItemHovered())
+                {
+                    selectedInstance = gameObjects.get(i);
+                    ImGui.openPopupOnItemClick("Instance Menu", 1);
+                }
             }
             //ImGui.text("Level/room objects would be listed here");
 
@@ -438,7 +486,7 @@ public class ImguiTestScene extends Scene {
             //ImGui.text("Width");
             ImGui.sliderInt("Width", new int[]{tempW}, 0, 1980);
             //ImGui.text("Height");
-             ImGui.sliderInt("Height", new int[]{tempH}, 0, 1020);
+            ImGui.sliderInt("Height", new int[]{tempH}, 0, 1020);
             ImGui.separator();
             ImGui.spacing(); ImGui.spacing();
             ImGui.button("Creation Code", 200, 20);
@@ -454,10 +502,9 @@ public class ImguiTestScene extends Scene {
     {
         ImGui.begin("Scene Selector");
         ImGui.textColored(44, 244, 193, 100, "Choose Scene!");
-        ImGui.sameLine();
-        if (ImGui.button("Triangle")){
-            Window.ChangeScene(0);
-        }
+        ImGui.sameLine(); if (ImGui.button("Triangle")){
+        Window.ChangeScene(0);
+    }
         ImGui.end();
     }
 
