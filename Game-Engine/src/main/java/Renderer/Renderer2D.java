@@ -11,12 +11,14 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.system.CallbackI;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 
 /**
- * This is a renerer class specifically designed for 2D graphics. It will take various data and use
+ * This is a renderer class specifically designed for 2D graphics. It will take various data and use
  * it do draw things to the screen.
  * How To Use - anything you want to submit to be drawn to the screen must be surrounded by
  * beginScene() and endScene().
@@ -47,6 +49,8 @@ public class Renderer2D {
     private Vector3d positions;
     private Vector4d color;
     private Vector2d texCoords;
+    private static List<Texture> textures;
+    private static int[] texSlots = {0, 1, 2, 3, 4, 5, 6, 7};
 
     private static SpriteRenderer[] sprites = new SpriteRenderer[maxSquares];
     private static int spriteNum = 0;
@@ -66,15 +70,19 @@ public class Renderer2D {
         final int posSize = 3;
         final int colorSize = 4;
         final int textureSize = 2;
+        final int textureIdSize = 1;
         final int entityIdSize = 1;
 
         final int posOffset = 0;
         final int colorOffset = posOffset + posSize * sizeOfFloat;
         final int textureOffset = colorOffset + colorSize * sizeOfFloat;
-        final int stride = (posSize + colorSize + textureSize) * sizeOfFloat;
-        final int vertexSize = posSize + colorSize + textureSize /* + entityIdSize*/;
-        final int entityIdOffest = textureOffset + textureSize * Float.BYTES;
+        final int textureIdOffest = textureOffset + textureSize * sizeOfFloat;
+        final int stride = (posSize + colorSize + textureSize + textureIdSize) * sizeOfFloat;
+        final int vertexSize = posSize + colorSize + textureSize + textureIdSize /* + entityIdSize*/;
+        final int entityIdOffest = textureOffset + textureSize * sizeOfFloat;
         final int vertexSizeBytes = vertexSize * sizeOfFloat;
+
+        textures = new ArrayList<>();
 
         hasRoom = true;
 
@@ -90,6 +98,9 @@ public class Renderer2D {
 
         glVertexAttribPointer(2, textureSize, GL_FLOAT, false, stride, textureOffset);
         glEnableVertexAttribArray(2);
+
+        glVertexAttribPointer(3, textureIdSize, GL_FLOAT, false, stride, textureIdOffest);
+        glEnableVertexAttribArray(3);
 
         /*glVertexAttribPointer(4, entityIdSize, GL_FLOAT, false, stride, entityIdOffest);
         glEnableVertexAttribArray(4);*/
@@ -161,6 +172,10 @@ public class Renderer2D {
         currentShader.setUniformMat4("u_view", camera.getViewMatrix());
         currentShader.setUniformMat4("u_projection", camera.getProjectionMatrix());
         whiteTexture.bind(0);
+        for (int i=0; i < textures.size(); i++) {
+            textures.get(i).bind(i + 1);
+        }
+        currentShader.uploadIntArray("u_texture", texSlots);
         currentShader.setUniform1i("u_texture", 0);
 
         int check;
@@ -179,6 +194,10 @@ public class Renderer2D {
 
         ibo.bind();
         Draw(indexCount);
+
+        for (int i=0; i < textures.size(); i++) {
+            textures.get(i).unbind();
+        }
     }
 
     /**
@@ -195,7 +214,7 @@ public class Renderer2D {
 
         CreateSquare(spriteIndex);
         indexCount += 6;
-        vertexCount += 9 * 4;
+        vertexCount += 10 * 4;
     }
 
     /**
@@ -236,6 +255,12 @@ public class Renderer2D {
         sprites[index] = spr;
         spriteNum++;
 
+        if (spr.getTexture() != null) {
+            if (!textures.contains(spr.getTexture())) {
+                textures.add(spr.getTexture());
+            }
+        }
+
         submit(index);
 
         if (spriteNum >= maxSquares)
@@ -256,8 +281,19 @@ public class Renderer2D {
         SpriteRenderer sprite = sprites[index];
 
         Vector4f color = sprite.getColor();
+        Vector2f[] texCoords = sprite.getTexCoords();
 
-        int offset = index * 4 * 9;
+        int offset = index * 4 * 10;
+
+        int texId = 0;
+        if (sprite.getTexture() != null) {
+            for (int i = 0; i < textures.size(); i++) {
+                if (textures.get(i).equals(sprite.getTexture())) {
+                    texId = i + 1;
+                    break;
+                }
+            }
+        }
 
         float xAdd = 1.0f;
         float yAdd = 1.0f;
@@ -292,15 +328,16 @@ public class Renderer2D {
             count++;
             vertexBuffer[offset + 6] = color.w;
             count++;
-            vertexBuffer[offset + 7] = tx;
+            vertexBuffer[offset + 7] = texCoords[i].x;
             count++;
-            vertexBuffer[offset + 8] = ty;
+            vertexBuffer[offset + 8] = texCoords[i].y;
             count++;
+            vertexBuffer[offset + 9] = texId;
 
             //load entity id
             //vertexBuffer[offset + 9] = sprite.gameObject.uID + 1;
 
-            offset += 9;
+            offset += 10;
         }
     }
 

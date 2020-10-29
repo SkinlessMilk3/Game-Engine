@@ -194,4 +194,11 @@ public class Shader {
         mat4.get(matBuffer);
         glUniformMatrix4fv(varLocation, false, matBuffer);
     }
+
+    public void uploadIntArray(String varName, int[] array)
+    {
+        int varLocation = glGetUniformLocation(renderid, varName);
+        bind();
+        glUniform1iv(varLocation, array);
+    }
 }

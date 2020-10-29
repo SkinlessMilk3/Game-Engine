@@ -5,6 +5,7 @@ import Components.SpriteRenderer;
 import Components.TempCounter;
 import Renderer.Renderer2D;
 import Renderer.Texture;
+import Utils.AssetPool;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
@@ -12,6 +13,7 @@ public class GameObjectData {
 
     public String name;
     private Texture sprite;
+    //currentShader = AssetPool.getShader("Assets/testing.glsl");
     //private Transform transform;
     private  transient Vector4f color = new Vector4f(0.0f, 0.0f, 1.0f, 1.0f);
     private  transient Vector2f position = new Vector2f(0.0f, 1.0f);
@@ -42,9 +44,25 @@ public class GameObjectData {
 
     public GameObject GenerateGameObject(Transform pos)
     {
+        this.sprite = new Texture("Assets/noTexture.png");
         GameObject obj = new GameObject(name, pos);
         TempCounter temp = new TempCounter();
-        SpriteRenderer spr = new SpriteRenderer(color);
+        SpriteRenderer spr = new SpriteRenderer(sprite);
+        ObjectLoop objLoop = new ObjectLoop();
+
+        obj.addComponent(temp);
+        obj.addComponent(spr);
+        obj.addComponent(objLoop);
+
+        return obj;
+    }
+
+    public GameObject GenerateGameObject(Transform pos, Texture texture)
+    {
+        this.sprite = texture;
+        GameObject obj = new GameObject(name, pos);
+        TempCounter temp = new TempCounter();
+        SpriteRenderer spr = new SpriteRenderer(sprite);
         ObjectLoop objLoop = new ObjectLoop();
 
         obj.addComponent(temp);

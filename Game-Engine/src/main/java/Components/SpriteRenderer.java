@@ -11,7 +11,7 @@ import org.joml.Vector4f;
 public class SpriteRenderer extends Component {
 
     private Vector4f color;
-    private Vector2f[] textCoords;
+    private Vector2f[] texCoords;
     private Texture texture;
 
     private Transform lastTransform;
@@ -62,14 +62,14 @@ public class SpriteRenderer extends Component {
         return this.texture;
     }
 
-    public Vector2f[] getTextCoords() {
+    public Vector2f[] getTexCoords() {
         Vector2f[] texCoords = {
                 new Vector2f(1,1),
                 new Vector2f(1,0),
-                new Vector2f(0,1),
-                new Vector2f(0,0)
+                new Vector2f(0,0),
+                new Vector2f(0,1)
         };
-        return textCoords;
+        return texCoords;
     }
 
     public void setColor(Vector4f color)
