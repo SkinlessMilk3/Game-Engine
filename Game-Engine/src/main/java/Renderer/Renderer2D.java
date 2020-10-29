@@ -71,8 +71,8 @@ public class Renderer2D {
         final int posOffset = 0;
         final int colorOffset = posOffset + posSize * sizeOfFloat;
         final int textureOffset = colorOffset + colorSize * sizeOfFloat;
-        final int stride = (posSize + colorSize + textureSize + entityIdSize) * sizeOfFloat;
-        final int vertexSize = posSize + colorSize + textureSize + entityIdSize;
+        final int stride = (posSize + colorSize + textureSize) * sizeOfFloat;
+        final int vertexSize = posSize + colorSize + textureSize /* + entityIdSize*/;
         final int entityIdOffest = textureOffset + textureSize * Float.BYTES;
         final int vertexSizeBytes = vertexSize * sizeOfFloat;
 
@@ -91,8 +91,8 @@ public class Renderer2D {
         glVertexAttribPointer(2, textureSize, GL_FLOAT, false, stride, textureOffset);
         glEnableVertexAttribArray(2);
 
-        glVertexAttribPointer(4, entityIdSize, GL_FLOAT, false, stride, entityIdOffest);
-        glEnableVertexAttribArray(4);
+        /*glVertexAttribPointer(4, entityIdSize, GL_FLOAT, false, stride, entityIdOffest);
+        glEnableVertexAttribArray(4);*/
 
         int[] indices = new int[maxIndices];
         int offset = 0;
@@ -298,9 +298,9 @@ public class Renderer2D {
             count++;
 
             //load entity id
-            vertexBuffer[offset + 9] = sprite.gameObject.uID + 1;
+            //vertexBuffer[offset + 9] = sprite.gameObject.uID + 1;
 
-            offset += 10;
+            offset += 9;
         }
     }
 

@@ -14,7 +14,7 @@ public class ObjectLoop extends Component {
 
     @Override
     public void update(float dt) {
-       /* if (MouseEventDispatcher.isPressed(0))
+        if (MouseEventDispatcher.isPressed(0))
         {
             gameObject.transform.position.x -= 0.10f;
         }
@@ -22,7 +22,7 @@ public class ObjectLoop extends Component {
         {
             gameObject.transform.position.x += 0.10f;
         }
-        */
+
 
     }
 }

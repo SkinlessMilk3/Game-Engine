@@ -190,7 +190,7 @@ public class Window {
             glfwPollEvents();
 
             //Render pass 1. Render to picking texture
-            glDisable(GL_BLEND);
+            /*glDisable(GL_BLEND);
             pickingTexture.enableWriting();
 
             glViewport(0,0, getWidth(), getHeight());
@@ -204,14 +204,14 @@ public class Window {
             if (MouseEventDispatcher.isPressed(GLFW_MOUSE_BUTTON_LEFT)) {
                 int x = (int)MouseEventDispatcher.getScreenX();
                 int y = (int) MouseEventDispatcher.getScreenY();
-                System.out.println(pickingTexture.readPixel(x, y));
+
             }
 
             pickingTexture.disableWriting();
             glEnable(GL_BLEND);
 
             //Render pass 2. Render to actual game
-
+            */
             Renderer2D.bindShader(defaultShader);
 
 

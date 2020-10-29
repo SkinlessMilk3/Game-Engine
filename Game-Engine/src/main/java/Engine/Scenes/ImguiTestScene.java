@@ -395,7 +395,7 @@ public class ImguiTestScene extends Scene {
 
     public void RoomEditorImGui()
     {
-        ImGui.begin("Room/Level Editor");
+        ImGui.begin("Scene Editor");
 
         ImGui.setNextItemOpen(true, ImGuiCond.Once);
         ImGui.spacing();
@@ -425,7 +425,7 @@ public class ImguiTestScene extends Scene {
 
         ImGui.setNextItemOpen(true, ImGuiCond.Once);
         ImGui.spacing();
-        if (ImGui.treeNodeEx("Layer Objects", 2)){
+        if (ImGui.treeNodeEx("Scene Objects", 2)){
 
             ImGui.button(levelLayerLabels.get(selectedLayer) + " Objects", 150, 20);
             boolean instanceSelections[] = new boolean[gameObjects.size()];

@@ -1,7 +1,7 @@
 [
   [
     {
-      "name": "obj_test"
+      "name": "obJ_player"
     }
   ],
   [],
