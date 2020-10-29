@@ -151,5 +151,8 @@ public class LevelEditorScene extends Scene {
         }
     }
 
+    @Override
+    public void render() {
 
+    }
 }

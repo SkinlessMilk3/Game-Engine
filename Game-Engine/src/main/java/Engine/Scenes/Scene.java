@@ -11,6 +11,7 @@ import imgui.ImGui;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -44,6 +45,10 @@ public abstract class Scene {
         isRunning = true;
     }
 
+    public Camera camera() {
+        return this.camera;
+    }
+
     public void addGameObjectToScene(GameObject go) {
         if (!isRunning) {
             gameObjects.add(go);
@@ -55,14 +60,15 @@ public abstract class Scene {
     }
 
     public abstract void update(float dt);
+    public abstract void render();
 
     //Gets current "selected" object in gui
     public void sceneImgui() {
         if (activeGameObject != null)
         {
             ImGui.begin("Inspector");
-            //activeGameObject.imgui();
-            ImGui.text(activeGameObject.name);
+            activeGameObject.imgui();
+            //ImGui.text(activeGameObject.name);
             ImGui.end();
         }
 
@@ -168,5 +174,10 @@ public abstract class Scene {
             System.out.println("Unknown Error!");
             e.printStackTrace();
         }
+    }
+
+    public GameObject getActiveGameObject()
+    {
+        return activeGameObject;
     }
 }

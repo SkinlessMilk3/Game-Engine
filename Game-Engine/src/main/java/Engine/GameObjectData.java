@@ -13,9 +13,9 @@ public class GameObjectData {
     public String name;
     private Texture sprite;
     //private Transform transform;
-    private static Vector4f color = new Vector4f(0.0f, 0.0f, 1.0f, 1.0f);
-    private static Vector2f position = new Vector2f(0.0f, 1.0f);
-    private static Vector2f size = new Vector2f(0.25f, 0.25f);
+    private  transient Vector4f color = new Vector4f(0.0f, 0.0f, 1.0f, 1.0f);
+    private  transient Vector2f position = new Vector2f(0.0f, 1.0f);
+    private  transient Vector2f size = new Vector2f(0.25f, 0.25f);
 
     public GameObjectData()
     {

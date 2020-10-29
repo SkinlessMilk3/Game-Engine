@@ -6,7 +6,10 @@ import API.EventListeners.MouseEventDispatcher;
 import API.EventListeners.WindowResizeDispatcher;
 import Engine.Scenes.*;
 
+import Renderer.PickingTexture;
 import Renderer.Renderer2D;
+import Renderer.Shader;
+import Utils.AssetPool;
 import Utils.GL_LOG;
 
 import org.joml.Vector4f;
@@ -29,6 +32,7 @@ public class Window {
     private static boolean saving;
     String title;
     private ImGuiLayer imGuiLayer;
+    private PickingTexture pickingTexture;
 
     private static ImguiTestScene editor = new ImguiTestScene();
 
@@ -148,6 +152,7 @@ public class Window {
 
         this.imGuiLayer = new ImGuiLayer(wnd);
         this.imGuiLayer.initImGui();
+        this.pickingTexture = new PickingTexture(getWidth(), getHeight());
 
         currentScene.load();
 
@@ -161,6 +166,9 @@ public class Window {
         float endTime;
         float dt = -1.0f;
 
+        Shader defaultShader = AssetPool.getShader("Assets/testing.glsl");
+        Shader pickingShader = AssetPool.getShader("Assets/pickingShader.glsl");
+
         GL_LOG.Log_Data("Run loop" + glGetError());
 
         /*Note for the future. Draw calls need to happen after the glClear function in the loop
@@ -170,7 +178,7 @@ public class Window {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         //currentScene = new LevelEditorScene();
-        Vector4f clearColor = new Vector4f(0.0f, 1.0f, 0.8f, 1.0f);
+        Vector4f clearColor = new Vector4f(0.15f, 0.15f, 0.15f, 1.0f);
 
 
         while (!glfwWindowShouldClose(wnd)) {
@@ -181,9 +189,36 @@ public class Window {
 
             glfwPollEvents();
 
+            //Render pass 1. Render to picking texture
+            glDisable(GL_BLEND);
+            pickingTexture.enableWriting();
+
+            glViewport(0,0, getWidth(), getHeight());
+            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            Renderer2D.bindShader(pickingShader);
+
+            currentScene.render();
+
+            if (MouseEventDispatcher.isPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+                int x = (int)MouseEventDispatcher.getScreenX();
+                int y = (int) MouseEventDispatcher.getScreenY();
+                System.out.println(pickingTexture.readPixel(x, y));
+            }
+
+            pickingTexture.disableWriting();
+            glEnable(GL_BLEND);
+
+            //Render pass 2. Render to actual game
+
+            Renderer2D.bindShader(defaultShader);
+
+
             //Draws/updates current scene
             if (dt >= 0) {
                 currentScene.update(dt);
+                currentScene.render();
             }
 
             //System.out.println("Mouse is at x: "  + MouseEventDispatcher.getX() + " y: " + MouseEventDispatcher.getY());
@@ -225,11 +260,6 @@ public class Window {
                 break;
             case 1:
                 currentScene = new LevelScene();
-                currentScene.init();
-                currentScene.start();
-                break;
-            case 2:
-                currentScene = new CounterDemoScene();
                 currentScene.init();
                 currentScene.start();
                 break;

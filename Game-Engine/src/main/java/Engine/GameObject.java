@@ -8,6 +8,7 @@ public class GameObject {
     public String name;
     public Transform transform;
     private List<Component> components;
+    public float uID = 13;
 
     public GameObject(String name) {
         this.name = name;

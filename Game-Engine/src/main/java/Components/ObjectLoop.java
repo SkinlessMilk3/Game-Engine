@@ -5,6 +5,8 @@ import Engine.Component;
 
 public class ObjectLoop extends Component {
 
+    public int x = 0;
+
     @Override
     public void start() {
 
@@ -12,7 +14,7 @@ public class ObjectLoop extends Component {
 
     @Override
     public void update(float dt) {
-        if (MouseEventDispatcher.isPressed(0))
+       /* if (MouseEventDispatcher.isPressed(0))
         {
             gameObject.transform.position.x -= 0.10f;
         }
@@ -20,6 +22,7 @@ public class ObjectLoop extends Component {
         {
             gameObject.transform.position.x += 0.10f;
         }
-        System.out.println("x: " + gameObject.transform.position.x);
+        */
+
     }
 }

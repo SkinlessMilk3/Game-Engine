@@ -1,6 +1,7 @@
 package Engine.Scenes;
 
 import API.EventListeners.KeyEventListener;
+import API.EventListeners.MouseEventDispatcher;
 import Components.SpriteRenderer;
 import Engine.*;
 import Renderer.Renderer2D;
@@ -41,6 +42,8 @@ public class ImguiTestScene extends Scene {
     @Override
     public void init() {
 
+        this.camera = new Camera(new Vector2f(-250, 0));
+
         objectDataCatagories.add(objectData);
         objectDataCatagories.add(spriteData);
         objectDataCatagories.add(fontData);
@@ -53,20 +56,6 @@ public class ImguiTestScene extends Scene {
 
         levelLayerLabels.add("Default Layer");
         levelLayerLabels.add("Background Layer");
-
-        GameObject go = new GameObject("test", new Transform(new Vector2f(0.0f, 0.0f), size));
-        go.addComponent(new SpriteRenderer(color));
-        this.addGameObjectToScene(go);
-
-        color = new Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-        GameObject go2 = new GameObject("test2", new Transform(new Vector2f(0.26f, 1.0f), size));
-        go2.addComponent(new SpriteRenderer(color));
-        this.addGameObjectToScene(go2);
-/*
-        color = new Vector4f(0.0f, 0.0f, 1.0f, 1.0f);
-        GameObject go3 = new GameObject("test3", new Transform(new Vector2f(0.0f, -1.0f), size));
-        go3.addComponent(new SpriteRenderer(color));
-        this.addGameObjectToScene(go3);*/
 
         objectsInScene = gameObjects.size();
 
@@ -82,11 +71,6 @@ public class ImguiTestScene extends Scene {
 
         control.onUpdate(dt);
 
-        objectsInScene = gameObjects.size();
-
-        Renderer2D.beginScene(control.getCamera());
-
-
 
         if (firstUpdate) {
             objectCount = objectData.size();
@@ -94,6 +78,7 @@ public class ImguiTestScene extends Scene {
             fontCount = fontData.size();
             scriptCount = scriptData.size();
             roomCount = roomData.size();
+            objectsInScene = gameObjects.size();
             firstUpdate = false;
         }
 
@@ -102,11 +87,14 @@ public class ImguiTestScene extends Scene {
             go.update(dt);
         }
 
+        //render();
+    }
 
-
+    @Override
+    public void render() {
+        Renderer2D.beginScene(control.getCamera());
 
         Renderer2D.endScene();
-
     }
 
     //Not actual list of objects, but labels for imgui
@@ -143,12 +131,7 @@ public class ImguiTestScene extends Scene {
         MainMenuBarImGui();
         RoomEditorImGui();
         assetBrowserImGui();
-        if (activeGameObject != null)
-        {
-            ImGui.begin("Inspector");
-            activeGameObject.imgui();
-            ImGui.end();
-        }
+
     }
 
     private int addNewAsset(List<String> labels, int counter, String tag)
@@ -267,6 +250,7 @@ public class ImguiTestScene extends Scene {
                 if(ImGui.button("Add to scene"))
                 {
                     GameObject newObj = selectedObject.GenerateGameObject(new Transform(position, size));
+                    selectedObject = null;
                     position.y += 1;
                     objectsInScene++;
                     addGameObjectToScene(newObj);

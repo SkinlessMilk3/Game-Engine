@@ -5,7 +5,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public class Camera {
-    private Matrix4f projectionMatrix, viewMatrix;
+    private Matrix4f projectionMatrix, viewMatrix, inverseProjection, inverseView;
     public Vector2f position;
     private float aspectratio;
 
@@ -13,6 +13,8 @@ public class Camera {
         this.position = position;
         this.projectionMatrix = new Matrix4f();
         this.viewMatrix = new Matrix4f();
+        this.inverseProjection = new Matrix4f();
+        this.inverseView = new Matrix4f();
         aspectratio = (float)Window.getWidth()/(float)Window.getHeight();
         adjustProjection();
 
@@ -20,7 +22,10 @@ public class Camera {
 
     public void adjustProjection() {
         projectionMatrix.identity();
-        projectionMatrix.ortho(-aspectratio, aspectratio, -position.y/*0.0f*/, position.y/*1.0f/**Window.getHeight()*/, -1.0f, 1.0f);//-1.0f, 1.0f, -1.0f, 1.0f,-1.0f, 1.0f);//0.0f,/* Window.getWidth()32.0f * 40.0f*/, 0.0f,/* Window.getHeight()32.0f * 21.0f*/, 0.0f, 100.0f);
+        //projectionMatrix.ortho(-aspectratio, aspectratio, -position.y/*0.0f*/, position.y/*1.0f/**Window.getHeight()*/, -1.0f, 1.0f);//-1.0f, 1.0f, -1.0f, 1.0f,-1.0f, 1.0f);//0.0f,/* Window.getWidth()32.0f * 40.0f*/, 0.0f,/* Window.getHeight()32.0f * 21.0f*/, 0.0f, 100.0f);
+        //***POSSIBLY TEMPORARY Had to change back to original to get world corrdinates for draging and dropping object (Camera controller still seemingly works)***
+        projectionMatrix.ortho(0.0f, 32.0f * 40.0f, 0.0f, 32.0f * 21.0f, 0.0f, 100.0f);
+        projectionMatrix.invert(inverseProjection);
     }
 
     public Matrix4f getViewMatrix() {
@@ -31,6 +36,8 @@ public class Camera {
                 cameraFront.add(position.x, position.y, 0.0f),
                 cameraUp);
 
+        this.viewMatrix.invert(inverseView);
+
         return this.viewMatrix;
     }
 
@@ -39,5 +46,13 @@ public class Camera {
     }
     public Matrix4f getProjectionMatrix() {
         return this.projectionMatrix;
+    }
+
+    public Matrix4f getInverseProjection() {
+        return this.inverseProjection;
+    }
+
+    public Matrix4f getInverseView() {
+        return this.inverseView;
     }
 }

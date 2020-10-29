@@ -3,6 +3,7 @@ package Renderer;
 import Components.SpriteRenderer;
 import Engine.Camera;
 import Engine.Transform;
+import Engine.Window;
 import Utils.AssetPool;
 import Utils.GL_LOG;
 import org.joml.*;
@@ -12,8 +13,7 @@ import org.lwjgl.system.CallbackI;
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL20.*;
 
 /**
  * This is a renerer class specifically designed for 2D graphics. It will take various data and use
@@ -37,7 +37,7 @@ public class Renderer2D {
     private static int indexCount = 0;
     private static int vertexCount = 0;
 
-    private static Shader shader;
+    private static Shader currentShader;
     private static VAO vao;
     private static Matrix4f transform;
     private static IBO ibo;
@@ -66,17 +66,19 @@ public class Renderer2D {
         final int posSize = 3;
         final int colorSize = 4;
         final int textureSize = 2;
+        final int entityIdSize = 1;
 
         final int posOffset = 0;
         final int colorOffset = posOffset + posSize * sizeOfFloat;
         final int textureOffset = colorOffset + colorSize * sizeOfFloat;
-        final int stride = (posSize + colorSize + textureSize) * sizeOfFloat;
-        final int vertexSize = posSize + colorSize + textureSize;
+        final int stride = (posSize + colorSize + textureSize + entityIdSize) * sizeOfFloat;
+        final int vertexSize = posSize + colorSize + textureSize + entityIdSize;
+        final int entityIdOffest = textureOffset + textureSize * Float.BYTES;
         final int vertexSizeBytes = vertexSize * sizeOfFloat;
 
         hasRoom = true;
 
-        shader = AssetPool.getShader("Assets/testing.glsl");
+        currentShader = AssetPool.getShader("Assets/testing.glsl");
         vao = new VAO();
         vbo = new VBO(maxVertexCount * sizeOfFloat);
 
@@ -88,6 +90,9 @@ public class Renderer2D {
 
         glVertexAttribPointer(2, textureSize, GL_FLOAT, false, stride, textureOffset);
         glEnableVertexAttribArray(2);
+
+        glVertexAttribPointer(4, entityIdSize, GL_FLOAT, false, stride, entityIdOffest);
+        glEnableVertexAttribArray(4);
 
         int[] indices = new int[maxIndices];
         int offset = 0;
@@ -123,7 +128,7 @@ public class Renderer2D {
      */
     public static void shutdown() {
         vao.delete();
-        shader.delete();
+        currentShader.delete();
         ibo.delete();
         whiteTexture.delete();
     }
@@ -145,20 +150,18 @@ public class Renderer2D {
         {
             SpriteRenderer spr = sprites[i];
             if (spr.isDirty()) {
-                System.out.println("Changing!");
-                System.out.println(sprites[i].gameObject.name);
-                System.out.println(sprites[i].gameObject.transform.position.x);
                 CreateSquare(i);
                 spr.setClean();
                 rebuferData = true;
             }
         }
-        vbo.pushData(vertexBuffer);
-        shader.bind();
-        shader.setUniformMat4("u_view", camera.getViewMatrix());
-        shader.setUniformMat4("u_projection", camera.getProjectionMatrix());
+
+
+        currentShader.bind();
+        currentShader.setUniformMat4("u_view", camera.getViewMatrix());
+        currentShader.setUniformMat4("u_projection", camera.getProjectionMatrix());
         whiteTexture.bind(0);
-        shader.setUniform1i("u_texture", 0);
+        currentShader.setUniform1i("u_texture", 0);
 
         int check;
         if ((check = glGetError()) != 0)
@@ -172,7 +175,7 @@ public class Renderer2D {
 
         vao.bind();
 
-
+        vbo.pushData(vertexBuffer);
 
         ibo.bind();
         Draw(indexCount);
@@ -210,7 +213,7 @@ public class Renderer2D {
     public static void submit(final Vector3f position, final Vector2f size, final Vector4f color, final Texture texture) {
 
         texture.bind(0);
-        shader.setUniform1i("u_texture", 0);
+        currentShader.setUniform1i("u_texture", 0);
 
         //CreateSquare(position, size, color);
     }
@@ -274,8 +277,7 @@ public class Renderer2D {
                 yAdd = 1.0f;
                 ty = 1.0f;
             }
-            System.out.println("cnt + vxcnt: " + (count + vertexCount));
-            System.out.println("offset: " + offset);
+
             vertexBuffer[offset + 0] = sprite.gameObject.transform.position.x + (xAdd * sprite.gameObject.transform.scale.x);
             count++;
             vertexBuffer[offset + 1] = sprite.gameObject.transform.position.y + (yAdd * sprite.gameObject.transform.scale.y);
@@ -292,12 +294,24 @@ public class Renderer2D {
             count++;
             vertexBuffer[offset + 7] = tx;
             count++;
-            vertexBuffer[offset + 9] = ty;
+            vertexBuffer[offset + 8] = ty;
             count++;
 
-            offset += 9;
+            //load entity id
+            vertexBuffer[offset + 9] = sprite.gameObject.uID + 1;
+
+            offset += 10;
         }
     }
 
+    public static void bindShader(Shader shader)
+    {
+        currentShader = shader;
+        //shader.bind();
+    }
+
+    public static Shader getBoundShader() {
+        return currentShader;
+    }
 
 }
