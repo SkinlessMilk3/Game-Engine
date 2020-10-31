@@ -15,11 +15,17 @@ import static org.lwjgl.stb.STBImage.*;
 
 /*Used to load textures into a the opengl state space.*/
 public class Texture {
-    private int render_id;
+    private transient int render_id;
     private int[] width = {0}, height = {0}, bitsPerPixel = {0};
-    private ByteBuffer localBuffer = null;
+    private transient ByteBuffer localBuffer = null;
     private String filePath;
-    private int internalFormat, dataFormat;
+    private transient int internalFormat, dataFormat;
+
+    public Texture(){
+        width[0] = -1;
+        height[0] = -1;
+        render_id = -1;
+    }
 
     public Texture(int width, int height){
 
@@ -99,5 +105,20 @@ public class Texture {
     }
     public int getHeight(){
         return height[0];
+    }
+    public String getFilepath() {return filePath;}
+
+    public int getId() {
+        return render_id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (!(o instanceof Texture)) return false;
+        Texture oTex = (Texture)o;
+        return oTex.getWidth() == this.width[0] && oTex.getHeight() == this.height[0] &&
+                oTex.getId() == this.render_id &&
+                oTex.getFilepath().equals(this.filePath);
     }
 }

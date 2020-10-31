@@ -16,6 +16,7 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL30C.glBindVertexArray;
 
 /**
  * This is a renderer class specifically designed for 2D graphics. It will take various data and use
@@ -49,7 +50,7 @@ public class Renderer2D {
     private Vector3d positions;
     private Vector4d color;
     private Vector2d texCoords;
-    private static List<Texture> textures;
+    private static List<Texture> textures = new ArrayList<>();
     private static int[] texSlots = {0, 1, 2, 3, 4, 5, 6, 7};
 
     private static SpriteRenderer[] sprites = new SpriteRenderer[maxSquares];
@@ -82,7 +83,7 @@ public class Renderer2D {
         final int entityIdOffest = textureOffset + textureSize * sizeOfFloat;
         final int vertexSizeBytes = vertexSize * sizeOfFloat;
 
-        textures = new ArrayList<>();
+
 
         hasRoom = true;
 
@@ -142,6 +143,9 @@ public class Renderer2D {
         currentShader.delete();
         ibo.delete();
         whiteTexture.delete();
+        for (int i=0; i < textures.size(); i++) {
+            textures.get(i).delete();
+        }
     }
 
     /**
@@ -171,7 +175,7 @@ public class Renderer2D {
         currentShader.bind();
         currentShader.setUniformMat4("u_view", camera.getViewMatrix());
         currentShader.setUniformMat4("u_projection", camera.getProjectionMatrix());
-        whiteTexture.bind(0);
+        //whiteTexture.bind(0);
         for (int i=0; i < textures.size(); i++) {
             textures.get(i).bind(i + 1);
         }
@@ -193,7 +197,12 @@ public class Renderer2D {
         vbo.pushData(vertexBuffer);
 
         ibo.bind();
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
         Draw(indexCount);
+        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
+        glBindVertexArray(0);
 
         for (int i=0; i < textures.size(); i++) {
             textures.get(i).unbind();
@@ -313,26 +322,36 @@ public class Renderer2D {
                 yAdd = 1.0f;
                 ty = 1.0f;
             }
-
+            System.out.println("index: " + index);
             vertexBuffer[offset + 0] = sprite.gameObject.transform.position.x + (xAdd * sprite.gameObject.transform.scale.x);
+            System.out.println(vertexBuffer[offset + 0]);
             count++;
             vertexBuffer[offset + 1] = sprite.gameObject.transform.position.y + (yAdd * sprite.gameObject.transform.scale.y);
+            System.out.println(vertexBuffer[offset + 1]);
             count++;
             vertexBuffer[offset + 2] = 0.0f;
+            System.out.println(vertexBuffer[offset + 2]);
             count++;
             vertexBuffer[offset + 3] = color.x;
+            System.out.println(vertexBuffer[offset + 3]);
             count++;
             vertexBuffer[offset + 4] = color.y;
+            System.out.println(vertexBuffer[offset + 4]);
             count++;
             vertexBuffer[offset + 5] = color.z;
+            System.out.println(vertexBuffer[offset + 5]);
             count++;
             vertexBuffer[offset + 6] = color.w;
+            System.out.println(vertexBuffer[offset + 6]);
             count++;
             vertexBuffer[offset + 7] = texCoords[i].x;
+            System.out.println(vertexBuffer[offset + 7]);
             count++;
             vertexBuffer[offset + 8] = texCoords[i].y;
+            System.out.println(vertexBuffer[offset + 8]);
             count++;
             vertexBuffer[offset + 9] = texId;
+            System.out.println(vertexBuffer[offset + 9]);
 
             //load entity id
             //vertexBuffer[offset + 9] = sprite.gameObject.uID + 1;

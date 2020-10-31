@@ -4,6 +4,7 @@ import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventDispatcher;
 import Components.SpriteRenderer;
 import Engine.*;
+import Engine.Window;
 import Renderer.Renderer2D;
 
 import Renderer.Texture;
@@ -18,7 +19,11 @@ import imgui.enums.ImGuiTreeNodeFlags;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.lwjgl.system.CallbackI;
 
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +44,9 @@ public class ImguiTestScene extends Scene {
 
     private GameObjectData selectedObject = null;
     private GameObject selectedInstance = null;
+
+    String filePath = "";
+    String fileName = "";
 
     @Override
     public void init() {
@@ -61,7 +69,7 @@ public class ImguiTestScene extends Scene {
         objectsInScene = gameObjects.size();
 
     }
-    private static Vector2f position = new Vector2f(0.0f, -1.0f);
+    private static Vector2f position = new Vector2f(0.0f, 0.0f);
     private static Vector2f size = new Vector2f(0.25f, 0.25f);
     private static Vector4f color = new Vector4f(1.0f, 0.0f, 1.0f, 1.0f);
 
@@ -134,20 +142,40 @@ public class ImguiTestScene extends Scene {
         assetBrowserImGui();
 
     }
+    private boolean explorerClosed = true;
 
     private int addNewAsset(List<String> labels, int counter, String tag)
     {
         if (ImGui.beginPopupContextItem())
         {
-            ImGui.inputText("", name);
-
+            if (tag.equals("Sprite")) {
+                if (explorerClosed) {
+                    try {
+                        FileDialog dialog = new FileDialog((Frame)null, "Select File to Open");
+                        explorerClosed = false;
+                        dialog.setMode(FileDialog.LOAD);
+                        dialog.setVisible(true);
+                        filePath = dialog.getDirectory() + dialog.getFile();
+                        fileName = dialog.getFile();
+                        System.out.println(filePath + " chosen.");
+                    } catch (Exception e) {
+                        System.out.println("test!");
+                    }
+                }
+                System.out.println("file: " + fileName);
+                ImGui.inputText(fileName, name);
+            }
+            else {
+                ImGui.inputText("", name);
+            }
             assetName = name.toString();
             if (ImGui.smallButton("Save"))
             {
+                explorerClosed = true;
                 if (!assetName.isEmpty()) {
                     counter++;
                     labels.add(assetName);
-                    if (tag.equals("Sprite")) { GameObjectData sprData = new GameObjectData(); sprData.setName(assetName); spriteData.add(sprData);}
+                    if (tag.equals("Sprite")) { GameObjectData sprData = new GameObjectData(); sprData.setName(assetName); sprData.setTexture(filePath); spriteData.add(sprData);}
                     if (tag.equals("Object")) { GameObjectData objData = new GameObjectData(); objData.setName(assetName); objectData.add(objData);}
                     if (tag.equals("Font")) { GameObjectData fntData = new GameObjectData(); fntData.setName(assetName); fontData.add(fntData);}
                     if (tag.equals("Script")) { GameObjectData scptData = new GameObjectData(); scptData.setName(assetName); scriptData.add(scptData);}
@@ -247,9 +275,37 @@ public class ImguiTestScene extends Scene {
                     }
                     ImGui.endPopup();
                 }
+                if (ImGui.beginPopup("Edit Data")) {
+                    if (ImGui.beginPopup("Choose Sprite")) {
+                        ImGui.text("Choose Sprite:");
+                        boolean[] sprites = new boolean[spriteCount];
+                        for (int i = 0; i < spriteCount; i++)
+                        {
+                            if (ImGui.selectable(spriteData.get(i).name, sprites[i])) {
+                                selectedObject.setTexture(spriteData.get(i).getSpritePath());
+                                changeInstanceSprites(spriteData.get(i).name, spriteData.get(i).getSpritePath());
+                            }
+                        }
+                        if (ImGui.button("close")) {
+                            ImGui.closeCurrentPopup();
+                        }
+                        ImGui.endPopup();
+                    }
+                    ImGui.text("Name: " + selectedObject.name);
+                    if (ImGui.button("Change Sprite")) {
+                        ImGui.openPopup("Choose Sprite");
+                    }
+                    ImGui.endPopup();
+                }
                 if(ImGui.button("Add to scene"))
                 {
-                    GameObject newObj = selectedObject.GenerateGameObject(new Transform(position, size));
+                    GameObject newObj;
+                    if (selectedObject.getSpritePath().equals("")) {
+                         newObj = selectedObject.GenerateGameObject(new Transform(position, size));
+                    }
+                    else {
+                         newObj = selectedObject.GenerateGameObject(new Transform(position, size), AssetPool.getTexture(selectedObject.getSpritePath()));
+                    }
                     selectedObject = null;
                     position.y += 1;
                     objectsInScene++;
@@ -260,6 +316,10 @@ public class ImguiTestScene extends Scene {
                 if(ImGui.button("Delete"))
                 {
                     ImGui.openPopup("Delete Confirmation");
+                }
+                if (ImGui.button("Edit Object"))
+                {
+                    ImGui.openPopup("Edit Data");
                 }
                 if (selectedObject == null)
                 {
@@ -492,10 +552,16 @@ public class ImguiTestScene extends Scene {
         ImGui.end();
     }
 
-    public void ObjectInspectorImGui(GameObjectData objData)
-    {
+    public void changeInstanceSprites(String instName, String filePath) {
+        int gameObjectSize = gameObjects.size();
 
-
-
+        for (int i = 0; i < gameObjectSize; i++)
+        {
+            if (gameObjects.get(i).name.equals(instName))
+            {
+                System.out.println("Changing texture!");
+                //gameObjects.get(i).getComponent(SpriteRenderer.class).setTexture(filePath);
+            }
+        }
     }
 }

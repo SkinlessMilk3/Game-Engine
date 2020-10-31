@@ -1,22 +1,20 @@
 package Engine.Scenes;
 
+import Components.Component;
+import Components.ComponentDeserializer;
 import Components.SpriteRenderer;
 import Engine.*;
 
 import Renderer.Renderer2D;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import imgui.ImGui;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -67,8 +65,8 @@ public abstract class Scene {
         if (activeGameObject != null)
         {
             ImGui.begin("Inspector");
+            ImGui.text("Name: " + activeGameObject.name);
             activeGameObject.imgui();
-            //ImGui.text(activeGameObject.name);
             ImGui.end();
         }
 
@@ -81,6 +79,7 @@ public abstract class Scene {
     }
 
     public void saveExit() {
+        System.out.println("THIS IS WEHERE THE ERROR STARTS! - THE SAVING");
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(Component.class, new ComponentDeserializer())
@@ -102,6 +101,7 @@ public abstract class Scene {
     }
 
     public void load() {
+        System.out.println("THIS IS WEHERE THE ERROR STARTS! - THE LOADING");
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(Component.class, new ComponentDeserializer())
@@ -164,6 +164,7 @@ public abstract class Scene {
     {
         //If we already have maxSquare sprites, then we catch the error
         try {
+            System.out.println("Adding path: " + sprite.getTexture().getFilepath());
             Renderer2D.addSprite(sprite);
         } catch (IndexOutOfBoundsException e)
         {

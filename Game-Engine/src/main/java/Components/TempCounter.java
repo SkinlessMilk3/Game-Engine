@@ -1,12 +1,6 @@
 package Components;
 
-import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventDispatcher;
-import API.EventListeners.MouseEventListener;
-import Engine.Component;
-import Engine.GameObject;
-
-import java.awt.event.KeyEvent;
 
 import static org.lwjgl.glfw.GLFW.*;
 

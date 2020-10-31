@@ -20,7 +20,7 @@ public class ExTexture {
     VAO vao;
     private Renderer2D renderer;
     public ExTexture(){
-        texture = new Texture("Assets/Textures/Fantasy-My-Hero-Academia.jpg");
+        /*texture = new Texture("Assets/Textures/Fantasy-My-Hero-Academia.jpg");
         texture.bind(0);
         renderer = new Renderer2D();
 
@@ -61,6 +61,6 @@ public class ExTexture {
 
 
         //GL_LOG.Log_Data("Drawing triangles "+Integer.toString(glGetError()));
-
+*/
     }
 }

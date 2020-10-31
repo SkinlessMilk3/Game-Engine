@@ -146,7 +146,6 @@ public class Window {
         GL.createCapabilities();
 
         //Sets starting scene
-        Renderer2D.Init();
 
         Window.ChangeScene(3);
 
@@ -155,6 +154,8 @@ public class Window {
         this.pickingTexture = new PickingTexture(getWidth(), getHeight());
 
         currentScene.load();
+
+        Renderer2D.Init();
 
     }
 
@@ -167,7 +168,7 @@ public class Window {
         float dt = -1.0f;
 
         Shader defaultShader = AssetPool.getShader("Assets/testing.glsl");
-        Shader pickingShader = AssetPool.getShader("Assets/pickingShader.glsl");
+        //Shader pickingShader = AssetPool.getShader("Assets/pickingShader.glsl");
 
         GL_LOG.Log_Data("Run loop" + glGetError());
 
@@ -225,6 +226,12 @@ public class Window {
 
             this.imGuiLayer.update(dt, currentScene);
 
+            if (saving)
+            {
+                currentScene.saveExit();
+                saving = false;
+            }
+
 
             glfwSwapBuffers(wnd);
 
@@ -233,13 +240,9 @@ public class Window {
             beginTime = endTime;
         }
 
-        if (saving)
-        {
-            currentScene.saveExit();
-            saving = false;
-        }
-
         Renderer2D.shutdown();
+        System.exit(0);
+
     }
 
     public static Window getWindow() {

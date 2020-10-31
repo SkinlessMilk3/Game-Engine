@@ -1,7 +1,6 @@
 package Components;
 
 import API.EventListeners.MouseEventDispatcher;
-import Engine.Component;
 
 public class ObjectLoop extends Component {
 
