@@ -1,51 +1,52 @@
 #shader vertex
 #version 330 core
-layout (location=0) in vec3 aPos;
-layout (location=1) in vec4 aColor;
-layout (location=2) in vec2 aTexCoords;
-layout (location=3) in float aTexId;
-layout (location=4) in float aEntityId;
+layout(location = 0) in vec3 points;
+layout(location = 1) in vec4 color;
+layout(location = 2) in vec2 texCoords;
+layout(location = 3) in float texId;
+layout (location=4) in float entityId;
 
-uniform mat4 uProjection;
-uniform mat4 uView;
+uniform mat4 u_projection;
+uniform mat4 u_view;
 
-out vec4 fColor;
-out vec2 fTexCoords;
-out float fTexId;
-out float fEntityId;
+out vec2 v_texCoords;
+out vec4 v_color;
+out float v_texId;
+out float v_entityId;
 
 void main()
 {
-    fColor = aColor;
-    fTexCoords = aTexCoords;
-    fTexId = aTexId;
-    fEntityId = aEntityId;
+    v_color = color;
+    v_texCoords = texCoords;
+    v_texId = texId;
+    v_entityId = entityId;
 
-    gl_Position = uProjection * uView * vec4(aPos, 1.0);
+    gl_Position = u_projection * u_view * vec4(points, 1.0);
 }
 
 #shader fragment
 #version 330 core
 
-in vec4 fColor;
-in vec2 fTexCoords;
-in float fTexId;
-in float fEntityId;
+in vec2 v_texCoords;
+in vec4 v_color;
+in float v_texId;
+in float v_entityId;
 
-uniform sampler2D uTextures[8];
+uniform sampler2D u_textures[511];
 
-out vec3 color;
+out vec3 fragColor;
 
 void main()
 {
     vec4 texColor = vec4(1, 1, 1, 1);
 
-        int id = int(fTexId);
-        texColor = fColor * texture(uTextures[id], fTexCoords);
+    if (v_texId > 0) {
+        int id = int(v_texId);
+        texColor = v_color * texture(u_textures[id], v_texCoords);
+    }
 
-
-    /*if (texColor.a < 0.5) {
+    if (texColor.a < 0.5) {
         discard;
-    }*/
-    color = vec3(fEntityId, fEntityId, fEntityId);
+    }
+    fragColor = vec3(v_entityId, v_entityId, v_entityId);
 }

@@ -2,6 +2,7 @@ package Renderer;
 
 import Components.SpriteRenderer;
 import Engine.Camera;
+import Engine.GameObject;
 import Engine.Transform;
 import Engine.Window;
 import Utils.AssetPool;
@@ -50,8 +51,8 @@ public class Renderer2D {
     private Vector3d positions;
     private Vector4d color;
     private Vector2d texCoords;
-    private static List<Texture> textures = new ArrayList<>();
-    private static int[] texSlots = {0, 1, 2, 3, 4, 5, 6, 7};
+    public static List<Texture> textures = new ArrayList<>();
+    private static int[] texSlots = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 
     private static SpriteRenderer[] sprites = new SpriteRenderer[maxSquares];
     private static int spriteNum = 0;
@@ -78,16 +79,23 @@ public class Renderer2D {
         final int colorOffset = posOffset + posSize * sizeOfFloat;
         final int textureOffset = colorOffset + colorSize * sizeOfFloat;
         final int textureIdOffest = textureOffset + textureSize * sizeOfFloat;
-        final int stride = (posSize + colorSize + textureSize + textureIdSize) * sizeOfFloat;
-        final int vertexSize = posSize + colorSize + textureSize + textureIdSize /* + entityIdSize*/;
+        final int stride = (posSize + colorSize + textureSize + textureIdSize + entityIdSize) * sizeOfFloat;
+        final int vertexSize = posSize + colorSize + textureSize + textureIdSize + entityIdSize;
         final int entityIdOffest = textureOffset + textureSize * sizeOfFloat;
         final int vertexSizeBytes = vertexSize * sizeOfFloat;
+
+        sprites = new SpriteRenderer[maxSquares];
+        vertexBuffer = new float[maxVertexCount];
+        textures = new ArrayList<>();
+        vertexCount = 0;
+        indexCount = 0;
+        spriteNum = 0;
 
 
 
         hasRoom = true;
 
-        currentShader = AssetPool.getShader("Assets/testing.glsl");
+        //currentShader = AssetPool.getShader("Assets/testing.glsl");
         vao = new VAO();
         vbo = new VBO(maxVertexCount * sizeOfFloat);
 
@@ -103,8 +111,8 @@ public class Renderer2D {
         glVertexAttribPointer(3, textureIdSize, GL_FLOAT, false, stride, textureIdOffest);
         glEnableVertexAttribArray(3);
 
-        /*glVertexAttribPointer(4, entityIdSize, GL_FLOAT, false, stride, entityIdOffest);
-        glEnableVertexAttribArray(4);*/
+        glVertexAttribPointer(4, entityIdSize, GL_FLOAT, false, stride, entityIdOffest);
+        glEnableVertexAttribArray(4);
 
         int[] indices = new int[maxIndices];
         int offset = 0;
@@ -122,7 +130,7 @@ public class Renderer2D {
         ibo = new IBO(indices);
 
 
-        whiteTexture = new Texture(1, 1);
+        /*whiteTexture = new Texture(1, 1);
 
 
         FloatBuffer whiteTextureData = BufferUtils.createFloatBuffer(4);
@@ -130,7 +138,7 @@ public class Renderer2D {
         whiteTextureData.put(tmp);
         whiteTextureData.flip();
 
-        whiteTexture.setData(4, whiteTextureData);
+        whiteTexture.setData(4, whiteTextureData);*/
     }
 
     /**
@@ -142,7 +150,7 @@ public class Renderer2D {
         vao.delete();
         currentShader.delete();
         ibo.delete();
-        whiteTexture.delete();
+        //whiteTexture.delete();
         for (int i=0; i < textures.size(); i++) {
             textures.get(i).delete();
         }
@@ -171,7 +179,7 @@ public class Renderer2D {
             }
         }
 
-
+        currentShader = getBoundShader();
         currentShader.bind();
         currentShader.setUniformMat4("u_view", camera.getViewMatrix());
         currentShader.setUniformMat4("u_projection", camera.getProjectionMatrix());
@@ -180,7 +188,7 @@ public class Renderer2D {
             textures.get(i).bind(i + 1);
         }
         currentShader.uploadIntArray("u_texture", texSlots);
-        currentShader.setUniform1i("u_texture", 0);
+        //currentShader.setUniform1i("u_texture", 0);
 
         int check;
         if ((check = glGetError()) != 0)
@@ -191,7 +199,6 @@ public class Renderer2D {
      * renders data to the screen.
      */
     public static void endScene() {
-
         vao.bind();
 
         vbo.pushData(vertexBuffer);
@@ -207,6 +214,7 @@ public class Renderer2D {
         for (int i=0; i < textures.size(); i++) {
             textures.get(i).unbind();
         }
+        currentShader.unbind();
     }
 
     /**
@@ -221,9 +229,11 @@ public class Renderer2D {
 
     public static void submit(int spriteIndex) {
 
+        //sprites[spriteIndex].getTexture().bind(0);
+        //currentShader.setUniform1i("u_texture", 0);
         CreateSquare(spriteIndex);
         indexCount += 6;
-        vertexCount += 10 * 4;
+        vertexCount += 11 * 4;
     }
 
     /**
@@ -278,8 +288,45 @@ public class Renderer2D {
         }
     }
 
-    public static void removedSprite(SpriteRenderer spr) {
+    public static void removeFromRenderer(GameObject go) {
+        int indexToDel = 0;
+        int verCount = 11;
+        int spriteSize = verCount * 4;
+        int spriteNumAtDelete = spriteNum;
 
+        //Get rid of 4 verticies
+        if (spriteNum <= 1) {
+            spriteNum--;
+            for (int i = 0; i < vertexCount; i++) {
+                vertexBuffer[i] = -1;
+            }
+        } else {
+            spriteNum--;
+            for (int i = (spriteSize - 1); i < maxVertexCount; i += 43) {
+                if (i != (spriteSize - 1)) {
+                    i++;
+                }
+                if (go.getUid() + 1 == vertexBuffer[i]) {
+                    indexToDel = i;
+                    for (int j = spriteSize; j > 0; j--) {
+                        vertexBuffer[i] = -1;
+                        i--;
+                    }
+                    break;
+                }
+            }
+            //Add last in place of deleted
+            if ((spriteNumAtDelete * (spriteSize - 1) + spriteNum) > indexToDel) {
+                int lastSpriteIndex = spriteNumAtDelete * (spriteSize - 1) + spriteNum;
+                for (int i = indexToDel; i > (indexToDel - spriteSize); i--) {
+                    vertexBuffer[i] = vertexBuffer[lastSpriteIndex];
+                    vertexBuffer[lastSpriteIndex] = 0.0f;
+                    lastSpriteIndex--;
+                }
+            }
+            sprites[((indexToDel + 1) / spriteSize) - 1] = sprites[spriteNumAtDelete - 1];
+            sprites[spriteNumAtDelete - 1] = null;
+        }
     }
 
     /**
@@ -292,7 +339,7 @@ public class Renderer2D {
         Vector4f color = sprite.getColor();
         Vector2f[] texCoords = sprite.getTexCoords();
 
-        int offset = index * 4 * 10;
+        int offset = index * 4 * 11;
 
         int texId = 0;
         if (sprite.getTexture() != null) {
@@ -322,48 +369,47 @@ public class Renderer2D {
                 yAdd = 1.0f;
                 ty = 1.0f;
             }
-            System.out.println("index: " + index);
             vertexBuffer[offset + 0] = sprite.gameObject.transform.position.x + (xAdd * sprite.gameObject.transform.scale.x);
-            System.out.println(vertexBuffer[offset + 0]);
+            //System.out.println(vertexBuffer[offset + 0]);
             count++;
             vertexBuffer[offset + 1] = sprite.gameObject.transform.position.y + (yAdd * sprite.gameObject.transform.scale.y);
-            System.out.println(vertexBuffer[offset + 1]);
+            //System.out.println(vertexBuffer[offset + 1]);
             count++;
             vertexBuffer[offset + 2] = 0.0f;
-            System.out.println(vertexBuffer[offset + 2]);
+            //System.out.println(vertexBuffer[offset + 2]);
             count++;
             vertexBuffer[offset + 3] = color.x;
-            System.out.println(vertexBuffer[offset + 3]);
+            //System.out.println(vertexBuffer[offset + 3]);
             count++;
             vertexBuffer[offset + 4] = color.y;
-            System.out.println(vertexBuffer[offset + 4]);
+            //System.out.println(vertexBuffer[offset + 4]);
             count++;
             vertexBuffer[offset + 5] = color.z;
-            System.out.println(vertexBuffer[offset + 5]);
+            //System.out.println(vertexBuffer[offset + 5]);
             count++;
             vertexBuffer[offset + 6] = color.w;
-            System.out.println(vertexBuffer[offset + 6]);
+            //System.out.println(vertexBuffer[offset + 6]);
             count++;
             vertexBuffer[offset + 7] = texCoords[i].x;
-            System.out.println(vertexBuffer[offset + 7]);
+            //System.out.println(vertexBuffer[offset + 7]);
             count++;
             vertexBuffer[offset + 8] = texCoords[i].y;
-            System.out.println(vertexBuffer[offset + 8]);
+            //System.out.println(vertexBuffer[offset + 8]);
             count++;
             vertexBuffer[offset + 9] = texId;
-            System.out.println(vertexBuffer[offset + 9]);
 
             //load entity id
-            //vertexBuffer[offset + 9] = sprite.gameObject.uID + 1;
+            vertexBuffer[offset + 10] = sprite.gameObject.getUid() + 1;
+            //System.out.println("Offset + 10: " + (offset + 10));
 
-            offset += 10;
+            offset += 11;
         }
     }
 
     public static void bindShader(Shader shader)
     {
         currentShader = shader;
-        //shader.bind();
+        shader.bind();
     }
 
     public static Shader getBoundShader() {

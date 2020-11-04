@@ -105,7 +105,7 @@ public class MouseEventDispatcher{
 
     public static float getScreenY() {
         float currentY = getY();
-        currentY = Window.getHeight() - ((currentY / (float)Window.getHeight()) * Window.getWidth()) * Window.getHeight() ;
+        currentY = Window.getHeight() - ((currentY / (float)Window.getHeight()) * Window.getHeight() );
 
 
         return currentY;

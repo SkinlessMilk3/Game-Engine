@@ -197,7 +197,7 @@ public class Shader {
 
     public void uploadIntArray(String varName, int[] array)
     {
-        int varLocation = glGetUniformLocation(renderid, varName);
+        int varLocation = glGetUniformLocation(this.renderid, varName);
         bind();
         glUniform1iv(varLocation, array);
     }

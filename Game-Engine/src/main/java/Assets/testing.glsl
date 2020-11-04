@@ -25,16 +25,21 @@ void main(){
 #version 330 core
 
 uniform vec4 u_color;
-uniform sampler2D u_texture[8];
+uniform sampler2D u_texture[511];
 
-out vec4 fragColor;
 in vec2 v_texCoords;
 in vec4 v_color;
 in float v_texId;
+
+out vec4 fragColor;
+
 void main(){
 
-
-        int id = int(v_texId);
-        fragColor = texture(u_texture[id], v_texCoords) * v_color;
+        if (v_texId > 0) {
+            int id = int(v_texId);
+            fragColor = texture(u_texture[id], v_texCoords) * v_color;
+        } else {
+            fragColor = v_color;
+        }
 
 }

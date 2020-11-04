@@ -47,7 +47,7 @@ public class Sprite {
         this.texCoords = texCoords;
     }
 
-    public void getTexId() {
-        //return texture == null ? -1 : texture.getId();
+    public int getTexId() {
+        return texture == null ? -1 : texture.getId();
     }
 }

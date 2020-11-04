@@ -3,7 +3,9 @@ package Engine;
 import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventDispatcher;
 import API.EventListeners.MouseEventListener;
+import Editor.PropertiesWindow;
 import Engine.Scenes.Scene;
+import Renderer.PickingTexture;
 import imgui.*;
 import imgui.callbacks.ImStrConsumer;
 import imgui.callbacks.ImStrSupplier;
@@ -12,6 +14,7 @@ import imgui.enums.ImGuiConfigFlags;
 import imgui.enums.ImGuiKey;
 import imgui.enums.ImGuiMouseCursor;
 import imgui.gl3.ImGuiImplGl3;
+import org.lwjgl.system.CallbackI;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -25,8 +28,15 @@ public class ImGuiLayer {
     // LWJGL3 renderer (SHOULD be initialized)
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
 
-    public ImGuiLayer(long glfwWindow) {
+    private PropertiesWindow propertiesWindow;
+
+    public ImGuiLayer(long glfwWindow, PickingTexture pickingTexture) {
         this.glfwWindow = glfwWindow;
+        this.propertiesWindow = new PropertiesWindow(pickingTexture);
+    }
+
+    public PropertiesWindow getPropertiesWindow() {
+        return this.propertiesWindow;
     }
 
     // Initialize Dear ImGui.
@@ -239,8 +249,9 @@ public class ImGuiLayer {
        ImGui.end();
         //----------------------------------------------------------------------
 
-        currentScene.sceneImgui();
-
+        currentScene.imgui();
+        propertiesWindow.update(dt, currentScene);
+        propertiesWindow.imgui();
         ImGui.showDemoWindow();
         ImGui.render();
 

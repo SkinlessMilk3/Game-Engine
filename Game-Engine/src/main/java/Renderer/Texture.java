@@ -15,7 +15,7 @@ import static org.lwjgl.stb.STBImage.*;
 
 /*Used to load textures into a the opengl state space.*/
 public class Texture {
-    private transient int render_id;
+    private int render_id;
     private int[] width = {0}, height = {0}, bitsPerPixel = {0};
     private transient ByteBuffer localBuffer = null;
     private String filePath;
@@ -62,7 +62,9 @@ public class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, localBuffer);
+
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, localBuffer);
+
 
         glBindTexture(GL_TEXTURE_2D, 0);
         glEnable(GL_TEXTURE_2D);

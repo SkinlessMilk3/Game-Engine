@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 public abstract class Scene {
@@ -57,21 +58,17 @@ public abstract class Scene {
         }
     }
 
+    public GameObject getGameObject(int gameObjectId) {
+        Optional<GameObject> result = this.gameObjects.stream()
+                .filter(gameObject -> gameObject.getUid() == gameObjectId)
+                .findFirst();
+        return result.orElse(null);
+    }
+
     public abstract void update(float dt);
     public abstract void render();
 
     //Gets current "selected" object in gui
-    public void sceneImgui() {
-        if (activeGameObject != null)
-        {
-            ImGui.begin("Inspector");
-            ImGui.text("Name: " + activeGameObject.name);
-            activeGameObject.imgui();
-            ImGui.end();
-        }
-
-        imgui();
-    }
 
     //The function that handles the layout of every imgui per scene
     public void imgui() {
@@ -79,7 +76,6 @@ public abstract class Scene {
     }
 
     public void saveExit() {
-        System.out.println("THIS IS WEHERE THE ERROR STARTS! - THE SAVING");
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(Component.class, new ComponentDeserializer())
@@ -101,7 +97,6 @@ public abstract class Scene {
     }
 
     public void load() {
-        System.out.println("THIS IS WEHERE THE ERROR STARTS! - THE LOADING");
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(Component.class, new ComponentDeserializer())
@@ -116,11 +111,26 @@ public abstract class Scene {
         }
 
         if (!inFile.equals("")) {
+            int maxGoId = -1;
+            int maxCompId = -1;
             GameObject[] objs = gson.fromJson(inFile, GameObject[].class);
             for (int i = 0; i < objs.length; i++)
             {
                 addGameObjectToScene(objs[i]);
+
+                for (Component c : objs[i].getAllComponents()) {
+                    if (c.getUid() > maxCompId) {
+                        maxCompId = c.getUid();
+                    }
+                }
+                if (objs[i].getUid() > maxGoId) {
+                    maxGoId = objs[i].getUid();
+                }
             }
+            maxGoId++;
+            maxCompId++;
+            GameObject.init(maxGoId);
+            Component.init(maxCompId);
             this.levelLoaded = true;
         }
 
@@ -164,7 +174,7 @@ public abstract class Scene {
     {
         //If we already have maxSquare sprites, then we catch the error
         try {
-            System.out.println("Adding path: " + sprite.getTexture().getFilepath());
+
             Renderer2D.addSprite(sprite);
         } catch (IndexOutOfBoundsException e)
         {

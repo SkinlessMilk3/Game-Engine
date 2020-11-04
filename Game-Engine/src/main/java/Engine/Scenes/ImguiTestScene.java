@@ -2,6 +2,7 @@ package Engine.Scenes;
 
 import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventDispatcher;
+import Components.Sprite;
 import Components.SpriteRenderer;
 import Engine.*;
 import Engine.Window;
@@ -25,6 +26,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -59,6 +61,13 @@ public class ImguiTestScene extends Scene {
         objectDataCatagories.add(scriptData);
         objectDataCatagories.add(roomData);
 
+        objectCount = objectData.size();
+        spriteCount = spriteData.size();
+        fontCount = fontData.size();
+        scriptCount = scriptData.size();
+        roomCount = roomData.size();
+        objectsInScene = gameObjects.size();
+
         if (levelLoaded) {
             return;
         }
@@ -70,7 +79,7 @@ public class ImguiTestScene extends Scene {
 
     }
     private static Vector2f position = new Vector2f(0.0f, 0.0f);
-    private static Vector2f size = new Vector2f(0.25f, 0.25f);
+    private static Vector2f size = new Vector2f(1.00f, 1.00f);
     private static Vector4f color = new Vector4f(1.0f, 0.0f, 1.0f, 1.0f);
 
 
@@ -80,7 +89,6 @@ public class ImguiTestScene extends Scene {
 
         control.onUpdate(dt);
 
-
         if (firstUpdate) {
             objectCount = objectData.size();
             spriteCount = spriteData.size();
@@ -88,6 +96,7 @@ public class ImguiTestScene extends Scene {
             scriptCount = scriptData.size();
             roomCount = roomData.size();
             objectsInScene = gameObjects.size();
+            loadResources();
             firstUpdate = false;
         }
 
@@ -96,7 +105,18 @@ public class ImguiTestScene extends Scene {
             go.update(dt);
         }
 
+
         //render();
+    }
+
+    private void loadResources() {
+        AssetPool.getShader("Assets/testing.glsl");
+        AssetPool.getShader("Assets/pickingShader.glsl");
+        AssetPool.getTexture("Assets/noTexture.png");
+        for (int i = 0; i < spriteData.size(); i++)
+        {
+            AssetPool.getTexture(spriteData.get(i).getSpritePath());
+        }
     }
 
     @Override
@@ -201,9 +221,20 @@ public class ImguiTestScene extends Scene {
             spriteCount--;
         }
         if (tag.equals("Object")) {
-            gameObjects.removeIf(go -> go.name.equals(asset.name));
-            objectData.remove(asset);
+            int goSize = gameObjects.size();
+            for (int i = 0; i < gameObjects.size(); i++) {
+                if (gameObjects.get(i).name.equals(asset.name)) {
+                    Renderer2D.removeFromRenderer(gameObjects.get(i));
+                    gameObjects.remove(gameObjects.get(i));
+                    objectsInScene--;
+                    i--;
+                }
+                if (gameObjects.size() == 0) {
+                    break;
+                }
+            }
             objectCount--;
+            objectData.remove(asset);
         }
         if (tag.equals("Font")) {
 
@@ -263,7 +294,9 @@ public class ImguiTestScene extends Scene {
                         if (activeGameObject != null && activeGameObject.name.equals(selectedObject.name))
                         {
                             activeGameObject = null;
+                            //Window.getImGuiLayer().getPropertiesWindow().setActiveGameObject(null);
                         }
+
                         deleteAsset(selectedObject, "Object");
                         selectedObject = null;
                         ImGui.closeCurrentPopup();
@@ -283,7 +316,8 @@ public class ImguiTestScene extends Scene {
                         {
                             if (ImGui.selectable(spriteData.get(i).name, sprites[i])) {
                                 selectedObject.setTexture(spriteData.get(i).getSpritePath());
-                                changeInstanceSprites(spriteData.get(i).name, spriteData.get(i).getSpritePath());
+                                System.out.println("selected name: " + selectedObject.name);
+                                changeInstanceSprites(selectedObject.name, spriteData.get(i).getSpritePath());
                             }
                         }
                         if (ImGui.button("close")) {
@@ -311,6 +345,7 @@ public class ImguiTestScene extends Scene {
                     objectsInScene++;
                     addGameObjectToScene(newObj);
                     activeGameObject = newObj;
+                    //Window.getImGuiLayer().getPropertiesWindow().setActiveGameObject(newObj);
                     ImGui.closeCurrentPopup();
                 }
                 if(ImGui.button("Delete"))
@@ -494,6 +529,7 @@ public class ImguiTestScene extends Scene {
                 ImGui.text("Instance: " + selectedInstance.name);
                 if (ImGui.button("Delete")) {
                     objectsInScene--;
+                    Renderer2D.removeFromRenderer(selectedInstance);
                     gameObjects.remove(selectedInstance);
                     ImGui.closeCurrentPopup();
                 }
@@ -507,7 +543,7 @@ public class ImguiTestScene extends Scene {
             for (int i = 0; i < objectsInScene; i++)
             {
                 ImGui.bullet();
-                ImGui.selectable(gameObjects.get(i).name, instanceSelections[i]);
+                ImGui.selectable("Name: " + gameObjects.get(i).name + "  ID: " + gameObjects.get(i).getUid(), instanceSelections[i]);
                 if (ImGui.isItemHovered())
                 {
                     selectedInstance = gameObjects.get(i);
@@ -559,8 +595,12 @@ public class ImguiTestScene extends Scene {
         {
             if (gameObjects.get(i).name.equals(instName))
             {
-                System.out.println("Changing texture!");
-                //gameObjects.get(i).getComponent(SpriteRenderer.class).setTexture(filePath);
+                Sprite spr = new Sprite();
+                spr.setTexture(AssetPool.getTexture(filePath));
+                if (!Renderer2D.textures.contains(AssetPool.getTexture(filePath))) {
+                Renderer2D.textures.add(spr.getTexture());
+                }
+                gameObjects.get(i).getComponent(SpriteRenderer.class).setSprite(spr);
             }
         }
     }

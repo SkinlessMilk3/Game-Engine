@@ -1,11 +1,16 @@
 [
   [
     {
-      "name": "fdf",
-      "spritePath": ""
+      "name": "test",
+      "spritePath": "B:\\Downloads\\Cats\\MEMES\\cat 11.png"
     }
   ],
-  [],
+  [
+    {
+      "name": "ts",
+      "spritePath": "B:\\Downloads\\Cats\\MEMES\\cat 11.png"
+    }
+  ],
   [],
   [],
   []

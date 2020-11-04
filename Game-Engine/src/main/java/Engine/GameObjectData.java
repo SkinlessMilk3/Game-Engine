@@ -51,14 +51,12 @@ public class GameObjectData {
     {
         Texture tex = AssetPool.getTexture("Assets/noTexture.png");
         GameObject obj = new GameObject(name, pos);
-        TempCounter temp = new TempCounter();
         SpriteRenderer sprRen = new SpriteRenderer();
         Sprite spr = new Sprite();
         spr.setTexture(tex);
         sprRen.setSprite(spr);
         ObjectLoop objLoop = new ObjectLoop();
 
-        obj.addComponent(temp);
         obj.addComponent(sprRen);
         obj.addComponent(objLoop);
 
@@ -68,14 +66,12 @@ public class GameObjectData {
     public GameObject GenerateGameObject(Transform pos, Texture texture)
     {
         GameObject obj = new GameObject(name, pos);
-        TempCounter temp = new TempCounter();
         Sprite spr = new Sprite();
         SpriteRenderer sprRen = new SpriteRenderer();
         spr.setTexture(texture);
         sprRen.setSprite(spr);
         ObjectLoop objLoop = new ObjectLoop();
 
-        obj.addComponent(temp);
         obj.addComponent(sprRen);
         obj.addComponent(objLoop);
 
@@ -86,18 +82,7 @@ public class GameObjectData {
     {
         for (GameObject go : Window.getScene().gameObjects)
         {
-            if (go.name.equals(this.name))
-            {
-                updateTestVal(go);
-            }
-        }
-    }
 
-    private void updateTestVal(GameObject go)
-    {
-        if (go.getComponent(TempCounter.class) != null)
-        {
-            go.getComponent(TempCounter.class).x += 5;
         }
     }
 

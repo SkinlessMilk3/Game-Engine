@@ -100,7 +100,7 @@ public class LevelEditorScene extends Scene {
     }
 
     private void loadResources() {
-        AssetPool.getShader("Assets/testing.glsl");
+        //AssetPool.getShader("Assets/testing.glsl");
     }
 
 
