@@ -17,7 +17,7 @@ public class GameObject {
     public GameObject(String name) {
         this.name = name;
         this.components = new ArrayList<>();
-        this.transform = new Transform();
+        this.transform = new Transform(this);
     }
 
     public GameObject(String name, Transform transform) {

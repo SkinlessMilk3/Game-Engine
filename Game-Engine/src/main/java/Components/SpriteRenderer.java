@@ -1,5 +1,8 @@
 package Components;
-
+import Engine.Component;
+import Engine.GameObject;
+import Engine.SubTexture2D;
+import Renderer.Texture;
 import Engine.Transform;
 import imgui.ImGui;
 import org.joml.Vector2f;
@@ -9,6 +12,40 @@ import Renderer.Texture;
 import java.util.Arrays;
 
 public class SpriteRenderer extends Component {
+
+    private Vector4f color;
+    private Vector2f[] textCoords = {
+            new Vector2f(0,0),
+            new Vector2f(1,0),
+            new Vector2f(1,1),
+            new Vector2f(0,1)
+    };
+    private Texture texture;
+
+    //For asset with no texture
+    public SpriteRenderer(Vector4f color, GameObject go) {
+        this.color = color;
+        this.texture = null;
+        gameObject = go;
+    }
+
+    //For asset with texture
+    public SpriteRenderer(Texture texture, GameObject go) {
+        this.texture = texture;
+        //White
+        this.color = new Vector4f(1,1,1,1);
+        gameObject = go;
+    }
+
+    public SpriteRenderer(Texture texture, Vector2f[] texCoords, GameObject go){
+        this.texture = texture;
+        textCoords = texCoords;
+        gameObject = go;
+        color = new Vector4f(1.f, 1.f, 1.f, 1.f);
+    }
+
+    @Override
+    public void start() {}
 
     private Vector4f color = new Vector4f(1, 1, 1, 1);
     private Sprite sprite = new Sprite();
@@ -44,7 +81,9 @@ public class SpriteRenderer extends Component {
     @Override
     public void imgui() {
 
-    }
+
+    @Override
+    public void update(float dt) {}
 
     public Vector4f getColor() {
         return this.color;
@@ -74,6 +113,10 @@ public class SpriteRenderer extends Component {
         return this.isDirty;
     }
 
+    public Vector2f[] getTextCoords() {
+
+        return textCoords;
+}
     public void setClean() {
         this.isDirty = false;
     }

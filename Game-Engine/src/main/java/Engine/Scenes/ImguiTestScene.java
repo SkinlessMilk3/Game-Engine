@@ -78,6 +78,7 @@ public class ImguiTestScene extends Scene {
         levelLayerLabels.add("Default Layer");
         levelLayerLabels.add("Background Layer");
 
+
         objectsInScene = gameObjects.size();
 
     }

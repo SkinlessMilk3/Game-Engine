@@ -146,6 +146,7 @@ public class Window {
 
         GL.createCapabilities();
 
+        Renderer2D.Init();
         //Sets starting scene
         Renderer2D.Init();
 
@@ -154,9 +155,9 @@ public class Window {
         this.imGuiLayer = new ImGuiLayer(wnd, pickingTexture);
         this.imGuiLayer.initImGui();
 
+        currentScene.load();
+
         Window.ChangeScene(3);
-
-
     }
 
     private void loop() {
@@ -167,10 +168,10 @@ public class Window {
         float endTime;
         float dt = -1.0f;
 
+        GL_LOG.Log_Data("163: Run loop " + glGetError());
+      
         Shader defaultShader = AssetPool.getShader("Assets/testing.glsl");
         Shader pickingShader = AssetPool.getShader("Assets/pickingShader.glsl");
-
-        GL_LOG.Log_Data("Run loop" + glGetError());
 
         /*Note for the future. Draw calls need to happen after the glClear function in the loop
          * or nothing will be drawn.
@@ -181,8 +182,13 @@ public class Window {
         //currentScene = new LevelEditorScene();
         Vector4f clearColor = new Vector4f(0.15f, 0.15f, 0.15f, 1.0f);
 
-
+        DemoScene dm = new DemoScene();
+        Renderer2D.Init();
         while (!glfwWindowShouldClose(wnd)) {
+
+            Renderer2D.Clear(clearColor);
+
+            //dm.update(dt);
 
             Frame_Rate.Update_Frame_Rate_Counter();
 
@@ -210,9 +216,11 @@ public class Window {
 
             //Draws/updates current scene
             if (dt >= 0) {
+
                 Renderer2D.bindShader(defaultShader);
                 currentScene.update(dt);
                 currentScene.render();
+
             }
 
             //System.out.println("Mouse is at x: "  + MouseEventDispatcher.getX() + " y: " + MouseEventDispatcher.getY());
