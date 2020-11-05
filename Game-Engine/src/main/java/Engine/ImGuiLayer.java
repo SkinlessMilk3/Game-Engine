@@ -3,7 +3,9 @@ package Engine;
 import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventDispatcher;
 import API.EventListeners.MouseEventListener;
+import Editor.PropertiesWindow;
 import Engine.Scenes.Scene;
+import Renderer.PickingTexture;
 import imgui.*;
 import imgui.callbacks.ImStrConsumer;
 import imgui.callbacks.ImStrSupplier;
@@ -12,6 +14,7 @@ import imgui.enums.ImGuiConfigFlags;
 import imgui.enums.ImGuiKey;
 import imgui.enums.ImGuiMouseCursor;
 import imgui.gl3.ImGuiImplGl3;
+import org.lwjgl.system.CallbackI;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -25,8 +28,15 @@ public class ImGuiLayer {
     // LWJGL3 renderer (SHOULD be initialized)
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
 
-    public ImGuiLayer(long glfwWindow) {
+    private PropertiesWindow propertiesWindow;
+
+    public ImGuiLayer(long glfwWindow, PickingTexture pickingTexture) {
         this.glfwWindow = glfwWindow;
+        this.propertiesWindow = new PropertiesWindow(pickingTexture);
+    }
+
+    public PropertiesWindow getPropertiesWindow() {
+        return this.propertiesWindow;
     }
 
     // Initialize Dear ImGui.
@@ -106,36 +116,31 @@ public class ImGuiLayer {
         });
 
         glfwSetMouseButtonCallback(glfwWindow, (w, button, action, mods) -> {
+            final boolean[] mouseDown = new boolean[5];
 
-            if(io.getWantCaptureMouse()) {
-                final boolean[] mouseDown = new boolean[5];
+            mouseDown[0] = button == GLFW_MOUSE_BUTTON_1 && action != GLFW_RELEASE;
+            mouseDown[1] = button == GLFW_MOUSE_BUTTON_2 && action != GLFW_RELEASE;
+            mouseDown[2] = button == GLFW_MOUSE_BUTTON_3 && action != GLFW_RELEASE;
+            mouseDown[3] = button == GLFW_MOUSE_BUTTON_4 && action != GLFW_RELEASE;
+            mouseDown[4] = button == GLFW_MOUSE_BUTTON_5 && action != GLFW_RELEASE;
 
-                mouseDown[0] = button == GLFW_MOUSE_BUTTON_1 && action != GLFW_RELEASE;
-                mouseDown[1] = button == GLFW_MOUSE_BUTTON_2 && action != GLFW_RELEASE;
-                mouseDown[2] = button == GLFW_MOUSE_BUTTON_3 && action != GLFW_RELEASE;
-                mouseDown[3] = button == GLFW_MOUSE_BUTTON_4 && action != GLFW_RELEASE;
-                mouseDown[4] = button == GLFW_MOUSE_BUTTON_5 && action != GLFW_RELEASE;
+            io.setMouseDown(mouseDown);
 
-                io.setMouseDown(mouseDown);
-
-                if (!io.getWantCaptureMouse() && mouseDown[1]) {
-                    ImGui.setWindowFocus(null);
-                }
+            if (!io.getWantCaptureMouse() && mouseDown[1]) {
+                ImGui.setWindowFocus(null);
             }
-            else{
+
+            if (!io.getWantCaptureMouse()) {
                 MouseEventDispatcher.isPressedCallback(w, button, action, mods);
             }
         });
 
         glfwSetScrollCallback(glfwWindow, (w, xOffset, yOffset) -> {
-            if(io.getWantCaptureMouse()) {
-                io.setMouseWheelH(io.getMouseWheelH() + (float) xOffset);
-                io.setMouseWheel(io.getMouseWheel() + (float) yOffset);
-            }
-            else {
-                MouseEventDispatcher.isScrolledCallback(w, xOffset, yOffset);
-            }
+            io.setMouseWheelH(io.getMouseWheelH() + (float) xOffset);
+            io.setMouseWheel(io.getMouseWheel() + (float) yOffset);
+            MouseEventDispatcher.isScrolledCallback(w, xOffset, yOffset);
         });
+
 
         /**
          * glfwSetScrollCallback(wnd, (glfwWns, xOffset, yOffset) ->{
@@ -239,8 +244,9 @@ public class ImGuiLayer {
        ImGui.end();
         //----------------------------------------------------------------------
 
-        currentScene.sceneImgui();
-
+        currentScene.imgui();
+        propertiesWindow.update(dt, currentScene);
+        propertiesWindow.imgui();
         ImGui.showDemoWindow();
         ImGui.render();
 

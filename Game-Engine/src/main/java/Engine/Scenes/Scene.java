@@ -1,22 +1,22 @@
 package Engine.Scenes;
 
+import Components.Component;
+import Components.ComponentDeserializer;
 import Components.SpriteRenderer;
 import Engine.*;
 
 import Renderer.Renderer2D;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import imgui.ImGui;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 
 public abstract class Scene {
@@ -44,6 +44,10 @@ public abstract class Scene {
         isRunning = true;
     }
 
+    public Camera camera() {
+        return this.camera;
+    }
+
     public void addGameObjectToScene(GameObject go) {
         if (!isRunning) {
             gameObjects.add(go);
@@ -55,20 +59,17 @@ public abstract class Scene {
         }
     }
 
+    public GameObject getGameObject(int gameObjectId) {
+        Optional<GameObject> result = this.gameObjects.stream()
+                .filter(gameObject -> gameObject.getUid() == gameObjectId)
+                .findFirst();
+        return result.orElse(null);
+    }
+
     public abstract void update(float dt);
+    public abstract void render();
 
     //Gets current "selected" object in gui
-    public void sceneImgui() {
-        if (activeGameObject != null)
-        {
-            ImGui.begin("Inspector");
-            //activeGameObject.imgui();
-            ImGui.text(activeGameObject.name);
-            ImGui.end();
-        }
-
-        imgui();
-    }
 
     //The function that handles the layout of every imgui per scene
     public void imgui() {
@@ -111,11 +112,26 @@ public abstract class Scene {
         }
 
         if (!inFile.equals("")) {
+            int maxGoId = -1;
+            int maxCompId = -1;
             GameObject[] objs = gson.fromJson(inFile, GameObject[].class);
             for (int i = 0; i < objs.length; i++)
             {
                 addGameObjectToScene(objs[i]);
+
+                for (Component c : objs[i].getAllComponents()) {
+                    if (c.getUid() > maxCompId) {
+                        maxCompId = c.getUid();
+                    }
+                }
+                if (objs[i].getUid() > maxGoId) {
+                    maxGoId = objs[i].getUid();
+                }
             }
+            maxGoId++;
+            maxCompId++;
+            GameObject.init(maxGoId);
+            Component.init(maxCompId);
             this.levelLoaded = true;
         }
 
@@ -159,6 +175,7 @@ public abstract class Scene {
     {
         //If we already have maxSquare sprites, then we catch the error
         try {
+
             Renderer2D.addSprite(sprite);
         } catch (IndexOutOfBoundsException e)
         {
@@ -170,4 +187,11 @@ public abstract class Scene {
             e.printStackTrace();
         }
     }
+
+    public GameObject getActiveGameObject()
+    {
+        return activeGameObject;
+    }
+
+    public void setActiveGameObject(GameObject go) { this.activeGameObject = go; }
 }

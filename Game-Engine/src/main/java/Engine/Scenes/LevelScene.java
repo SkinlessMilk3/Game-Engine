@@ -129,4 +129,10 @@ public class LevelScene extends Scene {
         glDrawElements(GL_TRIANGLES, ibo.getCount(), GL_UNSIGNED_INT, 0);
     }
 
+    @Override
+    public void render()
+    {
+
+    }
+
 }

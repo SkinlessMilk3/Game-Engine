@@ -17,9 +17,15 @@ import static org.lwjgl.stb.STBImage.*;
 public class Texture {
     private int render_id;
     private int[] width = {0}, height = {0}, bitsPerPixel = {0};
-    private ByteBuffer localBuffer = null;
+    private transient ByteBuffer localBuffer = null;
     private String filePath;
-    private int internalFormat, dataFormat;
+    private transient int internalFormat, dataFormat;
+
+    public Texture(){
+        width[0] = -1;
+        height[0] = -1;
+        render_id = -1;
+    }
 
     public Texture(int width, int height){
 
@@ -56,7 +62,9 @@ public class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, localBuffer);
+
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, localBuffer);
+
 
         glBindTexture(GL_TEXTURE_2D, 0);
         glEnable(GL_TEXTURE_2D);
@@ -99,5 +107,20 @@ public class Texture {
     }
     public int getHeight(){
         return height[0];
+    }
+    public String getFilepath() {return filePath;}
+
+    public int getId() {
+        return render_id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (!(o instanceof Texture)) return false;
+        Texture oTex = (Texture)o;
+        return oTex.getWidth() == this.width[0] && oTex.getHeight() == this.height[0] &&
+                oTex.getId() == this.render_id &&
+                oTex.getFilepath().equals(this.filePath);
     }
 }

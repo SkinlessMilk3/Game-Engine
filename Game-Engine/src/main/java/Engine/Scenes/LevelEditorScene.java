@@ -100,7 +100,7 @@ public class LevelEditorScene extends Scene {
     }
 
     private void loadResources() {
-        AssetPool.getShader("Assets/testing.glsl");
+        //AssetPool.getShader("Assets/testing.glsl");
     }
 
 
@@ -151,5 +151,8 @@ public class LevelEditorScene extends Scene {
         }
     }
 
+    @Override
+    public void render() {
 
+    }
 }

@@ -6,7 +6,10 @@ import API.EventListeners.MouseEventDispatcher;
 import API.EventListeners.WindowResizeDispatcher;
 import Engine.Scenes.*;
 
+import Renderer.PickingTexture;
 import Renderer.Renderer2D;
+import Renderer.Shader;
+import Utils.AssetPool;
 import Utils.GL_LOG;
 
 import org.joml.Vector4f;
@@ -15,6 +18,7 @@ import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.system.CallbackI;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -29,6 +33,7 @@ public class Window {
     private static boolean saving;
     String title;
     private ImGuiLayer imGuiLayer;
+    private PickingTexture pickingTexture;
 
     private static ImguiTestScene editor = new ImguiTestScene();
 
@@ -114,12 +119,12 @@ public class Window {
         //Lambda Functions
         glfwSetKeyCallback(wnd, KeyEventListener::isKeyPressed);
 
-        glfwSetMouseButtonCallback(wnd, MouseEventDispatcher::isPressedCallback);
+        //glfwSetMouseButtonCallback(wnd, MouseEventDispatcher::isPressedCallback);
         glfwSetScrollCallback(wnd, MouseEventDispatcher::isScrolledCallback);
         glfwSetCursorPosCallback(wnd, MouseEventDispatcher::isMovedCallback);
         glfwSetWindowSizeCallback(wnd, WindowResizeDispatcher::WindowReizeCallback);
 
-        glfwSetMouseButtonCallback(wnd, MouseEventDispatcher::isPressedCallback);
+        //glfwSetMouseButtonCallback(wnd, MouseEventDispatcher::isPressedCallback);
         glfwSetScrollCallback(wnd, MouseEventDispatcher::isScrolledCallback);
         glfwSetCursorPosCallback(wnd, MouseEventDispatcher::isMovedCallback);
         glfwSetWindowSizeCallback(wnd, WindowResizeDispatcher::WindowReizeCallback);
@@ -143,13 +148,16 @@ public class Window {
 
         Renderer2D.Init();
         //Sets starting scene
+        Renderer2D.Init();
 
-        Window.ChangeScene(3);
+        this.pickingTexture = new PickingTexture(getWidth(), getHeight());
 
-        this.imGuiLayer = new ImGuiLayer(wnd);
+        this.imGuiLayer = new ImGuiLayer(wnd, pickingTexture);
         this.imGuiLayer.initImGui();
 
         currentScene.load();
+
+        Window.ChangeScene(3);
     }
 
     private void loop() {
@@ -161,6 +169,9 @@ public class Window {
         float dt = -1.0f;
 
         GL_LOG.Log_Data("163: Run loop " + glGetError());
+      
+        Shader defaultShader = AssetPool.getShader("Assets/testing.glsl");
+        Shader pickingShader = AssetPool.getShader("Assets/pickingShader.glsl");
 
         /*Note for the future. Draw calls need to happen after the glClear function in the loop
          * or nothing will be drawn.
@@ -169,7 +180,7 @@ public class Window {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         //currentScene = new LevelEditorScene();
-        Vector4f clearColor = new Vector4f(0.0f, 1.0f, 0.8f, 1.0f);
+        Vector4f clearColor = new Vector4f(0.15f, 0.15f, 0.15f, 1.0f);
 
         DemoScene dm = new DemoScene();
         Renderer2D.Init();
@@ -177,20 +188,50 @@ public class Window {
 
             Renderer2D.Clear(clearColor);
 
-            dm.update(dt);
+            //dm.update(dt);
 
             Frame_Rate.Update_Frame_Rate_Counter();
 
             glfwPollEvents();
 
+            //Render pass 1. Render to picking texture
+            glDisable(GL_BLEND);
+            pickingTexture.enableWriting();
+
+            glViewport(0,0, getWidth(), getHeight());
+            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            Renderer2D.bindShader(pickingShader);
+            currentScene.update(dt);
+            currentScene.render();
+
+            pickingTexture.disableWriting();
+            glEnable(GL_BLEND);
+
+            //Render pass 2. Render to actual game*/
+
+            Renderer2D.Clear(clearColor);
+            Renderer2D.bindShader(defaultShader);
+
             //Draws/updates current scene
             if (dt >= 0) {
-                //currentScene.update(dt);
+
+                Renderer2D.bindShader(defaultShader);
+                currentScene.update(dt);
+                currentScene.render();
+
             }
 
             //System.out.println("Mouse is at x: "  + MouseEventDispatcher.getX() + " y: " + MouseEventDispatcher.getY());
 
             this.imGuiLayer.update(dt, currentScene);
+
+            if (saving)
+            {
+                currentScene.saveExit();
+                saving = false;
+            }
 
 
             glfwSwapBuffers(wnd);
@@ -200,13 +241,9 @@ public class Window {
             beginTime = endTime;
         }
 
-        if (saving)
-        {
-            currentScene.saveExit();
-            saving = false;
-        }
-
         Renderer2D.shutdown();
+        System.exit(0);
+
     }
 
     public static Window getWindow() {
@@ -230,14 +267,11 @@ public class Window {
                 currentScene.init();
                 currentScene.start();
                 break;
-            case 2:
-                currentScene = new CounterDemoScene();
-                currentScene.init();
-                currentScene.start();
-                break;
             case 3:
-                currentScene = editor;
+                currentScene = new ImguiTestScene();
+                Renderer2D.Init();
                 currentScene.init();
+                currentScene.load();
                 currentScene.start();
                 break;
 
@@ -264,4 +298,10 @@ public class Window {
     public static void setSaving() {
         saving = true;
     }
+
+    public static ImGuiLayer getImGuiLayer() {
+        return getWindow().imGuiLayer;
+    }
+
+    public static PickingTexture getPickingTexture() { return  getWindow().pickingTexture; }
 }

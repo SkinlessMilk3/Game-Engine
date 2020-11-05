@@ -1,10 +1,15 @@
 package Engine.Scenes;
 
 import API.EventListeners.KeyEventListener;
+import API.EventListeners.MouseEventDispatcher;
+import Components.MouseControls;
+import Components.Sprite;
 import Components.SpriteRenderer;
 import Engine.*;
+import Engine.Window;
 import Renderer.Renderer2D;
 
+import Renderer.Texture;
 import Utils.AssetPool;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -16,8 +21,13 @@ import imgui.enums.ImGuiTreeNodeFlags;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.lwjgl.system.CallbackI;
 
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -33,16 +43,33 @@ public class ImguiTestScene extends Scene {
     public List<GameObjectData> roomData = new ArrayList<>();
     boolean firstUpdate = true;
 
+    int objectsInScene = gameObjects.size();
+
     private GameObjectData selectedObject = null;
+    private GameObject selectedInstance = null;
+
+    private MouseControls mouseControls = new MouseControls();
+
+    String filePath = "";
+    String fileName = "";
 
     @Override
     public void init() {
+
+        this.camera = new Camera(new Vector2f(-250, 0));
 
         objectDataCatagories.add(objectData);
         objectDataCatagories.add(spriteData);
         objectDataCatagories.add(fontData);
         objectDataCatagories.add(scriptData);
         objectDataCatagories.add(roomData);
+
+        objectCount = objectData.size();
+        spriteCount = spriteData.size();
+        fontCount = fontData.size();
+        scriptCount = scriptData.size();
+        roomCount = roomData.size();
+        objectsInScene = gameObjects.size();
 
         if (levelLoaded) {
             return;
@@ -51,21 +78,12 @@ public class ImguiTestScene extends Scene {
         levelLayerLabels.add("Default Layer");
         levelLayerLabels.add("Background Layer");
 
-        GameObject go = new GameObject("test");
-        go.addComponent(new Transform(new Vector2f(0.0f, 0.0f), size, go));
-        go.addComponent(new SpriteRenderer(color, go));
-        this.addGameObjectToScene(go);
 
-        color = new Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-        GameObject go2 = new GameObject("test2");
-        go2.addComponent(new Transform(new Vector2f(0.26f, 1.0f), size, go2));
-
-        go2.addComponent(new SpriteRenderer(color, go));
-        this.addGameObjectToScene(go2);
+        objectsInScene = gameObjects.size();
 
     }
-    private static Vector2f position = new Vector2f(0.0f, -1.0f);
-    private static Vector2f size = new Vector2f(0.25f, 0.25f);
+    private static Vector2f position = new Vector2f(0.0f, 0.0f);
+    private static Vector2f size = new Vector2f(1.00f, 1.00f);
     private static Vector4f color = new Vector4f(1.0f, 0.0f, 1.0f, 1.0f);
 
 
@@ -75,18 +93,31 @@ public class ImguiTestScene extends Scene {
 
         control.onUpdate(dt);
 
-        Renderer2D.beginScene(control.getCamera());
-
-
-
         if (firstUpdate) {
             objectCount = objectData.size();
             spriteCount = spriteData.size();
             fontCount = fontData.size();
             scriptCount = scriptData.size();
             roomCount = roomData.size();
+            objectsInScene = gameObjects.size();
+            loadResources();
             firstUpdate = false;
         }
+        //Was for picking up objects upon picking them, but doesnt work atm because if coordinate troubles
+        /*if (MouseEventDispatcher.isPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+            int x = (int)MouseEventDispatcher.getScreenX();
+            int y = (int)MouseEventDispatcher.getScreenY();
+            if (Renderer2D.getBoundShader() != AssetPool.getShader("Assets/pickingShader.glsl")) {
+                int test2 = Window.getPickingTexture().readPixel(x, y);
+                //System.out.println(test2);
+                GameObject test = getGameObject(test2);
+                if (test != null) {
+                    mouseControls.pickupObject(test);
+                }
+            }
+        }
+
+        mouseControls.update(dt);*/
 
         for (GameObject go : this.gameObjects)
         {
@@ -94,10 +125,24 @@ public class ImguiTestScene extends Scene {
         }
 
 
+        //render();
+    }
 
+    private void loadResources() {
+        AssetPool.getShader("Assets/testing.glsl");
+        AssetPool.getShader("Assets/pickingShader.glsl");
+        AssetPool.getTexture("Assets/noTexture.png");
+        for (int i = 0; i < spriteData.size(); i++)
+        {
+            AssetPool.getTexture(spriteData.get(i).getSpritePath());
+        }
+    }
+
+    @Override
+    public void render() {
+        Renderer2D.beginScene(control.getCamera());
 
         Renderer2D.endScene();
-
     }
 
     //Not actual list of objects, but labels for imgui
@@ -134,27 +179,42 @@ public class ImguiTestScene extends Scene {
         MainMenuBarImGui();
         RoomEditorImGui();
         assetBrowserImGui();
-        if (activeGameObject != null)
-        {
-            ImGui.begin("Inspector");
-            activeGameObject.imgui();
-            ImGui.end();
-        }
+
     }
+    private boolean explorerClosed = true;
 
     private int addNewAsset(List<String> labels, int counter, String tag)
     {
         if (ImGui.beginPopupContextItem())
         {
-            ImGui.inputText("", name);
-
+            if (tag.equals("Sprite")) {
+                if (explorerClosed) {
+                    try {
+                        FileDialog dialog = new FileDialog((Frame)null, "Select File to Open");
+                        explorerClosed = false;
+                        dialog.setMode(FileDialog.LOAD);
+                        dialog.setVisible(true);
+                        filePath = dialog.getDirectory() + dialog.getFile();
+                        fileName = dialog.getFile();
+                        System.out.println(filePath + " chosen.");
+                    } catch (Exception e) {
+                        System.out.println("test!");
+                    }
+                }
+                System.out.println("file: " + fileName);
+                ImGui.inputText(fileName, name);
+            }
+            else {
+                ImGui.inputText("", name);
+            }
             assetName = name.toString();
             if (ImGui.smallButton("Save"))
             {
+                explorerClosed = true;
                 if (!assetName.isEmpty()) {
                     counter++;
                     labels.add(assetName);
-                    if (tag.equals("Sprite")) { GameObjectData sprData = new GameObjectData(); sprData.setName(assetName); spriteData.add(sprData);}
+                    if (tag.equals("Sprite")) { GameObjectData sprData = new GameObjectData(); sprData.setName(assetName); sprData.setTexture(filePath); spriteData.add(sprData);}
                     if (tag.equals("Object")) { GameObjectData objData = new GameObjectData(); objData.setName(assetName); objectData.add(objData);}
                     if (tag.equals("Font")) { GameObjectData fntData = new GameObjectData(); fntData.setName(assetName); fontData.add(fntData);}
                     if (tag.equals("Script")) { GameObjectData scptData = new GameObjectData(); scptData.setName(assetName); scriptData.add(scptData);}
@@ -180,9 +240,20 @@ public class ImguiTestScene extends Scene {
             spriteCount--;
         }
         if (tag.equals("Object")) {
-            gameObjects.removeIf(go -> go.name.equals(asset.name));
-            objectData.remove(asset);
+            int goSize = gameObjects.size();
+            for (int i = 0; i < gameObjects.size(); i++) {
+                if (gameObjects.get(i).name.equals(asset.name)) {
+                    Renderer2D.removeFromRenderer(gameObjects.get(i));
+                    gameObjects.remove(gameObjects.get(i));
+                    objectsInScene--;
+                    i--;
+                }
+                if (gameObjects.size() == 0) {
+                    break;
+                }
+            }
             objectCount--;
+            objectData.remove(asset);
         }
         if (tag.equals("Font")) {
 
@@ -200,7 +271,6 @@ public class ImguiTestScene extends Scene {
             roomCount--;
         }
     }
-
     private void assetBrowserImGui()
     {
         //For accessing game assets like objects and sprites
@@ -240,10 +310,11 @@ public class ImguiTestScene extends Scene {
                     ImGui.text("(This will delete all instances of this object)");
                     if (ImGui.button("Yes"))
                     {
-                        if (activeGameObject.name == selectedObject.name)
+                        if (activeGameObject != null && activeGameObject.name.equals(selectedObject.name))
                         {
                             activeGameObject = null;
                         }
+
                         deleteAsset(selectedObject, "Object");
                         selectedObject = null;
                         ImGui.closeCurrentPopup();
@@ -255,16 +326,53 @@ public class ImguiTestScene extends Scene {
                     }
                     ImGui.endPopup();
                 }
+                if (ImGui.beginPopup("Edit Data")) {
+                    if (ImGui.beginPopup("Choose Sprite")) {
+                        ImGui.text("Choose Sprite:");
+                        boolean[] sprites = new boolean[spriteCount];
+                        for (int i = 0; i < spriteCount; i++)
+                        {
+                            if (ImGui.selectable(spriteData.get(i).name, sprites[i])) {
+                                selectedObject.setTexture(spriteData.get(i).getSpritePath());
+                                System.out.println("selected name: " + selectedObject.name);
+                                changeInstanceSprites(selectedObject.name, spriteData.get(i).getSpritePath());
+                            }
+                        }
+                        if (ImGui.button("Close")) {
+                            ImGui.closeCurrentPopup();
+                        }
+                        ImGui.endPopup();
+                    }
+                    ImGui.text("Name: " + selectedObject.name);
+                    if (ImGui.button("Change Sprite")) {
+                        ImGui.openPopup("Choose Sprite");
+                    }
+                    ImGui.endPopup();
+                }
                 if(ImGui.button("Add to scene"))
                 {
-                    GameObject newObj = selectedObject.GenerateGameObject();
+                    GameObject newObj;
+                    if (selectedObject.getSpritePath().equals("")) {
+                         newObj = selectedObject.GenerateGameObject(new Transform(position, size));
+                    }
+                    else {
+                         newObj = selectedObject.GenerateGameObject(new Transform(position, size), AssetPool.getTexture(selectedObject.getSpritePath()));
+                    }
+                    selectedObject = null;
+                    position.y += 1;
+                    objectsInScene++;
                     addGameObjectToScene(newObj);
                     activeGameObject = newObj;
+                    Window.getImGuiLayer().getPropertiesWindow().setActiveGameObject(newObj);
                     ImGui.closeCurrentPopup();
                 }
                 if(ImGui.button("Delete"))
                 {
                     ImGui.openPopup("Delete Confirmation");
+                }
+                if (ImGui.button("Edit Object"))
+                {
+                    ImGui.openPopup("Edit Data");
                 }
                 if (selectedObject == null)
                 {
@@ -385,9 +493,22 @@ public class ImguiTestScene extends Scene {
         }
     }
 
+    public void instanceMenuImGui(int goIndex){
+        if (ImGui.beginPopupContextItem("Instance Menu"))
+        {
+            ImGui.text("Instance: " + gameObjects.get(goIndex).name);
+            ImGui.button("Delete");
+            ImGui.sameLine();
+            if (ImGui.button("Inspect")){
+                activeGameObject = gameObjects.get(goIndex);
+            }
+            ImGui.endPopup();
+        }
+    }
+
     public void RoomEditorImGui()
     {
-        ImGui.begin("Room/Level Editor");
+        ImGui.begin("Scene Editor");
 
         ImGui.setNextItemOpen(true, ImGuiCond.Once);
         ImGui.spacing();
@@ -417,13 +538,38 @@ public class ImguiTestScene extends Scene {
 
         ImGui.setNextItemOpen(true, ImGuiCond.Once);
         ImGui.spacing();
-        if (ImGui.treeNodeEx("Layer Objects", 2)){
+        if (ImGui.treeNodeEx("Scene Objects", 2)){
 
             ImGui.button(levelLayerLabels.get(selectedLayer) + " Objects", 150, 20);
-            for (GameObject go : gameObjects)
+            boolean instanceSelections[] = new boolean[gameObjects.size()];
+            if (ImGui.beginPopupContextItem("Instance Menu"))
+            {
+                ImGui.text("Instance: " + selectedInstance.name);
+                if (ImGui.button("Delete")) {
+                    objectsInScene--;
+                    if (selectedInstance.equals(activeGameObject)) {
+                        activeGameObject = null;
+                    }
+                    Renderer2D.removeFromRenderer(selectedInstance);
+                    gameObjects.remove(selectedInstance);
+                    ImGui.closeCurrentPopup();
+                }
+                ImGui.sameLine();
+                if (ImGui.button("Inspect")){
+                    activeGameObject = selectedInstance;
+                    ImGui.closeCurrentPopup();
+                }
+                ImGui.endPopup();
+            }
+            for (int i = 0; i < objectsInScene; i++)
             {
                 ImGui.bullet();
-                ImGui.selectable(go.name);
+                ImGui.selectable("Name: " + gameObjects.get(i).name + "  ID: " + gameObjects.get(i).getUid(), instanceSelections[i]);
+                if (ImGui.isItemHovered())
+                {
+                    selectedInstance = gameObjects.get(i);
+                    ImGui.openPopupOnItemClick("Instance Menu", 1);
+                }
             }
             //ImGui.text("Level/room objects would be listed here");
 
@@ -441,7 +587,7 @@ public class ImguiTestScene extends Scene {
             //ImGui.text("Width");
             ImGui.sliderInt("Width", new int[]{tempW}, 0, 1980);
             //ImGui.text("Height");
-             ImGui.sliderInt("Height", new int[]{tempH}, 0, 1020);
+            ImGui.sliderInt("Height", new int[]{tempH}, 0, 1020);
             ImGui.separator();
             ImGui.spacing(); ImGui.spacing();
             ImGui.button("Creation Code", 200, 20);
@@ -457,17 +603,28 @@ public class ImguiTestScene extends Scene {
     {
         ImGui.begin("Scene Selector");
         ImGui.textColored(44, 244, 193, 100, "Choose Scene!");
-        ImGui.sameLine();
-        if (ImGui.button("Triangle")){
-            Window.ChangeScene(0);
-        }
+        ImGui.sameLine(); if (ImGui.button("Triangle")){
+        Window.ChangeScene(0);
+    }
         ImGui.end();
     }
 
-    public void ObjectInspectorImGui(GameObjectData objData)
-    {
+    public void changeInstanceSprites(String instName, String filePath) {
+        int gameObjectSize = gameObjects.size();
 
-
-
+        for (int i = 0; i < gameObjectSize; i++)
+        {
+            if (gameObjects.get(i).name.equals(instName))
+            {
+                Sprite spr = new Sprite();
+                spr.setTexture(AssetPool.getTexture(filePath));
+                if (!Renderer2D.textures.contains(AssetPool.getTexture(filePath))) {
+                Renderer2D.textures.add(spr.getTexture());
+                }
+                gameObjects.get(i).getComponent(SpriteRenderer.class).setSprite(spr);
+            }
+        }
     }
+
+    public MouseControls getMouseControls() { return this.mouseControls; }
 }
