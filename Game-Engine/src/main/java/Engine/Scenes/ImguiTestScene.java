@@ -51,13 +51,16 @@ public class ImguiTestScene extends Scene {
         levelLayerLabels.add("Default Layer");
         levelLayerLabels.add("Background Layer");
 
-        GameObject go = new GameObject("test", new Transform(new Vector2f(0.0f, 0.0f), size));
-        go.addComponent(new SpriteRenderer(color));
+        GameObject go = new GameObject("test");
+        go.addComponent(new Transform(new Vector2f(0.0f, 0.0f), size, go));
+        go.addComponent(new SpriteRenderer(color, go));
         this.addGameObjectToScene(go);
 
         color = new Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-        GameObject go2 = new GameObject("test2", new Transform(new Vector2f(0.26f, 1.0f), size));
-        go2.addComponent(new SpriteRenderer(color));
+        GameObject go2 = new GameObject("test2");
+        go2.addComponent(new Transform(new Vector2f(0.26f, 1.0f), size, go2));
+
+        go2.addComponent(new SpriteRenderer(color, go));
         this.addGameObjectToScene(go2);
 
     }

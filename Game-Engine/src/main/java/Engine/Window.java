@@ -141,6 +141,7 @@ public class Window {
 
         GL.createCapabilities();
 
+        Renderer2D.Init();
         //Sets starting scene
 
         Window.ChangeScene(3);
@@ -149,8 +150,6 @@ public class Window {
         this.imGuiLayer.initImGui();
 
         currentScene.load();
-
-        Renderer2D.Init();
     }
 
     private void loop() {
@@ -161,7 +160,7 @@ public class Window {
         float endTime;
         float dt = -1.0f;
 
-        GL_LOG.Log_Data("Run loop" + glGetError());
+        GL_LOG.Log_Data("163: Run loop " + glGetError());
 
         /*Note for the future. Draw calls need to happen after the glClear function in the loop
          * or nothing will be drawn.
@@ -172,10 +171,13 @@ public class Window {
         //currentScene = new LevelEditorScene();
         Vector4f clearColor = new Vector4f(0.0f, 1.0f, 0.8f, 1.0f);
 
-
+        DemoScene dm = new DemoScene();
+        Renderer2D.Init();
         while (!glfwWindowShouldClose(wnd)) {
 
             Renderer2D.Clear(clearColor);
+
+            dm.update(dt);
 
             Frame_Rate.Update_Frame_Rate_Counter();
 
@@ -183,7 +185,7 @@ public class Window {
 
             //Draws/updates current scene
             if (dt >= 0) {
-                currentScene.update(dt);
+                //currentScene.update(dt);
             }
 
             //System.out.println("Mouse is at x: "  + MouseEventDispatcher.getX() + " y: " + MouseEventDispatcher.getY());

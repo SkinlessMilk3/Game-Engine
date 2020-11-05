@@ -174,6 +174,7 @@ public class Renderer2D {
 
     public static void submit(int spriteIndex) {
 
+        shader.setUniform1i("u_texture", 0);
         CreateSquare(spriteIndex);
 
         indexCount += 6;
@@ -194,9 +195,8 @@ public class Renderer2D {
 
     public static void submit(final Vector3f position, final Vector2f size, final Vector4f color, final Texture texture) {
 
-        texture.bind(0);
         shader.setUniform1i("u_texture", 0);
-
+        texture.bind(0);
         //CreateSquare(position, size, color);
     }
 
@@ -233,30 +233,33 @@ public class Renderer2D {
      */
     private static void CreateSquare(int index) {
         SpriteRenderer sprite = sprites[index];
-
+        Vector2f transform = sprite.gameObject.getComponent(Transform.class).position;
+        Vector2f scale = sprite.gameObject.getComponent(Transform.class).scale;
         Vector4f color = sprite.getColor();
 
-        float xAdd = 1.0f;
-        float yAdd = 1.0f;
+        float xAdd = 0.0f;//1.0f;
+        float yAdd = 0.0f;//1.0f;
 
         int count = 0;
         for (int i = 0; i < 4; i++) {
             float tx = 0.0f;
             float ty = 0.0f;
             if (i == 1) {
-                yAdd = 0.0f;
+                xAdd = 1.0f;//yAdd = 1.0f;//0.0f;
                 tx = 1.0f;
             } else if (i == 2) {
-                xAdd = 0.0f;
+                xAdd = 1.0f;//0.0f;
+                yAdd = 1.0f;//tmp
                 tx = 1.0f;
                 ty = 1.0f;
             } else if (i == 3) {
                 yAdd = 1.0f;
+                xAdd = 0.0f;
                 ty = 1.0f;
             }
-            vertexBuffer[count + vertexCount] = sprite.gameObject.transform.position.x + (xAdd * sprite.gameObject.transform.scale.x);
+            vertexBuffer[count + vertexCount] = transform.x + (xAdd * scale.x);//sprite.gameObject.transform.position.x + (xAdd * sprite.gameObject.transform.scale.x);
             count++;
-            vertexBuffer[count + vertexCount] = sprite.gameObject.transform.position.y + (yAdd * sprite.gameObject.transform.scale.y);
+            vertexBuffer[count + vertexCount] = transform.y + (yAdd * scale.y);//sprite.gameObject.transform.position.y + (yAdd * sprite.gameObject.transform.scale.y);
             count++;
             vertexBuffer[count + vertexCount] = 0.0f;
             count++;
@@ -268,9 +271,9 @@ public class Renderer2D {
             count++;
             vertexBuffer[count + vertexCount] = color.w;
             count++;
-            vertexBuffer[count + vertexCount] = tx;
+            vertexBuffer[count + vertexCount] = sprite.getTextCoords()[i].x;//tx;
             count++;
-            vertexBuffer[count + vertexCount] = ty;
+            vertexBuffer[count + vertexCount] = sprite.getTextCoords()[i].y;//ty;
             count++;
         }
     }

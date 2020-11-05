@@ -47,6 +47,7 @@ public abstract class Scene {
     public void addGameObjectToScene(GameObject go) {
         if (!isRunning) {
             gameObjects.add(go);
+            addGOtoRenderer(go);//TMP
         } else {
             gameObjects.add(go);
             go.start();
