@@ -229,7 +229,7 @@ public class Renderer2D {
 
     public static void submit(int spriteIndex) {
 
-       shader.setUniform1i("u_texture", 0);
+       //shader.setUniform1i("u_texture", 0);
        //sprites[spriteIndex].getTexture().bind(0);
         //currentShader.setUniform1i("u_texture", 0);
 
@@ -340,8 +340,8 @@ public class Renderer2D {
      */
     private static void CreateSquare(int index) {
         SpriteRenderer sprite = sprites[index];
-        Vector2f transform = sprite.gameObject.getComponent(Transform.class).position;
-        Vector2f scale = sprite.gameObject.getComponent(Transform.class).scale;
+        Transform transform = sprite.gameObject.transform;
+        Vector2f scale = sprite.gameObject.transform.scale;
         Vector4f color = sprite.getColor();
         Vector2f[] texCoords = sprite.getTexCoords();
 
@@ -378,10 +378,9 @@ public class Renderer2D {
                 ty = 1.0f;
             }
 
-            vertexBuffer[count + vertexCount] = transform.x + (xAdd * scale.x);//sprite.gameObject.transform.position.x + (xAdd * sprite.gameObject.transform.scale.x);
+            vertexBuffer[offset + 0] = transform.position.x + (xAdd * scale.x);//sprite.gameObject.transform.position.x + (xAdd * sprite.gameObject.transform.scale.x);
             count++;
-            vertexBuffer[count + vertexCount] = transform.y + (yAdd * scale.y);//sprite.gameObject.transform.position.y + (yAdd * sprite.gameObject.transform.scale.y);
-       
+            vertexBuffer[offset + 1] = transform.position.y + (yAdd * scale.y);//sprite.gameObject.transform.position.y + (yAdd * sprite.gameObject.transform.scale.y);
             count++;
             vertexBuffer[offset + 2] = 0.0f;
             //System.out.println(vertexBuffer[offset + 2]);
@@ -398,14 +397,14 @@ public class Renderer2D {
             vertexBuffer[offset + 6] = color.w;
             //System.out.println(vertexBuffer[offset + 6]);
             count++;
-            vertexBuffer[count + vertexCount] = sprite.getTextCoords()[i].x;//tx;
+            vertexBuffer[offset + 7] = texCoords[i].x;//tx;
             count++;
-            vertexBuffer[count + vertexCount] = sprite.getTextCoords()[i].y;//ty;
+            vertexBuffer[offset + 8] = texCoords[i].y;//ty;
 
-            //vertexBuffer[offset + 7] = texCoords[i].x;
+            vertexBuffer[offset + 7] = texCoords[i].x;
             //System.out.println(vertexBuffer[offset + 7]);
             //count++;
-            //vertexBuffer[offset + 8] = texCoords[i].y;
+            vertexBuffer[offset + 8] = texCoords[i].y;
             //System.out.println(vertexBuffer[offset + 8]);
 
             count++;
@@ -413,7 +412,7 @@ public class Renderer2D {
 
             //load entity id
             vertexBuffer[offset + 10] = sprite.gameObject.getUid() + 1;
-            //System.out.println("Offset + 10: " + vertexBuffer[offset + 10]);
+            System.out.println("Offset + 10: " + vertexBuffer[offset + 10]);
 
             offset += 11;
         }

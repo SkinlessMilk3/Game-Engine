@@ -1,4 +1,4 @@
-package Engine.Scenes;
+/*package Engine.Scenes;
 
 import Components.SpriteRenderer;
 import Engine.*;
@@ -24,7 +24,6 @@ public class DemoScene extends Scene{
     public DemoScene(){
         stxs = new ArrayList<>();
 
-        go = new GameObject("DemoScene GameObject 1");
         spriteSheet = new Texture("Assets/Textures/RPGpack_sheet_2X.png");//("Assets/Textures/RPGpack_sheet_2X.png");
         Vector2f coords = new Vector2f(1.0f, 1.0f);
         Vector2f dimensions = new Vector2f(128.0f, 128.0f);
@@ -34,14 +33,15 @@ public class DemoScene extends Scene{
         for(int y = 0; y < 15; y++){
             for(int x = 0; x < 15; x++) {
 
+                Transform transform = new Transform(new Vector2f(0.0f + distx, 0.15f+disty));
+                go = new GameObject("DemoScene GameObject 1", transform);
                 SubTexture2D stx = new SubTexture2D(spriteSheet, coords, dimensions);
                 SpriteRenderer spr = new SpriteRenderer(spriteSheet, stx.getTexCoords(), go);
-                Transform transform = new Transform(new Vector2f(0.0f + distx, 0.15f+disty), go);
                 transform.scale.x = 1.f;
                 transform.scale.y = 1.f;
 
                 go.addComponent(spr);
-                go.addComponent(transform);
+                //go.addComponent(transform);
 
                 distx = distx + 0.2f + transform.scale.x;//distx +.15f*go.getComponent(Transform.class).scale.x;
                 addGameObjectToScene(go);
@@ -67,4 +67,4 @@ public class DemoScene extends Scene{
         Renderer2D.endScene();
 
     }
-}
+} */

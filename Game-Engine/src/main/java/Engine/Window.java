@@ -146,7 +146,7 @@ public class Window {
 
         GL.createCapabilities();
 
-        Renderer2D.Init();
+        //Renderer2D.Init();
         //Sets starting scene
         Renderer2D.Init();
 
@@ -155,7 +155,6 @@ public class Window {
         this.imGuiLayer = new ImGuiLayer(wnd, pickingTexture);
         this.imGuiLayer.initImGui();
 
-        currentScene.load();
 
         Window.ChangeScene(3);
     }
@@ -182,7 +181,7 @@ public class Window {
         //currentScene = new LevelEditorScene();
         Vector4f clearColor = new Vector4f(0.15f, 0.15f, 0.15f, 1.0f);
 
-        DemoScene dm = new DemoScene();
+        //DemoScene dm = new DemoScene();
         Renderer2D.Init();
         while (!glfwWindowShouldClose(wnd)) {
 
