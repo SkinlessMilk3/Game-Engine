@@ -23,8 +23,12 @@ public class PropertiesWindow {
         if (MouseEventDispatcher.isPressed(GLFW_MOUSE_BUTTON_LEFT)) {
             int x = (int)MouseEventDispatcher.getScreenX();
             int y = (int)MouseEventDispatcher.getScreenY();
-            System.out.println(pickingTexture.readPixel(x, y));
+            //System.out.println(pickingTexture.readPixel(x, y));
             activeGameObject = currentScene.getGameObject(pickingTexture.readPixel(x, y));
+            Window.getScene().setActiveGameObject(activeGameObject);
+        }
+        if (Window.getScene().getActiveGameObject() == null){
+            voidActiveObject();
         }
     }
 
@@ -45,5 +49,9 @@ public class PropertiesWindow {
 
     public void setActiveGameObject(GameObject go) {
         this.activeGameObject = go;
+    }
+
+    public void voidActiveObject() {
+        this.activeGameObject = null;
     }
 }

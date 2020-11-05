@@ -119,12 +119,12 @@ public class Window {
         //Lambda Functions
         glfwSetKeyCallback(wnd, KeyEventListener::isKeyPressed);
 
-        glfwSetMouseButtonCallback(wnd, MouseEventDispatcher::isPressedCallback);
+        //glfwSetMouseButtonCallback(wnd, MouseEventDispatcher::isPressedCallback);
         glfwSetScrollCallback(wnd, MouseEventDispatcher::isScrolledCallback);
         glfwSetCursorPosCallback(wnd, MouseEventDispatcher::isMovedCallback);
         glfwSetWindowSizeCallback(wnd, WindowResizeDispatcher::WindowReizeCallback);
 
-        glfwSetMouseButtonCallback(wnd, MouseEventDispatcher::isPressedCallback);
+        //glfwSetMouseButtonCallback(wnd, MouseEventDispatcher::isPressedCallback);
         glfwSetScrollCallback(wnd, MouseEventDispatcher::isScrolledCallback);
         glfwSetCursorPosCallback(wnd, MouseEventDispatcher::isMovedCallback);
         glfwSetWindowSizeCallback(wnd, WindowResizeDispatcher::WindowReizeCallback);
@@ -199,13 +199,6 @@ public class Window {
             Renderer2D.bindShader(pickingShader);
             currentScene.update(dt);
             currentScene.render();
-
-            if (MouseEventDispatcher.isPressed(GLFW_MOUSE_BUTTON_LEFT)) {
-                int x = (int)MouseEventDispatcher.getScreenX();
-                int y = (int)MouseEventDispatcher.getScreenY();
-                System.out.println(pickingTexture.readPixel(x, y));
-                //activeGameObject = currentScene.getGameObject(pickingTexture.readPixel(x, y));
-            }
 
             pickingTexture.disableWriting();
             glEnable(GL_BLEND);
@@ -301,4 +294,6 @@ public class Window {
     public static ImGuiLayer getImGuiLayer() {
         return getWindow().imGuiLayer;
     }
+
+    public static PickingTexture getPickingTexture() { return  getWindow().pickingTexture; }
 }

@@ -3,6 +3,10 @@
     {
       "name": "test",
       "spritePath": "B:\\Downloads\\Cats\\MEMES\\cat 11.png"
+    },
+    {
+      "name": "awsdas",
+      "spritePath": ""
     }
   ],
   [

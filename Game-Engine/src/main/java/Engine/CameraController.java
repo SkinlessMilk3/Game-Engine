@@ -24,8 +24,8 @@ public class CameraController implements MouseEventListener, WindowResizeListene
     public CameraController(float aspectratio){
 
         this.aspectratio = aspectratio;
-        zoomLevel = 2.0f;
-        speed = 0.25f;
+        zoomLevel = 1.0f;
+        speed = 0.35f;
         camera = new Camera(new Vector2f().set(-zoomLevel, zoomLevel));
         camera.setProjectionMatrix(-aspectratio * zoomLevel, aspectratio * zoomLevel, -zoomLevel, zoomLevel);
 

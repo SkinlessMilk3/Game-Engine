@@ -191,4 +191,6 @@ public abstract class Scene {
     {
         return activeGameObject;
     }
+
+    public void setActiveGameObject(GameObject go) { this.activeGameObject = go; }
 }

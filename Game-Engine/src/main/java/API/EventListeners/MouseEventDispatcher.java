@@ -59,7 +59,7 @@ public class MouseEventDispatcher{
                 getDispatcher().isPressed[button] = true;
             }
         }
-        else if(GLFW_RELEASE == action){
+        if(GLFW_RELEASE == action){
             if(button < getDispatcher().isPressed.length) {
                 getDispatcher().isDragging = false;
                 getDispatcher().isPressed[button] = false;

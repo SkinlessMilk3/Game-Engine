@@ -6,6 +6,7 @@ layout(location = 0) in vec3 points;
 layout(location = 1) in vec4 color;
 layout(location = 2) in vec2 texCoords;
 layout(location = 3) in float texId;
+layout(location = 4) in float entityId;
 
 uniform mat4 u_projection;
 uniform mat4 u_view;

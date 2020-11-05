@@ -2,6 +2,7 @@ package Engine.Scenes;
 
 import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventDispatcher;
+import Components.MouseControls;
 import Components.Sprite;
 import Components.SpriteRenderer;
 import Engine.*;
@@ -46,6 +47,8 @@ public class ImguiTestScene extends Scene {
 
     private GameObjectData selectedObject = null;
     private GameObject selectedInstance = null;
+
+    private MouseControls mouseControls = new MouseControls();
 
     String filePath = "";
     String fileName = "";
@@ -99,6 +102,21 @@ public class ImguiTestScene extends Scene {
             loadResources();
             firstUpdate = false;
         }
+        //Was for picking up objects upon picking them, but doesnt work atm because if coordinate troubles
+        /*if (MouseEventDispatcher.isPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+            int x = (int)MouseEventDispatcher.getScreenX();
+            int y = (int)MouseEventDispatcher.getScreenY();
+            if (Renderer2D.getBoundShader() != AssetPool.getShader("Assets/pickingShader.glsl")) {
+                int test2 = Window.getPickingTexture().readPixel(x, y);
+                //System.out.println(test2);
+                GameObject test = getGameObject(test2);
+                if (test != null) {
+                    mouseControls.pickupObject(test);
+                }
+            }
+        }
+
+        mouseControls.update(dt);*/
 
         for (GameObject go : this.gameObjects)
         {
@@ -294,7 +312,6 @@ public class ImguiTestScene extends Scene {
                         if (activeGameObject != null && activeGameObject.name.equals(selectedObject.name))
                         {
                             activeGameObject = null;
-                            //Window.getImGuiLayer().getPropertiesWindow().setActiveGameObject(null);
                         }
 
                         deleteAsset(selectedObject, "Object");
@@ -320,7 +337,7 @@ public class ImguiTestScene extends Scene {
                                 changeInstanceSprites(selectedObject.name, spriteData.get(i).getSpritePath());
                             }
                         }
-                        if (ImGui.button("close")) {
+                        if (ImGui.button("Close")) {
                             ImGui.closeCurrentPopup();
                         }
                         ImGui.endPopup();
@@ -345,7 +362,7 @@ public class ImguiTestScene extends Scene {
                     objectsInScene++;
                     addGameObjectToScene(newObj);
                     activeGameObject = newObj;
-                    //Window.getImGuiLayer().getPropertiesWindow().setActiveGameObject(newObj);
+                    Window.getImGuiLayer().getPropertiesWindow().setActiveGameObject(newObj);
                     ImGui.closeCurrentPopup();
                 }
                 if(ImGui.button("Delete"))
@@ -529,6 +546,9 @@ public class ImguiTestScene extends Scene {
                 ImGui.text("Instance: " + selectedInstance.name);
                 if (ImGui.button("Delete")) {
                     objectsInScene--;
+                    if (selectedInstance.equals(activeGameObject)) {
+                        activeGameObject = null;
+                    }
                     Renderer2D.removeFromRenderer(selectedInstance);
                     gameObjects.remove(selectedInstance);
                     ImGui.closeCurrentPopup();
@@ -604,4 +624,6 @@ public class ImguiTestScene extends Scene {
             }
         }
     }
+
+    public MouseControls getMouseControls() { return this.mouseControls; }
 }

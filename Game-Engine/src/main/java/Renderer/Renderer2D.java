@@ -81,7 +81,7 @@ public class Renderer2D {
         final int textureIdOffest = textureOffset + textureSize * sizeOfFloat;
         final int stride = (posSize + colorSize + textureSize + textureIdSize + entityIdSize) * sizeOfFloat;
         final int vertexSize = posSize + colorSize + textureSize + textureIdSize + entityIdSize;
-        final int entityIdOffest = textureOffset + textureSize * sizeOfFloat;
+        final int entityIdOffest = textureIdOffest + textureIdSize * sizeOfFloat;
         final int vertexSizeBytes = vertexSize * sizeOfFloat;
 
         sprites = new SpriteRenderer[maxSquares];
@@ -400,7 +400,7 @@ public class Renderer2D {
 
             //load entity id
             vertexBuffer[offset + 10] = sprite.gameObject.getUid() + 1;
-            //System.out.println("Offset + 10: " + (offset + 10));
+            //System.out.println("Offset + 10: " + vertexBuffer[offset + 10]);
 
             offset += 11;
         }
