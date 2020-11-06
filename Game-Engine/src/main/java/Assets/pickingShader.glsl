@@ -1,5 +1,5 @@
 #shader vertex
-#version 330 core
+#version 410 core
 layout(location = 0) in vec3 points;
 layout(location = 1) in vec4 color;
 layout(location = 2) in vec2 texCoords;
@@ -25,7 +25,7 @@ void main()
 }
 
 #shader fragment
-#version 330 core
+#version 410 core
 
 in vec2 v_texCoords;
 in vec4 v_color;

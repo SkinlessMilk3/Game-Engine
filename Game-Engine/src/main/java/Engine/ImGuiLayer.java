@@ -16,6 +16,8 @@ import imgui.enums.ImGuiMouseCursor;
 import imgui.gl3.ImGuiImplGl3;
 import org.lwjgl.system.CallbackI;
 
+import java.awt.*;
+
 import static org.lwjgl.glfw.GLFW.*;
 
 public class ImGuiLayer {
@@ -112,6 +114,9 @@ public class ImGuiLayer {
         glfwSetCharCallback(glfwWindow, (w, c) -> {
             if (c != GLFW_KEY_DELETE) {
                 io.addInputCharacter(c);
+            }
+            if (!io.getWantCaptureKeyboard()) {
+                glfwSetKeyCallback(w, KeyEventListener::isKeyPressed);
             }
         });
 
@@ -213,9 +218,10 @@ public class ImGuiLayer {
         // ImGui context should be created as well.
         imGuiGl3.init("#version 330 core");
     }
-
+    boolean inGame = false;
     public void update(float dt, Scene currentScene) {
         startFrame(dt);
+
 
         // Any Dear ImGui code SHOULD go between ImGui.newFrame()/ImGui.render() methods
         ImGui.newFrame();
@@ -223,6 +229,7 @@ public class ImGuiLayer {
 
         //-----------------------------------------------------------------------
         //Demo gui to change scene
+        if (!inGame) {
         ImGui.begin("Scene Selector");
         ImGui.textColored(44, 244, 193, 100, "Choose Scene!");
          if (ImGui.button("Triangle")){
@@ -237,17 +244,18 @@ public class ImGuiLayer {
             Window.ChangeScene(3);
         }
         ImGui.sameLine();
-
-        if (ImGui.button("Batch")){
+        if (ImGui.button("Game Demo")) {
             Window.ChangeScene(4);
+            inGame = true;
         }
        ImGui.end();
+            currentScene.imgui();
+            propertiesWindow.update(dt, currentScene);
+            propertiesWindow.imgui();
+            ImGui.showDemoWindow();
+        }
         //----------------------------------------------------------------------
 
-        currentScene.imgui();
-        propertiesWindow.update(dt, currentScene);
-        propertiesWindow.imgui();
-        ImGui.showDemoWindow();
         ImGui.render();
 
         endFrame();

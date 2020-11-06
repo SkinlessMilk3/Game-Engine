@@ -412,7 +412,7 @@ public class Renderer2D {
 
             //load entity id
             vertexBuffer[offset + 10] = sprite.gameObject.getUid() + 1;
-            System.out.println("Offset + 10: " + vertexBuffer[offset + 10]);
+            //System.out.println("Offset + 10: " + vertexBuffer[offset + 10]);
 
             offset += 11;
         }

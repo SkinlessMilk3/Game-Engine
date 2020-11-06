@@ -5,6 +5,7 @@ import API.EventListeners.MouseEventDispatcher;
 import Components.MouseControls;
 import Components.Sprite;
 import Components.SpriteRenderer;
+import Components.TestGame.BulletLoop;
 import Engine.*;
 import Engine.Window;
 import Renderer.Renderer2D;
@@ -151,7 +152,7 @@ public class ImguiTestScene extends Scene {
     List<String> scriptLabels = new ArrayList<>();
     List<String> fontLabels = new ArrayList<>();
     List<String> roomLabels = new ArrayList<>();
-    //Most likely temporary counters as the ECS should handle counts of this kind.
+
     int spriteCount = 0;
     int objectCount = 0;
     int scriptCount = 0;
@@ -196,7 +197,6 @@ public class ImguiTestScene extends Scene {
                         dialog.setVisible(true);
                         filePath = dialog.getDirectory() + dialog.getFile();
                         fileName = dialog.getFile();
-                        System.out.println(filePath + " chosen.");
                     } catch (Exception e) {
                         System.out.println("test!");
                     }
@@ -501,6 +501,7 @@ public class ImguiTestScene extends Scene {
             ImGui.sameLine();
             if (ImGui.button("Inspect")){
                 activeGameObject = gameObjects.get(goIndex);
+                Window.getImGuiLayer().getPropertiesWindow().setActiveGameObject(activeGameObject);
             }
             ImGui.endPopup();
         }

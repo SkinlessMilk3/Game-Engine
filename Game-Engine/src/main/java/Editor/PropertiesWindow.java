@@ -38,6 +38,26 @@ public class PropertiesWindow {
             ImGui.begin("Inspector");
             ImGui.text("Name: " + activeGameObject.name);
             ImGui.text("ID: " + activeGameObject.getUid());
+            float xval = activeGameObject.transform.position.x;
+            float[] imFloatx = {xval};
+            if (ImGui.dragFloat("X Pos: ", imFloatx)) {
+                activeGameObject.transform.position.x = imFloatx[0];
+            }
+            float yval = activeGameObject.transform.position.y;
+            float[] imFloaty = {yval};
+            if (ImGui.dragFloat("Y Pos: ", imFloaty)) {
+                activeGameObject.transform.position.y = imFloaty[0];
+            }
+            float sclaexval = activeGameObject.transform.scale.x;
+            float[] imFloatScalex = {sclaexval};
+            if (ImGui.dragFloat("X Scale: ", imFloatScalex)) {
+                activeGameObject.transform.scale.x = imFloatScalex[0];
+            }
+            float scaleyval = activeGameObject.transform.scale.y;
+            float[] imFloatScaley = {scaleyval};
+            if (ImGui.dragFloat("Y Scale: ", imFloatScaley)) {
+                activeGameObject.transform.scale.y = imFloatScaley[0];
+            }
             activeGameObject.imgui();
             ImGui.end();
         }

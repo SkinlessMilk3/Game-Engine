@@ -27,6 +27,9 @@ public abstract class Scene {
     public ArrayList<List<GameObjectData>> objectDataCatagories = new ArrayList<List<GameObjectData>>();
     protected GameObject activeGameObject = null;
     protected boolean levelLoaded = false;
+    //Temp for demo game
+    public boolean shoot;
+    public boolean isGame = false;
 
     public Scene() {
 
@@ -51,7 +54,6 @@ public abstract class Scene {
     public void addGameObjectToScene(GameObject go) {
         if (!isRunning) {
             gameObjects.add(go);
-            addGOtoRenderer(go);//TMP
         } else {
             gameObjects.add(go);
             go.start();
@@ -85,17 +87,29 @@ public abstract class Scene {
 
         try {
             //Save current objects in scene
-            FileWriter writer = new FileWriter("instances.txt");
-            writer.write(gson.toJson(this.gameObjects));
-            writer.close();
-            //Save data for objects that can be added
-            writer = new FileWriter("objectData.txt");
-            writer.write(gson.toJson(this.objectDataCatagories));
-            writer.close();
+            if (!isGame){
+                FileWriter writer = new FileWriter("instances.txt");
+                writer.write(gson.toJson(this.gameObjects));
+                writer.close();
+                //Save data for objects that can be added
+                writer = new FileWriter("objectData.txt");
+                writer.write(gson.toJson(this.objectDataCatagories));
+                writer.close();
+            } else {
+                FileWriter writer = new FileWriter("gameInstances.txt");
+                writer.write(gson.toJson(this.gameObjects));
+                writer.close();
+                //Save data for objects that can be added
+                writer = new FileWriter("gameObjectData.txt");
+                writer.write(gson.toJson(this.objectDataCatagories));
+                writer.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
+
 
     public void load() {
         Gson gson = new GsonBuilder()

@@ -1,14 +1,22 @@
 package Components;
 
+import API.EventListeners.KeyEventListener;
 import API.EventListeners.MouseEventDispatcher;
+import Components.TestGame.BulletLoop;
+import Engine.GameObject;
+import Engine.Transform;
+import Engine.Window;
+import Renderer.Texture;
+import Utils.AssetPool;
+import org.joml.Vector2f;
 
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_RIGHT;
+import static org.lwjgl.glfw.GLFW.*;
 
 //The main object loop for an object. Describes what the object does every frame.
 public class ObjectLoop extends Component {
 
-    public int x = 0;
+    public transient int x = 0;
+
 
     @Override
     public void start() {
@@ -18,15 +26,6 @@ public class ObjectLoop extends Component {
     @Override
     public void update(float dt) {
 
-        /*
-        if (MouseEventDispatcher.isPressed(GLFW_MOUSE_BUTTON_LEFT)) {
-            gameObject.transform.position.x -= 1;
-            System.out.println(gameObject.transform.position.x);
-        }
-        if (MouseEventDispatcher.isPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
-            gameObject.transform.position.x += 1;
-            System.out.println(gameObject.transform.position.x);
-        }
-        */
+
     }
 }
